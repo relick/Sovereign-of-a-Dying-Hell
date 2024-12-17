@@ -1,55 +1,86 @@
 #include <genesis.h>
-#include <array>
+#include <memory>
 
-class IMessage {
-public:
-    IMessage(const u16 pos_y) :
-        _pos_y(pos_y) {}
-    virtual ~IMessage() = default;
-    virtual void say() const = 0;
-
-protected:
-    u16 _pos_y;
-};
-
-class Hello : public IMessage
+class World
 {
 public:
-    Hello(const u16 pos_y) :
-        IMessage(pos_y) {}
+	virtual ~World() = default;
 
-    ~Hello() = default;
-
-    virtual void say() const override
-    {
-        VDP_drawText("Hello", 12, _pos_y);
-    }
+	virtual void Init() = 0;
+	virtual void Shutdown() = 0;
+	virtual void Run() = 0;
 };
 
-class World : public IMessage
+class IntroWorld
+	: public World
 {
+	int y = 0;
+
+	void Init() override {}
+	void Shutdown() override {}
+	void Run() override
+	{
+		VDP_clearText(12, y, 11);
+		y++;
+		y%=28;
+		VDP_drawText("Hello world", 12, y);
+	}
+};
+
+class TitleWorld
+	: public World
+{
+	void Init() override {}
+	void Shutdown() override {}
+	void Run() override
+	{
+	}
+};
+
+class GameWorld
+	: public World
+{
+	void Init() override {}
+	void Shutdown() override {}
+	void Run() override
+	{
+	}
+};
+
+class Game
+{
+	std::unique_ptr<IntroWorld> m_intro;
+	std::unique_ptr<TitleWorld> m_title;
+	std::unique_ptr<GameWorld> m_game;
+
+	World* m_curWorld{nullptr};
+
 public:
-    World(const u16 pos_y) :
-        IMessage(pos_y) {}
-    ~World() = default;
+	Game()
+	{
+		m_intro = std::make_unique<IntroWorld>();
+		m_title = std::make_unique<TitleWorld>();
+		m_game = std::make_unique<GameWorld>();
 
-    virtual void say() const override
-    {
-        VDP_drawText("World cpp!", 14, _pos_y);
-    }
+		m_curWorld = m_intro.get();
+
+		m_curWorld->Init();
+	}
+
+	int Run()
+	{
+		while (true)
+		{
+			m_curWorld->Run();
+			SYS_doVBlankProcess();
+		}
+
+		return 0;
+	}
 };
 
-int main(bool hardReset)
+int main( bool hardReset )
 {
-    std::array<IMessage*, 2> messages{new Hello(10), new World(11)};
-
-    for (const auto &msg : messages)
-        msg->say();
-
-    while (true)
-    {
-        SYS_doVBlankProcess();
-    }
-
-    return 0;
+	Game game;
+	return game.Run();
 }
