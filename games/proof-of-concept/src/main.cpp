@@ -1,14 +1,16 @@
 #include <genesis.h>
 #include <memory>
 
+class Game;
+
 class World
 {
 public:
 	virtual ~World() = default;
 
-	virtual void Init() = 0;
-	virtual void Shutdown() = 0;
-	virtual void Run() = 0;
+	virtual void Init(Game& io_game) = 0;
+	virtual void Shutdown(Game& io_game) = 0;
+	virtual void Run(Game& io_game) = 0;
 };
 
 class IntroWorld
@@ -16,9 +18,9 @@ class IntroWorld
 {
 	int y = 0;
 
-	void Init() override {}
-	void Shutdown() override {}
-	void Run() override
+	void Init(Game& io_game) override {}
+	void Shutdown(Game& io_game) override {}
+	void Run(Game& io_game) override
 	{
 		VDP_clearText(12, y, 11);
 		y++;
@@ -30,9 +32,9 @@ class IntroWorld
 class TitleWorld
 	: public World
 {
-	void Init() override {}
-	void Shutdown() override {}
-	void Run() override
+	void Init(Game& io_game) override {}
+	void Shutdown(Game& io_game) override {}
+	void Run(Game& io_game) override
 	{
 	}
 };
@@ -40,47 +42,47 @@ class TitleWorld
 class GameWorld
 	: public World
 {
-	void Init() override {}
-	void Shutdown() override {}
-	void Run() override
+	void Init(Game& io_game) override {}
+	void Shutdown(Game& io_game) override {}
+	void Run(Game& io_game) override
 	{
 	}
 };
 
 class Game
 {
-	std::unique_ptr<IntroWorld> m_intro;
-	std::unique_ptr<TitleWorld> m_title;
-	std::unique_ptr<GameWorld> m_game;
-
-	World* m_curWorld{nullptr};
+	std::unique_ptr<World> m_curWorld;
+	std::unique_ptr<World> m_nextWorld;
 
 public:
-	Game()
+	void RequestNextWorld(std::unique_ptr<World>&& i_nextWorld)
 	{
-		m_intro = std::make_unique<IntroWorld>();
-		m_title = std::make_unique<TitleWorld>();
-		m_game = std::make_unique<GameWorld>();
-
-		m_curWorld = m_intro.get();
-
-		m_curWorld->Init();
+		m_nextWorld = std::move(i_nextWorld);
 	}
 
-	int Run()
+	void Run()
 	{
 		while (true)
 		{
-			m_curWorld->Run();
+			if (m_nextWorld)
+			{
+				if (m_curWorld)
+				{
+					m_curWorld->Shutdown(*this);
+				}
+				m_nextWorld->Init(*this);
+				std::swap(m_curWorld, m_nextWorld);
+				m_nextWorld = nullptr;
+			}
+			m_curWorld->Run(*this);
 			SYS_doVBlankProcess();
 		}
-
-		return 0;
 	}
 };
 
 int main( bool hardReset )
 {
 	Game game;
-	return game.Run();
+	game.RequestNextWorld(std::make_unique<IntroWorld>());
+	game.Run();
 }
