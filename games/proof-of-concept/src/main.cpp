@@ -85,4 +85,6 @@ int main( bool hardReset )
 	Game game;
 	game.RequestNextWorld(std::make_unique<IntroWorld>());
 	game.Run();
+
+	return 0;
 }
