@@ -24,7 +24,7 @@
         {
             "label": "Run",
             "type": "shell",
-            "command": "\"C:\\Users\\peted\\Documents\\SDKs\\SGDKplusplus\\blastem-win32-0.6.2\\blastem.exe\" \"games\\proof-of-concept\\out\\rom.bin\"",
+            "command": "\"..\\..\\SDKs\\SGDKplusplus\\blastem-win32-0.6.2\\blastem.exe\" \"games\\proof-of-concept\\out\\rom.bin\"",
             "presentation": {
                 "echo": true,
                 "reveal": "never",
