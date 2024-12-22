@@ -9,20 +9,31 @@
             "type": "cppdbg",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/../../SDKs/SGDKplusplus/blastem-win32-0.6.2/blastem.exe",
-            "args": [
-                "${workspaceFolder}/games/proof-of-concept/out/rom.bin",
-                "-D"
-            ],
+            "preLaunchTask": "Build and Run (Debug)",
+            "program": "games/proof-of-concept/out/rom.out",
+            "logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            },
             "miDebuggerPath": "${workspaceFolder}/../../SDKs/SGDKplusplus/x68k-gcc/bin/m68k-elf-gdb.exe",
-            "miDebuggerArgs": "${workspaceFolder}/games/proof-of-concept/out/rom.out",
+            "miDebuggerServerAddress": ":1234",
             "MIMode": "gdb",
-            "customLaunchSetupCommands":[
+            "stopAtEntry": true,
+            "setupCommands": [
                 {
-                    "description": "Attach",
-                    "text": "target remote :1234"
+                    "description": "File",
+                    "text": "file \"C:/Users/peted/Documents/GitHub/adventure-md/games/proof-of-concept/out/rom.out\"",
+                    "ignoreFailures": false
+                },
+                {
+                   "text": "set target-async off"
+                },
+                {
+                   "text": "set print pretty on"
                 }
-            ]
+            ],
+            "targetArchitecture": "x64"
         }
     ]
 }

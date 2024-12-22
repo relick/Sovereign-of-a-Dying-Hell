@@ -6,7 +6,25 @@
         {
             "label": "Build",
             "type": "shell",
-            "command": "./build.bat",
+            "command": "./build_release.bat",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build (Debug)",
+            "type": "shell",
+            "command": "./build_debug.bat",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -24,7 +42,20 @@
         {
             "label": "Run",
             "type": "shell",
-            "command": "\"..\\..\\SDKs\\SGDKplusplus\\blastem-win32-0.6.2\\blastem.exe\" \"games\\proof-of-concept\\out\\rom.bin\"",
+            "command": "\"..\\..\\SDKs\\blastem-win32-0.6.2\\blastem.exe\" \"games\\proof-of-concept\\out\\rom.bin\"",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Run (Debug)",
+            "type": "shell",
+            "command": "\"..\\..\\SDKs\\blastem-win32-0.6.2\\blastem.exe\" \"games\\proof-of-concept\\out\\rom.bin\" -D",
             "presentation": {
                 "echo": true,
                 "reveal": "never",
@@ -39,6 +70,22 @@
             "dependsOn": [
                 "Build",
                 "Run"
+            ],
+            "dependsOrder": "sequence",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Build and Run (Debug)",
+            "dependsOn": [
+                "Build (Debug)",
+                "Run (Debug)"
             ],
             "dependsOrder": "sequence",
             "presentation": {
