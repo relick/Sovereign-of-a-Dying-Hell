@@ -11,11 +11,11 @@
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build and Run (Debug)",
             "program": "games/proof-of-concept/out/rom.out",
-            "logging": {
+            /*"logging": {
                 "engineLogging": true,
                 "trace": true,
                 "traceResponse": true
-            },
+            },*/
             "miDebuggerPath": "${workspaceFolder}/../../SDKs/SGDKplusplus/x68k-gcc/bin/m68k-elf-gdb.exe",
             "miDebuggerServerAddress": ":1234",
             "MIMode": "gdb",
