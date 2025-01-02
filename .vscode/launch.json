@@ -16,21 +16,18 @@
                 "trace": true,
                 "traceResponse": true
             },*/
-            "miDebuggerPath": "${workspaceFolder}/../../SDKs/SGDKplusplus/x68k-gcc/bin/m68k-elf-gdb.exe",
+            "miDebuggerPath": "${workspaceFolder}\\..\\..\\SDKs\\SGDKplusplus\\x68k-gcc\\bin\\m68k-elf-gdb.exe",
             "miDebuggerServerAddress": ":1234",
             "MIMode": "gdb",
             "stopAtEntry": true,
             "setupCommands": [
                 {
-                    "description": "File",
-                    "text": "file \"C:/Users/peted/Documents/GitHub/adventure-md/games/proof-of-concept/out/rom.out\"",
-                    "ignoreFailures": false
+                    "text": "-enable-pretty-printing",
+                    "description": "enable pretty printing",
+                    "ignoreFailures": true
                 },
                 {
                    "text": "set target-async off"
-                },
-                {
-                   "text": "set print pretty on"
                 }
             ],
             "targetArchitecture": "x64"
