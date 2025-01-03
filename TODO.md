@@ -21,3 +21,26 @@ Requirements:
 - Intro and title screen.
 
 After all that's done, write a little script for it!
+
+// NOTES:
+Priority ordering in MD:
+1. BG Colour
+2. Plane B
+3. Plane A
+4. Sprites
+5. Window Plane
+6. Plane B (priority)
+7. Plane A (priority)
+8. Sprites (priority)
+9. Window Plane (priority)
+
+So for general VN stuff, I think it makes sense to standardise around -
+Visual area:
+BG = Plane B, PAL0
+BG sprites = Sprites, any palette
+Characters = Plane A (priority). Char1 = PAL1, Char2 = PAL2
+Effects/fade = Sprites (priority), PAL3. Balance with BG sprites (e.g. make them disappear during fades)
+
+Text area:
+Frame + text = Window Plane, PAL3
+Effects/fade = Sprites (priority), PAL3

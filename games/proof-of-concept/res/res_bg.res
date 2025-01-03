@@ -1,0 +1,1 @@
+IMAGE tri "bg/triangle.png"

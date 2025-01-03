@@ -1,5 +1,8 @@
 {
     "files.associations": {
+        "*.s": "m68k",
+        "*.rcpp": "cpp",
+        "*.rhpp": "cpp",
         "memory": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -24,7 +27,12 @@
         "xmemory": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "vector": "cpp",
+        "xstring": "cpp",
+        "random": "cpp"
     },
     "files.exclude": {
         "**/*.rpyc": true,
