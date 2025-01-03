@@ -36,11 +36,11 @@ Priority ordering in MD:
 
 So for general VN stuff, I think it makes sense to standardise around -
 Visual area:
-BG = Plane B, PAL0
-BG sprites = Sprites, any palette
-Characters = Plane A (priority). Char1 = PAL1, Char2 = PAL2
-Effects/fade = Sprites (priority), PAL3. Balance with BG sprites (e.g. make them disappear during fades)
+BG = Plane B, PAL1
+BG sprites = Sprites, any palette that fits
+Characters = Plane A (priority). Char1 = PAL2, Char2 = PAL3. Can shift to Sprites (priority) for the sake of special animations, but this is a stretch idea
+Effects/fade = Sprites (priority), PAL0. Balance with BG sprites (e.g. make them disappear during fades)
 
 Text area:
-Frame + text = Window Plane, PAL3
-Effects/fade = Sprites (priority), PAL3
+Frame + text = Window Plane, PAL0 - text uses colours 0 (BG colour) and 15.
+Effects/fade = Sprites (priority), PAL0

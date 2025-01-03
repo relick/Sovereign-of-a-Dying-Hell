@@ -15,14 +15,13 @@ void GameWorld::Init
 	Game& io_game
 )
 {
-	VDP_setTextPlane(VDPPlane::BG_B);
+	VDP_setWindowVPos(true, 23);
+	VDP_setTextPlane(VDPPlane::WINDOW);
 	VDP_setTextPriority(0);
 
-	VDP_drawImage(VDP_getTextPlane(), &tri, 0, 0);
-
-	PAL_setPalette(PAL3, vn_font_pal.data, TransferMethod::DMA);
+	VDP_drawImage(VDP_getTextPlane(), &text_frame, 0, 23);
+	VDP_setTextPalette(PAL0);
 	VDP_loadFont(&vn_font, TransferMethod::DMA);
-	VDP_setTextPalette(PAL3);
 
 	m_printer.PushLine("The quick brown fox, jumps over the lazy dog. \n\"Amazing'!??! (3*3+2); or: £3.50 :) :) :)");
 }

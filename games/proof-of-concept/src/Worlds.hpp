@@ -37,7 +37,7 @@ class TitleWorld
 class GameWorld
 	: public World
 {
-	DialoguePrinter m_printer{1, 25, 38, 2};
+	DialoguePrinter m_printer{1, 24, 38, 3};
 
 	void Init(Game &io_game) override;
 	void Shutdown(Game &io_game) override;
