@@ -31,5 +31,5 @@ const ROMHeader rom_header = {
     0x0020FFFF,                                         // SRAM end address
     "            ",                                     // Modem support (leave blank)
     "                                        ",         // Memos
-    "JU              "                                  // Region support (JUE)
+    "JUE             "                                  // Region support (JUE)
 };

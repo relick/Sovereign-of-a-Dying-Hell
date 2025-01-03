@@ -15,11 +15,11 @@ void GameWorld::Init
 	Game& io_game
 )
 {
-	VDP_setWindowVPos(true, 23);
+	VDP_setWindowVPos(true, c_textFramePos);
 	VDP_setTextPlane(VDPPlane::WINDOW);
 	VDP_setTextPriority(0);
 
-	VDP_drawImage(VDP_getTextPlane(), &text_frame, 0, 23);
+	VDP_drawImage(VDP_getTextPlane(), &text_frame, 0, c_textFramePos);
 	VDP_setTextPalette(PAL0);
 	VDP_loadFont(&vn_font, TransferMethod::DMA);
 

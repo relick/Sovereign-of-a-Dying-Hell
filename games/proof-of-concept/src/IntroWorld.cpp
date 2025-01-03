@@ -1,5 +1,6 @@
 #include "Worlds.hpp"
 #include "Game.hpp"
+#include "Version.hpp"
 
 #include <genesis.h>
 #include "res_fonts.h"
@@ -33,18 +34,15 @@ void IntroWorld::Run
 	Game& io_game
 )
 {
-	if (y < 56)
+	if (m_timer < RealToTimer(c_screenHeightPx / 2))
 	{
-		VDP_setVerticalScroll(VDP_getTextPlane(), -2*(y++));
+		VDP_setVerticalScroll(VDP_getTextPlane(), -1 * TimerToReal(m_timer));
 	}
-	else if (y < 150)
-	{
-		++y;
-	}
-	else
+	else if (m_timer > RealToTimer(150))
 	{
 		io_game.RequestNextWorld(std::make_unique<GameWorld>());
 	}
+	m_timer += TimerStep();
 }
 
 }

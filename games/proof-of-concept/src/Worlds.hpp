@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 #include "DialoguePrinter.hpp"
+#include "Constants.hpp"
 
 namespace Game
 {
@@ -19,7 +20,7 @@ public:
 class IntroWorld
 	: public World
 {
-	s16 y = 0;
+	u16 m_timer = 0;
 
 	void Init(Game &io_game) override;
 	void Shutdown(Game &io_game) override;
@@ -37,7 +38,7 @@ class TitleWorld
 class GameWorld
 	: public World
 {
-	DialoguePrinter m_printer{1, 24, 38, 3};
+	DialoguePrinter m_printer{1, c_textFramePos + 1, 38, 3};
 
 	void Init(Game &io_game) override;
 	void Shutdown(Game &io_game) override;
