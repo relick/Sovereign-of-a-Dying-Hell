@@ -34,15 +34,15 @@ void IntroWorld::Run
 	Game& io_game
 )
 {
-	if (m_timer < RealToTimer(c_screenHeightPx / 2))
+	if (m_timer < FIX16(1))
 	{
-		VDP_setVerticalScroll(VDP_getTextPlane(), -1 * TimerToReal(m_timer));
+		VDP_setVerticalScroll(VDP_getTextPlane(), -fix16ToInt(fix16Mul(intToFix16(c_screenHeightPx / 2), m_timer)));
 	}
-	else if (m_timer > RealToTimer(150))
+	else if (m_timer > FIX16(2))
 	{
 		io_game.RequestNextWorld(std::make_unique<GameWorld>());
 	}
-	m_timer += TimerStep();
+	m_timer += FrameStep();
 }
 
 }

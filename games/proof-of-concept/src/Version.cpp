@@ -15,7 +15,7 @@ bool IsJapan()
 
 void StaticInit_Version()
 {
-	s_timerStep = IsNTSC() ? 5 : 6;
+	s_timerStep = IsNTSC() ? FIX16(0.0166666666666) : FIX16(0.02);
 }
 
 }

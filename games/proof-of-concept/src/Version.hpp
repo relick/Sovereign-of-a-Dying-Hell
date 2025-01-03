@@ -1,6 +1,7 @@
 #pragma once
 
 #include <types.h>
+#include <maths.h>
 
 // Useful variables for handling region differences
 namespace System
@@ -12,35 +13,30 @@ bool IsJapan();
 // Run once
 void StaticInit_Version();
 
-inline u16 s_timerStep = 5;
+inline f16 s_timerStep = FIX16(0.02);
 }
 
 // Use these for a region-free life
-#define USE_REGIONFREE_TIMERS 0
+// FrameStep = the timing of 1 frame, so can make timers in f16 in numbers of seconds
+#define USE_REGIONFREE_TIMERS 1
 #define FORCE_PAL 0
 #define FORCE_NTSC 0
 
 #if USE_REGIONFREE_TIMERS
 
-// TODO: this is going to be really slow because of all the mults and divs.
-// There is probably a better way but just need to be careful on how to potentially do it at runtime
-inline constexpr u16 TimerStep()
+inline constexpr f16 FrameStep()
 {
 #if FORCE_PAL
-	return 6;
+	return FIX16(0.02);
 #elif FORCE_NTSC
-	return 5;
+	return FIX16(0.0166666666666);
 #else
 	return System::s_timerStep;
 #endif
 }
-inline constexpr u16 RealToTimer(u16 i_realStep) { return i_realStep * TimerStep(); }
-inline constexpr u16 TimerToReal(u16 i_timerStep) { return i_timerStep / TimerStep(); }
 
 #else
 
-inline constexpr u16 TimerStep() { return 1; }
-inline constexpr u16 RealToTimer(u16 i_realStep) { return i_realStep; }
-inline constexpr u16 TimerToReal(u16 i_timerStep) { return i_timerStep; }
+inline constexpr f16 FrameStep() { return FIX16(0.02); }
 
 #endif

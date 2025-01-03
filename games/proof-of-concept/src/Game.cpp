@@ -7,6 +7,14 @@
 namespace Game
 {
 
+Game::Game
+(
+)
+{
+	VDP_setScreenWidth320();
+	VDP_setScreenHeight224();
+}
+
 void Game::RequestNextWorld(std::unique_ptr<World> &&i_nextWorld)
 {
 	m_nextWorld = std::move(i_nextWorld);

@@ -20,7 +20,7 @@ public:
 class IntroWorld
 	: public World
 {
-	u16 m_timer = 0;
+	f16 m_timer = 0;
 
 	void Init(Game &io_game) override;
 	void Shutdown(Game &io_game) override;
@@ -38,7 +38,7 @@ class TitleWorld
 class GameWorld
 	: public World
 {
-	DialoguePrinter m_printer{1, c_textFramePos + 1, 38, 3};
+	DialoguePrinter m_printer{2, c_textFramePos + 1, 36, 3};
 
 	void Init(Game &io_game) override;
 	void Shutdown(Game &io_game) override;
