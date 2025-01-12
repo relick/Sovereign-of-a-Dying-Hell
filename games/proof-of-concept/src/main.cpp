@@ -7,7 +7,7 @@ int main( bool hardReset )
 	System::StaticInit_Version();
 
 	Game::Game game;
-	game.RequestNextWorld(std::make_unique<Game::VNWorld>());
+	game.RequestNextWorld(std::make_unique<Game::IntroWorld>());
 	game.Run();
 
 	return 0;

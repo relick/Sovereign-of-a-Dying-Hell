@@ -34,6 +34,11 @@ void IntroWorld::Run
 	Game& io_game
 )
 {
+	if (JOY_readJoypad(JOY_1) != 0)
+	{
+		m_timer = FIX16(3);
+	}
+
 	if (m_timer < FIX16(1))
 	{
 		VDP_setVerticalScroll(VDP_getTextPlane(), -fix16ToInt(fix16Mul(intToFix16(c_screenHeightPx / 2), m_timer)));
@@ -49,5 +54,4 @@ void IntroWorld::Run
 	}
 	m_timer += FrameStep();
 }
-
 }
