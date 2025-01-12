@@ -38,7 +38,12 @@ void IntroWorld::Run
 	{
 		VDP_setVerticalScroll(VDP_getTextPlane(), -fix16ToInt(fix16Mul(intToFix16(c_screenHeightPx / 2), m_timer)));
 	}
-	else if (m_timer > FIX16(2))
+	else if (m_timer < FIX16(2) && !m_fadeOutStarted)
+	{
+		PAL_fadeOutAll(FramesPerSecond(), true);
+		m_fadeOutStarted = true;
+	}
+	else if (m_timer > FIX16(3))
 	{
 		io_game.RequestNextWorld(std::make_unique<GameWorld>());
 	}

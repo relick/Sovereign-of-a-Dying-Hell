@@ -69,7 +69,8 @@
         "xlocmon": "cpp",
         "xlocnum": "cpp",
         "xloctime": "cpp",
-        "maths.h": "c"
+        "maths.h": "c",
+        "dma.h": "c"
     },
     "files.exclude": {
         "**/*.rpyc": true,

@@ -14,6 +14,7 @@ bool IsJapan();
 void StaticInit_Version();
 
 inline f16 s_timerStep = FIX16(0.02);
+inline u16 s_fps = 50;
 }
 
 // Use these for a region-free life
@@ -34,9 +35,20 @@ inline constexpr f16 FrameStep()
 	return System::s_timerStep;
 #endif
 }
+inline constexpr u16 FramesPerSecond()
+{
+#if FORCE_PAL
+	return 50;
+#elif FORCE_NTSC
+	return 60;
+#else
+	return System::s_fps;
+#endif
+}
 
 #else
 
 inline constexpr f16 FrameStep() { return FIX16(0.02); }
+inline constexpr u16 FramesPerSecond() { return 50; }
 
 #endif

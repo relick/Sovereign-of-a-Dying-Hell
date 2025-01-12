@@ -21,6 +21,7 @@ class IntroWorld
 	: public World
 {
 	f16 m_timer = 0;
+	bool m_fadeOutStarted = false;
 
 	void Init(Game &io_game) override;
 	void Shutdown(Game &io_game) override;

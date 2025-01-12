@@ -56,7 +56,7 @@ void DialoguePrinter::Next
 		}
 
 		// Can't print any more already, so move to next
-		VDP_clearTextArea(m_xPos, m_yPos, m_lineWidth, m_lineCount);
+		VDP_fillTileMapRect(VDP_getTextPlane(), TILE_ATTR_FULL(PAL3, 0, 0, 0, TILE_FONT_INDEX), m_xPos, m_yPos, m_lineWidth, m_lineCount);
 		m_x = 0;
 		m_y = 0;
 		m_lastWasSpace = true;
@@ -96,7 +96,8 @@ bool DialoguePrinter::PushChar
 	// Main logic for stepping through and deciding how our display progresses
 	if(m_lineI == 0)
 	{
-		VDP_clearTextArea(m_xPos, m_yPos, m_lineWidth, m_lineCount);
+		VDP_fillTileMapRect(VDP_getTextPlane(), TILE_ATTR_FULL(PAL3, 0, 0, 0, TILE_FONT_INDEX), m_xPos, m_yPos, m_lineWidth, m_lineCount);
+		//VDP_clearTextArea(m_xPos, m_yPos, m_lineWidth, m_lineCount);
 	}
 
 	// Word wrapping handling, run on first character of each word
@@ -106,8 +107,8 @@ bool DialoguePrinter::PushChar
 		u16 wordLen = 0;
 		while (*word != ' ' && *word != '\n' && *word != '\0')
 		{
-			// Handle :) by ignoring length from the colon
-			if (*word == ':' && *(word + 1) == ')')
+			// Handle £ and :) by ignoring length from one of the characters
+			if ((*word == ':' && *(word + 1) == ')') || (*word == '\xC2' && *(word + 1) == '\xA3'))
 			{
 				--wordLen;
 			}
@@ -134,9 +135,13 @@ bool DialoguePrinter::PushChar
 	m_lastWasSpace = str[0] == ' ';
 
 	// Minor processing for font
-	if(str[0] == '\xA3')
+	if (str[0] == '\xC2')
 	{
-		str[0] = '{'; // renders as £ in vn_font
+		if (m_curLine[m_lineI + 1] == '\xA3')
+		{
+			str[0] = '{'; // renders as £ in vn_font
+			m_lineI++;
+		}
 	}
 	else if(str[0] == ':')
 	{
