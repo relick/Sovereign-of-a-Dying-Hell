@@ -80,7 +80,9 @@ void VNWorld::Run
 	if (buttons != 0)
 	{
 		if (!pressed)
+		{
 			m_printer.Next();
+		}
 		pressed = true;
 	}
 	else
