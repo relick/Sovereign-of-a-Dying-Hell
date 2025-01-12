@@ -36,7 +36,7 @@ class TitleWorld
 	void Run(Game &io_game) override {}
 };
 
-class GameWorld
+class VNWorld
 	: public World
 {
 	DialoguePrinter m_printer{2, c_textFramePos + 1, 36, 3};

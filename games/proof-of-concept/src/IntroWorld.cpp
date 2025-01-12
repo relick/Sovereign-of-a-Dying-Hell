@@ -45,7 +45,7 @@ void IntroWorld::Run
 	}
 	else if (m_timer > FIX16(3))
 	{
-		io_game.RequestNextWorld(std::make_unique<GameWorld>());
+		io_game.RequestNextWorld(std::make_unique<VNWorld>());
 	}
 	m_timer += FrameStep();
 }

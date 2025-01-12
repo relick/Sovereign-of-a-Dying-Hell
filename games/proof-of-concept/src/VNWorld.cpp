@@ -23,7 +23,7 @@ void VBlank_TextFrameReset()
 // TODO
 u16 curTileInd = TILE_USER_INDEX;
 
-void GameWorld::Init
+void VNWorld::Init
 (
 	Game& io_game
 )
@@ -62,14 +62,14 @@ void GameWorld::Init
 	m_printer.PushLine("The quick brown fox, jumps over the lazy dog. \n\"Amazing'!??! (3*3+2); or: £3.50 :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :)");
 }
 
-void GameWorld::Shutdown
+void VNWorld::Shutdown
 (
 	Game& io_game
 )
 {
 }
 
-void GameWorld::Run
+void VNWorld::Run
 (
 	Game& io_game
 )
