@@ -2,6 +2,12 @@
 
 #include <types.h>
 
+enum class During
+{
+	HBlank,
+	VBlank,
+};
+
 namespace Game
 {
 

@@ -1,6 +1,7 @@
 #include "Worlds.hpp"
 #include "Game.hpp"
 #include "Version.hpp"
+#include "PaletteOps.hpp"
 
 #include <genesis.h>
 #include "res_bg.h"
@@ -10,6 +11,13 @@
 
 namespace Game
 {
+
+void VBlank_TextFrameReset()
+{
+	// Delay the reset til top of screen
+	while(GET_VCOUNTER < 235) {}
+	System::SetPalette_Fast<During::VBlank, PAL0>(beach.palette->data);
+}
 
 // current VRAM upload tile position
 // TODO
@@ -30,11 +38,12 @@ void GameWorld::Init
 	VDP_drawImageEx(VDPPlane::BG_B, &beach, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, curTileInd), 0, 0, false, DMA);
 	curTileInd += beach.tileset->numTile;
 
-	if (curTileInd + text_frame.tileset->numTile < userTileMaxIndex)
+	// Show image-based text frame
+	/*if (curTileInd + text_frame.tileset->numTile < userTileMaxIndex)
 	{
 		VDP_drawImageEx(VDP_getTextPlane(), &text_frame, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, curTileInd), 0, c_textFramePos, false, DMA);
 		curTileInd += text_frame.tileset->numTile;
-	}
+	}*/
 
 	PAL_setColorsDMA(0, palette_black, 64);
 	u16 fullPal[64] = { 0 };
@@ -42,6 +51,13 @@ void GameWorld::Init
 	std::memcpy(fullPal, beach.palette->data, 16 * sizeof(u16));
 	std::memcpy(fullPal + 48, text_frame.palette->data + 48, 16 * sizeof(u16));
 	PAL_fadeToAll(fullPal, FramesPerSecond(), false);
+
+	// Show palette-based text frame
+	SetTextFramePalette(beach_frame_pal);
+	SYS_setHIntCallback(&HInt_TextFrameDMA<184>);
+	SYS_setVBlankCallback(&VBlank_TextFrameReset);
+	VDP_setHInterrupt(TRUE);
+	VDP_setHIntCounter(0);
 
 	m_printer.PushLine("The quick brown fox, jumps over the lazy dog. \n\"Amazing'!??! (3*3+2); or: £3.50 :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :)");
 }
