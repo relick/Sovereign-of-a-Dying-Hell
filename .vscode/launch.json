@@ -19,7 +19,7 @@
             "miDebuggerPath": "${workspaceFolder}\\..\\..\\SDKs\\SGDKplusplus\\x68k-gcc\\bin\\m68k-elf-gdb.exe",
             "miDebuggerServerAddress": ":1234",
             "MIMode": "gdb",
-            "stopAtEntry": true,
+            //"stopAtEntry": true, // doesn't seem to be needed now
             "setupCommands": [
                 {
                     "text": "-enable-pretty-printing",
