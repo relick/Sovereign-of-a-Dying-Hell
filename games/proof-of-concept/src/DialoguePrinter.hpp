@@ -18,6 +18,7 @@ class DialoguePrinter
 	bool m_lastWasSpace{true};
 	u16 m_x{0};
 	u16 m_y{0};
+	char m_lineBuf[41]{};
 
 public:
 	DialoguePrinter(u16 i_xPos, u16 i_yPos, u16 i_lineWidth, u16 i_lineCount);
@@ -34,6 +35,9 @@ public:
 
 private:
 	// Returns false when no more can be pushed to the screen until progressed
-	bool PushChar();
+	bool PushChar(bool i_displayPerChar);
+
+	// Draws m_lineBuf
+	void FlushBuf();
 };
 }

@@ -34,6 +34,7 @@ void DialoguePrinter::PushLine
 	m_lastWasSpace = true;
 	m_x = 0;
 	m_y = 0;
+	std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
 }
 
 //------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ void DialoguePrinter::Next
 		return;
 	}
 
-	if(!PushChar())
+	if(!PushChar(false))
 	{
 		if (m_lineI == m_lineLen)
 		{
@@ -59,13 +60,16 @@ void DialoguePrinter::Next
 		VDP_fillTileMapRect(VDP_getTextPlane(), TILE_ATTR_FULL(PAL3, 0, 0, 0, TILE_FONT_INDEX), m_xPos, m_yPos, m_lineWidth, m_lineCount);
 		m_x = 0;
 		m_y = 0;
+		std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
 		m_lastWasSpace = true;
 	}
 	else
 	{
 		// Could print more so print to end of current display
-		while(PushChar())
-		{}
+		while(PushChar(false))
+		{
+		}
+		FlushBuf();
 	}
 }
 
@@ -76,7 +80,7 @@ bool DialoguePrinter::Update
 {
 	if (m_curLine)
 	{
-		bool const noMoreThisDisp = PushChar();
+		bool const noMoreThisDisp = PushChar(true);
 		return noMoreThisDisp && m_lineI == m_lineLen;
 	}
 	return true;
@@ -86,6 +90,7 @@ bool DialoguePrinter::Update
 //------------------------------------------------------------------------------
 bool DialoguePrinter::PushChar
 (
+	bool i_displayPerChar
 )
 {
 	if (m_y >= m_lineCount || m_lineI == m_lineLen)
@@ -124,35 +129,40 @@ bool DialoguePrinter::PushChar
 			}
 			else
 			{
+				FlushBuf();
+				std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
 				m_x = 0;
 				m_y++;
 			}
 		}
 	}
 
-	char str[2] = { m_curLine[m_lineI], '\0'};
+	m_lineBuf[m_x] = m_curLine[m_lineI];
 
-	m_lastWasSpace = str[0] == ' ';
+	m_lastWasSpace = m_lineBuf[m_x] == ' ';
 
 	// Minor processing for font
-	if (str[0] == '\xC2')
+	if (m_lineBuf[m_x] == '\xC2')
 	{
 		if (m_curLine[m_lineI + 1] == '\xA3')
 		{
-			str[0] = '{'; // renders as £ in vn_font
+			m_lineBuf[m_x] = '{'; // renders as £ in vn_font
 			m_lineI++;
 		}
 	}
-	else if(str[0] == ':')
+	else if (m_lineBuf[m_x] == ':')
 	{
 		if(m_curLine[m_lineI+1] == ')')
 		{
-			str[0] = '`'; // renders as :) in vn_font
+			m_lineBuf[m_x] = '`'; // renders as :) in vn_font
 			m_lineI++;
 		}
 	}
-	else if(str[0] == '\n')
+	else if (m_lineBuf[m_x] == '\n')
 	{
+		m_lineBuf[m_x] = '\0';
+		FlushBuf();
+		std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
 		m_lastWasSpace = true;
 		m_x = 0;
 		m_y++;
@@ -160,14 +170,19 @@ bool DialoguePrinter::PushChar
 		return m_y < m_lineCount;
 	}
 
-	VDP_drawText(str, m_x + m_xPos, m_y + m_yPos);
-
 	// Update counters
 	m_lineI++;
+
+	if (i_displayPerChar)
+	{
+		FlushBuf();
+	}
 
 	m_x++;
 	if(m_x >= m_lineWidth)
 	{
+		FlushBuf();
+		std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
 		m_x = 0;
 		m_y++;
 		if(m_y >= m_lineCount)
@@ -177,5 +192,13 @@ bool DialoguePrinter::PushChar
 	}
 
 	return true;
+}
+
+//------------------------------------------------------------------------------
+void DialoguePrinter::FlushBuf()
+{
+	SYS_disableInts();
+	VDP_drawTextEx(VDP_getTextPlane(), m_lineBuf, TILE_ATTR_FULL(PAL3, 0, 0, 0, 0), m_xPos, m_y + m_yPos, DMA);
+	SYS_enableInts();
 }
 }
