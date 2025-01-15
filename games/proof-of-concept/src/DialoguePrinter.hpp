@@ -2,6 +2,9 @@
 
 #include "Declare.hpp"
 
+#include <array>
+#include <vector>
+
 namespace Game
 {
 
@@ -18,7 +21,8 @@ class DialoguePrinter
 	bool m_lastWasSpace{true};
 	u16 m_x{0};
 	u16 m_y{0};
-	char m_lineBuf[41]{};
+	std::array<char, 41> m_lineBuf{};
+	std::vector<u16> m_clearBuf{};
 
 public:
 	DialoguePrinter(u16 i_xPos, u16 i_yPos, u16 i_lineWidth, u16 i_lineCount);

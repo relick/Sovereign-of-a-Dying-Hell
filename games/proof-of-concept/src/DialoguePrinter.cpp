@@ -20,6 +20,8 @@ DialoguePrinter::DialoguePrinter
 	, m_lineWidth{ i_lineWidth }
 	, m_lineCount{ i_lineCount }
 {
+	m_clearBuf.resize(m_lineWidth * m_lineCount);
+	std::fill(m_clearBuf.begin(), m_clearBuf.end(), TILE_ATTR_FULL(PAL3, 0, 0, 0, TILE_FONT_INDEX));
 }
 
 //------------------------------------------------------------------------------
@@ -34,7 +36,7 @@ void DialoguePrinter::PushLine
 	m_lastWasSpace = true;
 	m_x = 0;
 	m_y = 0;
-	std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
+	m_lineBuf = {};
 }
 
 //------------------------------------------------------------------------------
@@ -57,10 +59,11 @@ void DialoguePrinter::Next
 		}
 
 		// Can't print any more already, so move to next
-		VDP_fillTileMapRect(VDP_getTextPlane(), TILE_ATTR_FULL(PAL3, 0, 0, 0, TILE_FONT_INDEX), m_xPos, m_yPos, m_lineWidth, m_lineCount);
+		//VDP_fillTileMapRect(VDP_getTextPlane(), TILE_ATTR_FULL(PAL3, 0, 0, 0, TILE_FONT_INDEX), m_xPos, m_yPos, m_lineWidth, m_lineCount);
+		VDP_setTileMapDataRect(VDP_getTextPlane(), m_clearBuf.data(), m_xPos, m_yPos, m_lineWidth, m_lineCount, m_lineWidth, DMA_QUEUE);
 		m_x = 0;
 		m_y = 0;
-		std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
+		m_lineBuf = {};
 		m_lastWasSpace = true;
 	}
 	else
@@ -101,8 +104,10 @@ bool DialoguePrinter::PushChar
 	// Main logic for stepping through and deciding how our display progresses
 	if(m_lineI == 0)
 	{
-		VDP_fillTileMapRect(VDP_getTextPlane(), TILE_ATTR_FULL(PAL3, 0, 0, 0, TILE_FONT_INDEX), m_xPos, m_yPos, m_lineWidth, m_lineCount);
 		//VDP_clearTextArea(m_xPos, m_yPos, m_lineWidth, m_lineCount);
+		//VDP_fillTileMapRect(VDP_getTextPlane(), TILE_ATTR_FULL(PAL3, 0, 0, 0, TILE_FONT_INDEX), m_xPos, m_yPos, m_lineWidth, m_lineCount);
+		VDP_setTileMapDataRect(VDP_getTextPlane(), m_clearBuf.data(), m_xPos, m_yPos, m_lineWidth, m_lineCount, m_lineWidth, DMA_QUEUE);
+		m_lineBuf = {};
 	}
 
 	// Word wrapping handling, run on first character of each word
@@ -130,7 +135,7 @@ bool DialoguePrinter::PushChar
 			else
 			{
 				FlushBuf();
-				std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
+				m_lineBuf = {};
 				m_x = 0;
 				m_y++;
 			}
@@ -162,7 +167,7 @@ bool DialoguePrinter::PushChar
 	{
 		m_lineBuf[m_x] = '\0';
 		FlushBuf();
-		std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
+		m_lineBuf = {};
 		m_lastWasSpace = true;
 		m_x = 0;
 		m_y++;
@@ -182,7 +187,7 @@ bool DialoguePrinter::PushChar
 	if(m_x >= m_lineWidth)
 	{
 		FlushBuf();
-		std::memset(m_lineBuf, 0, sizeof(m_lineBuf));
+		m_lineBuf = {};
 		m_x = 0;
 		m_y++;
 		if(m_y >= m_lineCount)
@@ -197,8 +202,10 @@ bool DialoguePrinter::PushChar
 //------------------------------------------------------------------------------
 void DialoguePrinter::FlushBuf()
 {
-	SYS_disableInts();
-	VDP_drawTextEx(VDP_getTextPlane(), m_lineBuf, TILE_ATTR_FULL(PAL3, 0, 0, 0, 0), m_xPos, m_y + m_yPos, DMA);
-	SYS_enableInts();
+	if(m_lineBuf[0] == '\0')
+	{
+		return;
+	}
+	VDP_drawTextEx(VDP_getTextPlane(), m_lineBuf.data(), TILE_ATTR_FULL(PAL3, 0, 0, 0, 0), m_xPos, m_y + m_yPos, DMA_QUEUE);
 }
 }
