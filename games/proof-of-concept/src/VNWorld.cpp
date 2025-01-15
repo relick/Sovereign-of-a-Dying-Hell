@@ -12,11 +12,18 @@
 namespace Game
 {
 
-void VBlank_TextFrameReset()
+void HInt_TextFramePaletteWasUnsetCallback();
+
+void HInt_TextFramePaletteWasSetCallback()
 {
-	// Delay the reset til top of screen
-	while(GET_VCOUNTER < 235) {}
-	System::SetPalette_Fast<During::VBlank, PAL0>(beach.palette->data);
+	SetTextFramePalette(*(beach.palette));
+	SYS_setHIntCallback(&HInt_TextFrameDMA<(c_textFramePos + c_textFrameHeight) * 8, &HInt_TextFramePaletteWasUnsetCallback>);
+}
+
+void HInt_TextFramePaletteWasUnsetCallback()
+{
+	SetTextFramePalette(beach_frame_pal);
+	SYS_setHIntCallback(&HInt_TextFrameDMA<c_textFramePos * 8, &HInt_TextFramePaletteWasSetCallback>);
 }
 
 // current VRAM upload tile position
@@ -53,9 +60,7 @@ void VNWorld::Init
 	PAL_fadeToAll(fullPal, FramesPerSecond(), false);
 
 	// Show palette-based text frame
-	SetTextFramePalette(beach_frame_pal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA<184>);
-	SYS_setVBlankCallback(&VBlank_TextFrameReset);
+	HInt_TextFramePaletteWasUnsetCallback();
 	VDP_setHInterrupt(TRUE);
 	VDP_setHIntCounter(0);
 

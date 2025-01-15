@@ -10,4 +10,4 @@ inline constexpr u16 c_screenHeightPx = c_screenHeightTiles << 3;
 
 // Game constants
 inline constexpr u16 c_textFrameHeight = 5;
-inline constexpr u16 c_textFramePos = c_screenHeightTiles - c_textFrameHeight;
+inline constexpr u16 c_textFramePos = 3;
