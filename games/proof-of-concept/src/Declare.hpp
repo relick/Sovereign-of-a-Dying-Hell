@@ -2,10 +2,11 @@
 
 #include <types.h>
 
+// Specify which section of frame some code is running in for template differences
 enum class During
 {
-	HBlank,
-	VBlank,
+	Active, // VDP actively rendering the frame
+	VBlank, // VDP between frames
 };
 
 namespace Game
