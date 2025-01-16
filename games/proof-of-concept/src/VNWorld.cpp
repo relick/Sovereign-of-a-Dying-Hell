@@ -6,6 +6,7 @@
 #include <genesis.h>
 #include "res_bg.h"
 #include "res_fonts.h"
+#include "res_music.h"
 
 #include <cstring>
 
@@ -65,6 +66,9 @@ void VNWorld::Init
 	VDP_setHIntCounter(0);
 
 	m_printer.PushLine("The quick brown fox, jumps over the lazy dog. \n\"Amazing'!??! (3*3+2); or: £3.50 :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :)");
+
+	// Playing music really is this easy
+	// XGM_startPlay(spacey);
 }
 
 void VNWorld::Shutdown
