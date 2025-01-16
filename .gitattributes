@@ -2,3 +2,4 @@
 * text=auto
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
+*.vgm filter=lfs diff=lfs merge=lfs -text
