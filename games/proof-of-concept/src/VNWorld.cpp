@@ -44,8 +44,6 @@ void VNWorld::Init
 	Game& io_game
 )
 {
-	VDP_setTextPlane(VDPPlane::BG_A);
-
 	VDP_drawImageEx(VDPPlane::BG_B, &beach, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, curTileInd), 0, 0, false, DMA);
 	curTileInd += beach.tileset->numTile;
 

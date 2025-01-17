@@ -37,7 +37,7 @@ void DialoguePrinter2::Init(TileSet const &i_textFont, TileSet const &i_nameFont
 		}
 	}
 
-	VDP_setTileMapData(VDP_WINDOW, m_tileMap.data(), 0, m_tileMap.size(), 2, DMA_QUEUE);
+	VDP_setTileMapData(VDP_BG_A, m_tileMap.data(), 0, m_tileMap.size(), 2, DMA_QUEUE);
 
 	// Parse font for widths up front
 	m_textFont = &i_textFont;
