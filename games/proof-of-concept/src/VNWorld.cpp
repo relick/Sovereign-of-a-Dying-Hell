@@ -13,18 +13,26 @@
 namespace Game
 {
 
-void HInt_TextFramePaletteWasUnsetCallback();
+void HInt_TextArea_SetName();
+void HInt_TextArea_SetText();
+void HInt_TextArea_Reset();
 
-void HInt_TextFramePaletteWasSetCallback()
+void HInt_TextArea_SetName()
 {
-	SetTextFramePalette(*(beach.palette));
-	SYS_setHIntCallback(&HInt_TextFrameDMA<(c_textFramePos + c_textFrameHeight) * 8, &HInt_TextFramePaletteWasUnsetCallback>);
+	SetTextFramePalette(beach_name_pal);
+	SYS_setHIntCallback(&HInt_TextFrameDMA<c_textFramePos * 8 - 14, &HInt_TextArea_SetText>);
 }
 
-void HInt_TextFramePaletteWasUnsetCallback()
+void HInt_TextArea_SetText()
 {
-	SetTextFramePalette(beach_frame_pal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA<c_textFramePos * 8, &HInt_TextFramePaletteWasSetCallback>);
+	SetTextFramePalette(beach_text_pal);
+	SYS_setHIntCallback(&HInt_TextFrameDMA<c_textFramePos * 8 + 4, &HInt_TextArea_Reset>);
+}
+
+void HInt_TextArea_Reset()
+{
+	SetTextFramePalette(*(beach.palette));
+	SYS_setHIntCallback(&HInt_TextFrameDMA<(c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
 }
 
 // current VRAM upload tile position
@@ -36,37 +44,29 @@ void VNWorld::Init
 	Game& io_game
 )
 {
-	VDP_setWindowVPos(true, c_textFramePos);
-	VDP_setTextPlane(VDPPlane::WINDOW);
-	VDP_setTextPriority(0);
+	VDP_setTextPlane(VDPPlane::BG_A);
 
-	VDP_setTextPalette(PAL3);
-	VDP_loadFont(&vn_font, TransferMethod::DMA);
-
-	VDP_drawImageEx(VDPPlane::BG_B, &beach, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, curTileInd), 0, 0, false, DMA);
+	VDP_drawImageEx(VDPPlane::BG_B, &beach, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, curTileInd), 0, 0, false, DMA);
 	curTileInd += beach.tileset->numTile;
-
-	// Show image-based text frame
-	/*if (curTileInd + text_frame.tileset->numTile < userTileMaxIndex)
-	{
-		VDP_drawImageEx(VDP_getTextPlane(), &text_frame, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, curTileInd), 0, c_textFramePos, false, DMA);
-		curTileInd += text_frame.tileset->numTile;
-	}*/
 
 	PAL_setColorsDMA(0, palette_black, 64);
 	u16 fullPal[64] = { 0 };
 
 	std::memcpy(fullPal, beach.palette->data, 16 * sizeof(u16));
-	std::memcpy(fullPal + 48, text_frame.palette->data + 48, 16 * sizeof(u16));
+	std::memcpy(fullPal + 48, text_font_pal.data, 16 * sizeof(u16));
 	PAL_fadeToAll(fullPal, FramesPerSecond(), false);
 
 	// Show palette-based text frame
-	HInt_TextFramePaletteWasUnsetCallback();
+	HInt_TextArea_SetName();
 	VDP_setHInterrupt(TRUE);
 	VDP_setHIntCounter(0);
 
-	m_printer.Init(vn_font);
-	m_printer.SetText("The quick brown fox, jumps over the lazy dog. \n\"Amazing'!??! (3*3+2); or: £3.50 :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :) :)");
+	m_printer.Init(vn_font, name_font);
+	m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!");
+	m_printer.SetName("WAKISAGIHIME", false);
+
+	// Enable shadow effects on text
+	VDP_setHilightShadow(1);
 
 	// Playing music really is this easy
 	// XGM_startPlay(spacey);

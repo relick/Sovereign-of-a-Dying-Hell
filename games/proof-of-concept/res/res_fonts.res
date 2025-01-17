@@ -4,4 +4,5 @@ TILESET intro_font "fonts/intro_font.png" NONE NONE
 PALETTE intro_font_pal "fonts/intro_font.png"
 
 TILESET vn_font "fonts/vn_font.png" NONE NONE
-PALETTE vn_font_pal "fonts/vn_font.png"
+TILESET name_font "fonts/name_font.png" NONE NONE
+PALETTE text_font_pal "fonts/vn_font.png"

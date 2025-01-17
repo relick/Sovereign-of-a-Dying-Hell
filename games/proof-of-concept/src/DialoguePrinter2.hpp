@@ -20,7 +20,7 @@ struct PackedPixel
 	u8 operator[](u16 const i_pixel) const { return i_pixel == 0 ? Pixel0() : Pixel1(); }
 };
 
-// Align to 32 bit as we'll cast to u32 when uploading to VRAM via SGDK
+// Align to 32 bit as we'll cast to u32* when blitting and uploading to VRAM via SGDK
 struct alignas(4) Tile
 {
 	// 8 rows of 8 pixels
@@ -36,6 +36,15 @@ struct Char
 	u8 m_charWidth{8};
 };
 
+struct Sprite
+{
+	u16 y;
+	u8 size;
+	u8 link;
+	u16 id;
+	u16 x;
+};
+
 //------------------------------------------------------------------------------
 /// Blits text to a tile buffer in RAM then creates DMA calls for execution in VBlank
 /// TODO: First pass fills tilemap into Window plane. It would be better to use sprites instead to free up the tilemap space for the text tiles themselves. But this will potentially conflict with the palette swap so be careful.
@@ -43,9 +52,6 @@ struct Char
 //------------------------------------------------------------------------------
 class DialoguePrinter2
 {
-	std::string m_nameLeft;
-	std::string m_nameRight;
-
 	char const* m_curText{nullptr};
 	u16 m_curTextLen{0};
 	u16 m_curTextIndex{0};
@@ -56,15 +62,20 @@ class DialoguePrinter2
 	std::array<Tile, 128> m_tiles{};
 	std::array<u16, 64 * 32> m_tileMap{};
 
-	TileSet const* m_font{nullptr};
-	std::array<Char, 96> m_fontData{}; // TODO: optimise by using proper ascii
+	TileSet const* m_textFont{nullptr};
+	std::array<Char, 96> m_textFontData{}; // TODO: optimise by using proper ascii
+
+	TileSet const* m_nameFont{nullptr};
+	std::array<u16, 26> m_nameFontData{};
+
+	bool spritesOnLeft{false};
+	std::array<Sprite, 7> sprites;
 
 public:
 	// Sets up tiles and tilemap
-	void Init(TileSet const& i_font);
+	void Init(TileSet const& i_textFont, TileSet const& i_nameFont);
 
-	void SetLeftName(std::string);
-	void SetRightName(std::string);
+	void SetName(char const* i_name, bool i_left);
 	void SetText(char const *i_text);
 
 	// Advances render and queues DMA

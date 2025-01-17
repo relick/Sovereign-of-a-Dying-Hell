@@ -61,7 +61,9 @@ inline void SetPalette_Fast(u16 const *i_pal)
 	#define pushl_val(VAL) asm(CONCAT_INST("move.l", "%0", "-(%%sp)")::"i"(VAL))
 	#define pushl_reg(SRC_REG) asm(CONCAT_INST("move.l", SRC_REG, "-(%sp)"))
 	#define movew_val_reg(VAL, DEST_DREG) asm(CONCAT_INST("move.w", "%0", "%" DEST_DREG)::"i"(VAL))
+	#define movel_val_reg(VAL, DEST_DREG) asm(CONCAT_INST("move.l", "%0", "%" DEST_DREG)::"i"(VAL))
 	#define movew_reg_mem(SRC_REG, DEST_AREG) asm(CONCAT_INST("move.w", SRC_REG, "(" DEST_AREG ")"))
+	#define movel_reg_mem(SRC_REG, DEST_AREG) asm(CONCAT_INST("move.l", SRC_REG, "(" DEST_AREG ")"))
 	#define popl_mem(DEST_AREG) asm(CONCAT_INST("move.l", "(%sp)+", "(" DEST_AREG ")"))
 	#define popl_reg(DEST_DREG) asm(CONCAT_INST("move.l", "(%sp)+", DEST_DREG))
 
@@ -72,6 +74,7 @@ inline void SetPalette_Fast(u16 const *i_pal)
 		// Note: if it's an issue, just replace the while loop with more manual asm. Then everything between the pushes and pops is completely controlled by us.
 
 		// Save registers to respect ABI
+		pushl_reg("%d5"); // d5 will be used to store the DMA command
 		pushl_reg("%d4"); // d4 will be used to store the command for enabling VDP
 		pushl_reg("%d3"); // d3 will be used to store the command for disabling VDP
 		pushl_reg("%a3"); // a3 will be used to store the VDP ctrl port address
@@ -82,7 +85,9 @@ inline void SetPalette_Fast(u16 const *i_pal)
 		lea(VDP_CTRL_PORT, "%a3");
 
 		// Put DMA command into memory (apparently, popping from the stack is the fastest way to deliver the command)
-		pushl_val(VDP_DMA_CRAM_ADDR((u32)(t_PalNum * 16 * sizeof(u16))));
+		//pushl_val(VDP_DMA_CRAM_ADDR((u32)(t_PalNum * 16 * sizeof(u16))));
+		// Newly added: the above was a lie, doing it from register is faster.
+		movel_val_reg(VDP_DMA_CRAM_ADDR((u32)(t_PalNum * 16 * sizeof(u16))), "%d5");
 	}
 	
 	// Wait until precise point near end of line (160 = end of line, but latency means we need to stop a little earlier)
@@ -99,7 +104,8 @@ inline void SetPalette_Fast(u16 const *i_pal)
 		}
 
 		// Initiate DMA
-		popl_mem("%a3");
+		//popl_mem("%a3");
+		movel_reg_mem("%d5", "%a3");
 
 		if constexpr (t_When == During::Active)
 		{
@@ -114,6 +120,7 @@ inline void SetPalette_Fast(u16 const *i_pal)
 		popl_reg("%a3");
 		popl_reg("%d3");
 		popl_reg("%d4");
+		popl_reg("%d5");
 	}
 
 	// Clean away macros
