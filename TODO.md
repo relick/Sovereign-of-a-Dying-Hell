@@ -46,3 +46,17 @@ Frame + text = Window Plane (swap priority based on effect type), PAL3 - text us
 Effects/fade = Sprites (priority), PAL3
 
 Doh, fades can be done with palette. ofc.
+
+
+
+
+// Some new plans:
+Pack bg tiles from 0 in VRAM
+Pack character tiles from 1536 backwards in VRAM
+Fit text tiles between tilemaps
+Text frame is palette swap(s) of bg
+Game blits text to tiles in RAM and DMA streams them in, allowing for non-monospace text. Idea for text is to have a larger font for names at the side of the frame (overlapping the border?) above smaller font for dialogue.
+
+TODOs:
+- Palette fading in RAM to allow for fading of text frame
+- Software text blitting
