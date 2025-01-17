@@ -8,6 +8,10 @@
 namespace Game
 {
 
+inline constexpr u16 c_lineCount = 3;
+inline constexpr u16 c_lineWidth = 36;
+inline constexpr u16 c_pixelsPerTile = 8;
+
 //------------------------------------------------------------------------------
 void DialoguePrinter2::Init(TileSet const &i_font)
 {
@@ -20,7 +24,7 @@ void DialoguePrinter2::Init(TileSet const &i_font)
 	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-107
 
-	u16 namesIndex = 108 + (1536 - m_tiles.size());
+	u16 namesIndex = (c_lineCount * c_lineWidth) + (1536 - m_tiles.size());
 	u16 textIndex = 0 + (1536 - m_tiles.size());
 
 	for(u16 y = 0; y < 32; ++y)
@@ -41,7 +45,7 @@ void DialoguePrinter2::Init(TileSet const &i_font)
 			}
 			else
 			{
-				for (u16 x = 0; x < 36; ++x)
+				for (u16 x = 0; x < c_lineWidth; ++x)
 				{
 					m_tileMap[2 + x + y * 64] = TILE_ATTR_FULL(PAL3, 0, 0, 0, textIndex++);
 				}
@@ -106,11 +110,36 @@ bool DialoguePrinter2::Update()
 //------------------------------------------------------------------------------
 void DialoguePrinter2::Next()
 {
-}
+	if(!m_curText)
+	{
+		return;
+	}
 
-inline constexpr u16 c_lineCount = 3;
-inline constexpr u16 c_lineWidth = 36;
-inline constexpr u16 c_pixelsPerTile = 8;
+	if(!DrawChar())
+	{
+		if (m_curTextIndex == m_curTextLen)
+		{
+			// End line
+			m_curText = nullptr;
+			return;
+		}
+
+		// Can't print any more already, so move to next
+		std::fill(m_tiles.begin(), m_tiles.begin() + c_lineWidth * c_lineCount, Tile{});
+		m_x = 0;
+		m_y = 0;
+		m_lastCharWasSpace = true;
+	}
+	else
+	{
+		// Could print more so print to end of current display
+		while(DrawChar())
+		{
+		}
+	}
+
+	QueueDMA();
+}
 
 //------------------------------------------------------------------------------
 bool DialoguePrinter2::DrawChar
@@ -175,14 +204,15 @@ bool DialoguePrinter2::DrawChar
 		u16 const tileInd = (m_y * c_lineWidth) + (m_x >> 3);
 		u32 *const leftTile = (u32 *)&(m_tiles[tileInd].m_pixels);
 
-		// So for the left tile, we need to just shift the font data to the right by m_x
-		u16 shift = (m_x - (tileInd * c_pixelsPerTile)) << 2;
+		// So for the left tile, we need to just shift the font data to the right by the amount of pixels m_x is in to the tile
+		u8 leftTilePixels = m_x & 0x7;
+		u16 const shift = leftTilePixels << 2;
 		for (u8 i = 0; i < 8; ++i)
 		{
 			leftTile[i] |= m_font->tiles[m_fontData[charFontDataI].m_srcIndex + i] >> shift;
 		}
 
-		u16 used = c_pixelsPerTile - (shift >> 2);
+		u16 const used = c_pixelsPerTile - leftTilePixels;
 		if (used < m_fontData[charFontDataI].m_charWidth)
 		{
 			u32 *const rightTile = (u32 *)&(m_tiles[tileInd + 1].m_pixels);
