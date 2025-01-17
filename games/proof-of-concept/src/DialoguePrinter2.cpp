@@ -12,11 +12,13 @@ inline constexpr u16 c_lineCount = 3;
 inline constexpr u16 c_lineWidth = 34;
 inline constexpr u16 c_pixelsPerTile = 8;
 
+inline constexpr u16 c_textTilesLoc = 0xD000 >> 5;
+
 //------------------------------------------------------------------------------
 void DialoguePrinter2::Init(TileSet const &i_textFont, TileSet const &i_nameFont)
 {
 	// Queue cleared tiles
-	VDP_fillTileData(0, 1536 - m_tiles.size(), m_tiles.size(), true);
+	VDP_fillTileData(0, c_textTilesLoc, m_tiles.size(), true);
 
 	// Tilemap indices setup as
 	// 108-XX-117                118-XX-127
@@ -24,7 +26,7 @@ void DialoguePrinter2::Init(TileSet const &i_textFont, TileSet const &i_nameFont
 	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-107
 
-	u16 textIndex = 0 + (1536 - m_tiles.size());
+	u16 textIndex = c_textTilesLoc;
 
 	for(u16 y = 0; y < 32; ++y)
 	{
@@ -110,7 +112,7 @@ void DialoguePrinter2::SetName
 	// Update sprites
 	if (spritesOnLeft != i_left)
 	{
-		u16 nameIndex = (c_lineCount * c_lineWidth) + (1536 - m_tiles.size());
+		u16 nameIndex = (c_lineCount * c_lineWidth) + c_textTilesLoc;
 
 		for (u16 i = 0; i < sprites.size(); ++i)
 		{
@@ -307,8 +309,8 @@ bool DialoguePrinter2::DrawChar
 //------------------------------------------------------------------------------
 void DialoguePrinter2::QueueDMA()
 {
-	DMA_queueDmaFast(DMA_VRAM, m_tiles.data(), (1536 * 32) - sizeof(m_tiles), sizeof(m_tiles) >> 1, 2);
-	//VDP_loadTileData((u32 *)m_tiles.data(), 1536 - m_tiles.size(), m_tiles.size(), DMA_QUEUE);
+	// TODO: at least split by whether name or text is being uploaded, and also attempt to optimise text where possible
+	DMA_queueDmaFast(DMA_VRAM, m_tiles.data(), c_textTilesLoc << 5, sizeof(m_tiles) >> 1, 2);
 }
 
 }
