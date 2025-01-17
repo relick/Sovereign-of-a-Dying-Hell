@@ -14,32 +14,20 @@ inline constexpr u16 c_pixelsPerTile = 8;
 
 inline constexpr u16 c_textTilesLoc = 0xD000 >> 5;
 
+inline constexpr u16 c_nameFontOffset = 26 * 8;
+inline constexpr u16 c_namePosSide = 10;
+inline constexpr u16 c_namePosUp = 5;
+
+inline constexpr u16 c_textPosSide = 24;
+inline constexpr u16 c_textPosDown = 0;
+inline constexpr u16 c_lineSeparation = 2;
+inline constexpr u16 c_lineIndent = 1;
+
 //------------------------------------------------------------------------------
 void DialoguePrinter2::Init(TileSet const &i_textFont, TileSet const &i_nameFont)
 {
 	// Queue cleared tiles
 	VDP_fillTileData(0, c_textTilesLoc, m_tiles.size(), true);
-
-	// Tilemap indices setup as
-	// 108-XX-117                118-XX-127
-	// 0-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-107
-
-	u16 textIndex = c_textTilesLoc;
-
-	for(u16 y = 0; y < 32; ++y)
-	{
-		if(y > c_textFramePos && y <= (c_textFramePos + 3))
-		{
-			for (u16 x = 0; x < c_lineWidth; ++x)
-			{
-				m_tileMap[3 + x + y * 64] = TILE_ATTR_FULL(PAL3, 1, 0, 0, textIndex++);
-			}
-		}
-	}
-
-	VDP_setTileMapData(VDP_BG_A, m_tileMap.data(), 0, m_tileMap.size(), 2, DMA_QUEUE);
 
 	// Parse font for widths up front
 	m_textFont = &i_textFont;
@@ -70,10 +58,74 @@ void DialoguePrinter2::Init(TileSet const &i_textFont, TileSet const &i_nameFont
 		m_nameFontData[i] = i * 8;
 	}
 
-	SetName("", !spritesOnLeft);
+	SetupSprites();
 }
 
-inline constexpr u16 c_nameFontOffset = 26 * 8;
+//------------------------------------------------------------------------------
+void DialoguePrinter2::SetupSprites()
+{
+	// Tile indices setup as
+	// 102-XXXXXXXXX
+	// XXXXXXXXX-127
+	// 0-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-101
+
+	// Name sprites
+	u16 nameIndex = (c_lineCount * c_lineWidth) + c_textTilesLoc;
+	for (u16 i = 0; i < m_sprites.m_nameSprites.size(); ++i)
+	{
+		Sprite &spr = m_sprites.m_nameSprites[i];
+		spr.x = 128 + c_namePosSide + i * 32;
+		spr.y = 128 - c_namePosUp + (c_textFramePos - 1) * 8;
+		spr.id = TILE_ATTR_FULL(PAL3, 1, 0, 0, nameIndex);
+		if (i == (m_sprites.m_nameSprites.size() - 1))
+		{
+			spr.size = 0b0001; // 1x2
+		}
+		else
+		{
+			spr.size = 0b1101; // 4x2
+		}
+		spr.link = i + 1;
+
+		nameIndex += 8;
+	}
+
+	// Text sprites
+	u16 textIndex = c_textTilesLoc;
+	u16 sprI = 0;
+	for (u16 y = 0; y < c_lineCount;)
+	{
+		for (u16 x = 0; x < c_lineWidth;)
+		{
+			Sprite &spr = m_sprites.m_textSprites[sprI];
+			spr.x = 128 + c_textPosSide + x * 8 + y * c_lineIndent;
+			spr.y = 128 + c_textPosDown + (c_textFramePos + 1 + y) * 8 + (c_lineSeparation * y);
+			spr.id = TILE_ATTR_FULL(PAL3, 1, 0, 0, textIndex);
+			if ((c_lineWidth - x) < 4)
+			{
+				spr.size = 0b0100; // 2x1
+				textIndex += 2;
+			}
+			else
+			{
+				spr.size = 0b1100; // 4x1
+				textIndex += 4;
+			}
+			spr.link = sprI + 1 + m_sprites.m_nameSprites.size();
+
+			++sprI;
+			x += 4;
+		}
+
+		++y;
+	}
+
+	m_sprites.m_textSprites.back().link = 0;
+
+	DMA_queueDmaFast(DMA_VRAM, &m_sprites, VDP_getSpriteListAddress(), sizeof(m_sprites) >> 1, 2);
+}
 
 //------------------------------------------------------------------------------
 void DialoguePrinter2::SetName
@@ -99,8 +151,7 @@ void DialoguePrinter2::SetName
 		{
 			u16 const srcIndexUpper = m_nameFontData[curChar - 'A'];
 			u16 const srcIndexLower = srcIndexUpper + c_nameFontOffset;
-			std::memcpy(&(m_tiles[(c_lineWidth * c_lineCount) + limit]), m_nameFont->tiles + srcIndexUpper, sizeof(Tile));
-			++limit;
+			std::memcpy(&(m_tiles[(c_lineWidth * c_lineCount) + (limit++)]), m_nameFont->tiles + srcIndexUpper, sizeof(Tile));
 			std::memcpy(&(m_tiles[(c_lineWidth * c_lineCount) + limit]), m_nameFont->tiles + srcIndexLower, sizeof(Tile));
 		}
 
@@ -110,33 +161,21 @@ void DialoguePrinter2::SetName
 	QueueDMA();
 
 	// Update sprites
-	if (spritesOnLeft != i_left)
+	if (m_nameOnLeft != i_left)
 	{
-		u16 nameIndex = (c_lineCount * c_lineWidth) + c_textTilesLoc;
-
-		for (u16 i = 0; i < sprites.size(); ++i)
+		for (u16 i = 0; i < m_sprites.m_nameSprites.size(); ++i)
 		{
-			Sprite &spr = sprites[i];
-			spr.x = 128 + 10 - 2 + i * 16;
+			Sprite &spr = m_sprites.m_nameSprites[i];
+			spr.x = 128 + c_namePosSide + i * 32;
 			if(!i_left)
 			{
-				spr.x += 320 - 16 - 10 - ((limit >> 1) * 8);
+				spr.x += 320 - 2 * c_namePosSide - ((limit >> 1) * 8);
 			}
-			spr.y = 123 + (c_textFramePos - 1) * 8;
-			spr.id = TILE_ATTR_FULL(PAL3, 1, 0, 0, nameIndex + i * 4);
-			spr.size = i == (sprites.size() - 1) ? 0b0001 : 0b0101;
-			spr.link = i == (sprites.size() - 1) ? 0 : i + 1;
 		}
 
-		DMA_queueDmaFast(DMA_VRAM, &sprites, VDP_getSpriteListAddress(), sizeof(sprites) >> 1, 2);
+		DMA_queueDmaFast(DMA_VRAM, &m_sprites.m_nameSprites, VDP_getSpriteListAddress(), sizeof(m_sprites.m_nameSprites) >> 1, 2);
 
-		// Old tilemap code
-		/*for (u16 x = 0; x < 13; ++x)
-		{
-			m_tileMap[2 + x + ((c_textFramePos - 1) * 64)] = TILE_ATTR_FULL(PAL3, 0, 0, 0, nameIndex++);
-			m_tileMap[2 + x + c_textFramePos * 64] = TILE_ATTR_FULL(PAL3, 0, 0, 0, nameIndex++);
-		}*/
-		spritesOnLeft = i_left;
+		m_nameOnLeft = i_left;
 	}
 }
 

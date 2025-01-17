@@ -60,16 +60,20 @@ class DialoguePrinter2
 	u16 m_y{0}; // In tiles
 
 	std::array<Tile, 128> m_tiles{};
-	std::array<u16, 64 * 32> m_tileMap{};
 
 	TileSet const* m_textFont{nullptr};
 	std::array<Char, 96> m_textFontData{}; // TODO: optimise by using proper ascii
 
 	TileSet const* m_nameFont{nullptr};
 	std::array<u16, 26> m_nameFontData{};
+	bool m_nameOnLeft{true};
 
-	bool spritesOnLeft{false};
-	std::array<Sprite, 7> sprites;
+	// In structure ready to be DMA'd
+	struct
+	{
+		std::array<Sprite, 4> m_nameSprites;
+		std::array<Sprite, 27> m_textSprites;
+	} m_sprites;
 
 public:
 	// Sets up tiles and tilemap
@@ -85,6 +89,8 @@ public:
 	void Next();
 
 private:
+	void SetupSprites();
+
 	// Returns false when no more can be drawn until user progresses
 	bool DrawChar();
 

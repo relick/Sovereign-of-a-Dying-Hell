@@ -19,19 +19,19 @@ void HInt_TextArea_Reset();
 
 void HInt_TextArea_SetName()
 {
-	SetTextFramePalette(beach_name_pal);
+	SetTextFramePalette(beach2_name_pal);
 	SYS_setHIntCallback(&HInt_TextFrameDMA<c_textFramePos * 8 - 14, &HInt_TextArea_SetText>);
 }
 
 void HInt_TextArea_SetText()
 {
-	SetTextFramePalette(beach_text_pal);
+	SetTextFramePalette(beach2_text_pal);
 	SYS_setHIntCallback(&HInt_TextFrameDMA<c_textFramePos * 8 + 4, &HInt_TextArea_Reset>);
 }
 
 void HInt_TextArea_Reset()
 {
-	SetTextFramePalette(*(beach.palette));
+	SetTextFramePalette(*(beach2.palette));
 	SYS_setHIntCallback(&HInt_TextFrameDMA<(c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
 }
 
@@ -44,13 +44,13 @@ void VNWorld::Init
 	Game& io_game
 )
 {
-	VDP_drawImageEx(VDPPlane::BG_B, &beach, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, curTileInd), 0, 0, false, DMA);
-	curTileInd += beach.tileset->numTile;
+	VDP_drawImageEx(VDPPlane::BG_B, &beach2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, curTileInd), 0, 0, false, DMA);
+	curTileInd += beach2.tileset->numTile;
 
 	PAL_setColorsDMA(0, palette_black, 64);
 	u16 fullPal[64] = { 0 };
 
-	std::memcpy(fullPal, beach.palette->data, 16 * sizeof(u16));
+	std::memcpy(fullPal, beach2.palette->data, 16 * sizeof(u16));
 	std::memcpy(fullPal + 48, text_font_pal.data, 16 * sizeof(u16));
 	PAL_fadeToAll(fullPal, FramesPerSecond(), false);
 
@@ -61,7 +61,7 @@ void VNWorld::Init
 
 	m_printer.Init(vn_font, name_font);
 	m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!");
-	m_printer.SetName("WAKISAGIHIME", false);
+	m_printer.SetName("SHINMYOUMARU", false);
 
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
