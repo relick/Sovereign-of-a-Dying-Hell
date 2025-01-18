@@ -59,15 +59,17 @@ class DialoguePrinter2
 	std::array<u16, 26> m_nameFontData{};
 	bool m_nameOnLeft{true};
 
-	struct
-	{
-		std::array<SpriteID, 4> m_nameSprites;
-		std::array<SpriteID, 27> m_textSprites;
-	} m_sprites;
+	std::array<SpriteID, 4> m_nameSprites;
+	std::array<SpriteID, 27> m_textSprites;
+
+	bool m_nameTileRefresh{true};
+	u16 m_lineTileRefreshStart{0};
+	u16 m_lineTileRefreshEnd{u16(m_tiles.size())};
 
 public:
 	// Sets up tiles and tilemap
 	void Init(Game& io_game, TileSet const& i_textFont, TileSet const& i_nameFont);
+	void Shutdown(Game& io_game);
 
 	void SetName(Game& io_game, char const* i_name, bool i_left);
 	void SetText(char const *i_text);
@@ -84,8 +86,8 @@ private:
 	// Returns false when no more can be drawn until user progresses
 	bool DrawChar();
 
-	// Sends command for tiles to VRAM
-	void QueueDMA();
+	void QueueNameDMA();
+	void QueueCharacterDMA(u16 i_charIndex);
 };
 
 }

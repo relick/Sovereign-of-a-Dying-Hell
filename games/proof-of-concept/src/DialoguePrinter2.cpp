@@ -14,7 +14,13 @@ inline constexpr u16 c_lineCount = 3;
 inline constexpr u16 c_lineWidth = 34;
 inline constexpr u16 c_pixelsPerTile = 8;
 
-inline constexpr u16 c_textTilesLoc = 0xD000 >> 5;
+inline constexpr u16 c_textTileCount = c_lineCount * c_lineWidth;
+inline constexpr u16 c_nameTileCount = 128 - c_textTileCount;
+
+inline constexpr u16 c_textTilesAddress = 0xD000;
+inline constexpr u16 c_textTilesIndex = c_textTilesAddress / 32;
+inline constexpr u16 c_nameTilesIndex = c_textTilesIndex + c_textTileCount;
+inline constexpr u16 c_nameTilesAddress = c_nameTilesIndex * 32;
 
 inline constexpr u16 c_nameFontOffset = 26 * 8;
 inline constexpr u16 c_namePosSide = 10;
@@ -34,7 +40,7 @@ void DialoguePrinter2::Init
 )
 {
 	// Queue cleared tiles
-	VDP_fillTileData(0, c_textTilesLoc, m_tiles.size(), true);
+	VDP_fillTileData(0, c_textTilesIndex, m_tiles.size(), true);
 
 	// Parse font for widths up front
 	m_textFont = &i_textFont;
@@ -66,6 +72,37 @@ void DialoguePrinter2::Init
 	}
 
 	SetupSprites(io_game);
+
+	io_game.AddVBlankCallback(
+		[this]{
+			if(m_nameTileRefresh)
+			{
+				DMA_doDmaFast(
+					DMA_VRAM,
+					m_tiles.data() + c_textTileCount,
+					c_nameTilesAddress,
+					c_nameTileCount * (sizeof(Tile) >> 1),
+					2
+				);
+
+				m_nameTileRefresh = false;
+			}
+			
+			if(m_lineTileRefreshStart <= m_lineTileRefreshEnd)
+			{
+				DMA_doDmaFast(
+					DMA_VRAM,
+					m_tiles.data() + m_lineTileRefreshStart,
+					c_textTilesAddress + (sizeof(Tile) * m_lineTileRefreshStart),
+					(1 + m_lineTileRefreshEnd - m_lineTileRefreshStart) * (sizeof(Tile) >> 1),
+					2
+				);
+
+				m_lineTileRefreshStart = UINT16_MAX;
+				m_lineTileRefreshEnd = 0;
+			}
+		}
+	);
 }
 
 //------------------------------------------------------------------------------
@@ -82,8 +119,8 @@ void DialoguePrinter2::SetupSprites
 	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-101
 
 	// Name sprites
-	u16 nameIndex = (c_lineCount * c_lineWidth) + c_textTilesLoc;
-	for (u16 i = 0; i < m_sprites.m_nameSprites.size(); ++i)
+	u16 nameIndex = c_nameTilesIndex;
+	for (u16 i = 0; i < m_nameSprites.size(); ++i)
 	{
 		SpriteData spr;
 
@@ -93,7 +130,7 @@ void DialoguePrinter2::SetupSprites
 		spr.m_highPriority = true;
 		spr.m_firstTileIndex = nameIndex;
 
-		if (i == (m_sprites.m_nameSprites.size() - 1))
+		if (i == (m_nameSprites.size() - 1))
 		{
 			spr.m_size = SpriteSize::r2c1;
 		}
@@ -102,13 +139,13 @@ void DialoguePrinter2::SetupSprites
 			spr.m_size = SpriteSize::r2c4;
 		}
 		
-		m_sprites.m_nameSprites[i] = io_game.Sprites().AddSprite(std::move(spr)).first;
+		m_nameSprites[i] = io_game.Sprites().AddSprite(std::move(spr)).first;
 
 		nameIndex += 8;
 	}
 
 	// Text sprites
-	u16 textIndex = c_textTilesLoc;
+	u16 textIndex = c_textTilesIndex;
 	u16 sprI = 0;
 	for (u16 y = 0; y < c_lineCount;)
 	{
@@ -133,7 +170,7 @@ void DialoguePrinter2::SetupSprites
 				textIndex += 4;
 			}
 
-			m_sprites.m_textSprites[sprI] = io_game.Sprites().AddSprite(std::move(spr)).first;
+			m_textSprites[sprI] = io_game.Sprites().AddSprite(std::move(spr)).first;
 
 			++sprI;
 			x += 4;
@@ -152,7 +189,7 @@ void DialoguePrinter2::SetName
 )
 {
 	// Clear current name
-	std::fill(m_tiles.begin() + (c_lineWidth * c_lineCount), m_tiles.end(), Tile{});
+	std::fill(m_tiles.begin() + c_textTileCount, m_tiles.end(), Tile{});
 
 	// Fill new name
 	u8 limit = 0;
@@ -168,21 +205,21 @@ void DialoguePrinter2::SetName
 		{
 			u16 const srcIndexUpper = m_nameFontData[curChar - 'A'];
 			u16 const srcIndexLower = srcIndexUpper + c_nameFontOffset;
-			std::memcpy(&(m_tiles[(c_lineWidth * c_lineCount) + (limit++)]), m_nameFont->tiles + srcIndexUpper, sizeof(Tile));
-			std::memcpy(&(m_tiles[(c_lineWidth * c_lineCount) + limit]), m_nameFont->tiles + srcIndexLower, sizeof(Tile));
+			std::memcpy(&(m_tiles[c_textTileCount + (limit++)]), m_nameFont->tiles + srcIndexUpper, sizeof(Tile));
+			std::memcpy(&(m_tiles[c_textTileCount + limit]), m_nameFont->tiles + srcIndexLower, sizeof(Tile));
 		}
 
 		++i_name;
 	}
 
-	QueueDMA();
+	QueueNameDMA();
 
 	// Update sprites
 	if (m_nameOnLeft != i_left)
 	{
-		for (u16 i = 0; i < m_sprites.m_nameSprites.size(); ++i)
+		for (u16 i = 0; i < m_nameSprites.size(); ++i)
 		{
-			SpriteData& spr = io_game.Sprites().EditSpriteData(m_sprites.m_nameSprites[i]);
+			SpriteData& spr = io_game.Sprites().EditSpriteData(m_nameSprites[i]);
 			spr.m_x = c_namePosSide + i * 32;
 			if(!i_left)
 			{
@@ -214,7 +251,6 @@ bool DialoguePrinter2::Update()
 	if (m_curText && m_curTextIndex < m_curTextLen)
 	{
 		bool const noMoreThisDisp = DrawChar();
-		QueueDMA();
 		return noMoreThisDisp && m_curTextIndex == m_curTextLen;
 	}
 	return true;
@@ -238,7 +274,7 @@ void DialoguePrinter2::Next()
 		}
 
 		// Can't print any more already, so move to next
-		std::fill(m_tiles.begin(), m_tiles.begin() + (c_lineWidth * c_lineCount), Tile{});
+		std::fill(m_tiles.begin(), m_tiles.begin() + c_textTileCount, Tile{});
 		m_x = 0;
 		m_y = 0;
 		m_lastCharWasSpace = true;
@@ -250,8 +286,6 @@ void DialoguePrinter2::Next()
 		{
 		}
 	}
-
-	QueueDMA();
 }
 
 //------------------------------------------------------------------------------
@@ -267,7 +301,7 @@ bool DialoguePrinter2::DrawChar
 	// Main logic for stepping through and deciding how our display progresses
 	if (m_curTextIndex == 0)
 	{
-		std::fill(m_tiles.begin(), m_tiles.begin() + c_lineWidth * c_lineCount, Tile{});
+		std::fill(m_tiles.begin(), m_tiles.begin() + c_textTileCount, Tile{});
 	}
 
 	// Word wrapping handling, run on first character of each word
@@ -317,6 +351,7 @@ bool DialoguePrinter2::DrawChar
 		u16 const tileInd = (m_y * c_lineWidth) + (m_x >> 3);
 		u32 *const leftTile = (u32 *)&(m_tiles[tileInd].m_pixels);
 
+
 		// So for the left tile, we need to just shift the font data to the right by the amount of pixels m_x is in to the tile
 		u8 leftTilePixels = m_x & 0x7;
 		u16 const shift = leftTilePixels << 2;
@@ -324,6 +359,7 @@ bool DialoguePrinter2::DrawChar
 		{
 			leftTile[i] |= m_textFont->tiles[m_textFontData[charFontDataI].m_srcIndex + i] >> shift;
 		}
+		QueueCharacterDMA(tileInd);
 
 		u16 const used = c_pixelsPerTile - leftTilePixels;
 		if (used < m_textFontData[charFontDataI].m_charWidth)
@@ -334,6 +370,7 @@ bool DialoguePrinter2::DrawChar
 			{
 				rightTile[i] |= m_textFont->tiles[m_textFontData[charFontDataI].m_srcIndex + i] << antiShift;
 			}
+			QueueCharacterDMA(tileInd + 1);
 		}
 
 		m_x += m_textFontData[charFontDataI].m_charWidth;
@@ -361,10 +398,19 @@ bool DialoguePrinter2::DrawChar
 }
 
 //------------------------------------------------------------------------------
-void DialoguePrinter2::QueueDMA()
+void DialoguePrinter2::QueueNameDMA()
 {
-	// TODO: at least split by whether name or text is being uploaded, and also attempt to optimise text where possible
-	DMA_queueDmaFast(DMA_VRAM, m_tiles.data(), c_textTilesLoc << 5, sizeof(m_tiles) >> 1, 2);
+	m_nameTileRefresh = true;
+}
+
+//------------------------------------------------------------------------------
+void DialoguePrinter2::QueueCharacterDMA
+(
+	u16 i_charIndex
+)
+{
+	m_lineTileRefreshStart = std::min(i_charIndex, m_lineTileRefreshStart);
+	m_lineTileRefreshEnd = std::max(i_charIndex, m_lineTileRefreshEnd);
 }
 
 }
