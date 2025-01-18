@@ -122,6 +122,7 @@ void VNWorld::Shutdown
 	Game& io_game
 )
 {
+	m_printer.Shutdown(io_game);
 	io_game.RemoveVBlankCallback(m_fxScrollID);
 }
 

@@ -43,6 +43,8 @@ struct Char
 //------------------------------------------------------------------------------
 class DialoguePrinter2
 {
+	VBlankCallbackID m_dmaCallbackID{};
+
 	char const* m_curText{nullptr};
 	u16 m_curTextLen{0};
 	u16 m_curTextIndex{0};
@@ -59,8 +61,8 @@ class DialoguePrinter2
 	std::array<u16, 26> m_nameFontData{};
 	bool m_nameOnLeft{true};
 
-	std::array<SpriteID, 4> m_nameSprites;
-	std::array<SpriteID, 27> m_textSprites;
+	std::array<SpriteID, 4> m_nameSprites{};
+	std::array<SpriteID, 27> m_textSprites{};
 
 	bool m_nameTileRefresh{true};
 	u16 m_lineTileRefreshStart{0};

@@ -17,8 +17,8 @@ class Game
 
 	SpriteManager m_sprites;
 
-	static inline u8 s_callbackID = 0;
-	static inline std::vector<std::pair<u8, std::function<void()>>> s_vBlankCallbacks;
+	static inline VBlankCallbackID s_callbackID = 0;
+	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
 
 public:
 	Game();
@@ -27,8 +27,8 @@ public:
 
 	void Run();
 
-	u8 AddVBlankCallback(std::function<void()>&& i_callback);
-	void RemoveVBlankCallback(u8 i_callbackID);
+	VBlankCallbackID AddVBlankCallback(std::function<void()>&& i_callback);
+	void RemoveVBlankCallback(VBlankCallbackID i_callbackID);
 
 	SpriteManager& Sprites() { return m_sprites; }
 

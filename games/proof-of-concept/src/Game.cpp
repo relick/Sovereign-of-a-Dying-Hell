@@ -44,13 +44,13 @@ void Game::Run()
 	}
 }
 
-u8 Game::AddVBlankCallback(std::function<void()>&& i_callback)
+VBlankCallbackID Game::AddVBlankCallback(std::function<void()>&& i_callback)
 {
 	s_vBlankCallbacks.push_back({ s_callbackID, std::move(i_callback), });
 	return s_callbackID++;
 }
 
-void Game::RemoveVBlankCallback(u8 i_callbackID)
+void Game::RemoveVBlankCallback(VBlankCallbackID i_callbackID)
 {
 	auto cbI = std::find_if(
 		s_vBlankCallbacks.begin(),

@@ -16,6 +16,8 @@ class Game;
 class World;
 class DialoguePrinter;
 
+using VBlankCallbackID = u8;
+
 using SpriteID = u16;
 class SpriteData;
 class SpriteManager;

@@ -73,7 +73,7 @@ void DialoguePrinter2::Init
 
 	SetupSprites(io_game);
 
-	io_game.AddVBlankCallback(
+	m_dmaCallbackID = io_game.AddVBlankCallback(
 		[this]{
 			if(m_nameTileRefresh)
 			{
@@ -103,6 +103,25 @@ void DialoguePrinter2::Init
 			}
 		}
 	);
+}
+
+//------------------------------------------------------------------------------
+void DialoguePrinter2::Shutdown
+(
+	Game& io_game
+)
+{
+	// Remove vblank and sprites
+	io_game.RemoveVBlankCallback(m_dmaCallbackID);
+
+	for(SpriteID id : m_nameSprites)
+	{
+		io_game.Sprites().RemoveSprite(id);
+	}
+	for(SpriteID id : m_textSprites)
+	{
+		io_game.Sprites().RemoveSprite(id);
+	}
 }
 
 //------------------------------------------------------------------------------

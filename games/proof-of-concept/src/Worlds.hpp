@@ -41,7 +41,7 @@ class TitleWorld
 class VNWorld
 	: public World
 {
-	u8 m_fxScrollID = UINT8_MAX;
+	VBlankCallbackID m_fxScrollID{};
 	bool m_fading = false;
 	// DialoguePrinter m_printer{2, c_textFramePos + 1, 36, 3};
 	DialoguePrinter2 m_printer;
