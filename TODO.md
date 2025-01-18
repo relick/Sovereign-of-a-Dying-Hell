@@ -58,7 +58,13 @@ Text frame is palette swap(s) of bg
 Game blits text to tiles in RAM and DMA streams them in, allowing for non-monospace text. Idea for text is to have a larger font for names at the side of the frame (overlapping the border?) above smaller font for dialogue.
 
 TODOs:
-- Palette fading in RAM to allow for fading of text frame
 - Software text blitting // done!
-- Intro world sounds
+- Palette fading in RAM to allow for fading of text frame // PAL_fade exists. lol.
+- Script engine
+- Character animation
 - Text beeps
+- Intro world sounds
+- Save data (straightforward to do but just bear in mind while making script engine)
+- Title screen
+- Credits animation
+- Music room

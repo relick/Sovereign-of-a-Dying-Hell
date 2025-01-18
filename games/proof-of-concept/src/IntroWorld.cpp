@@ -5,8 +5,6 @@
 #include <genesis.h>
 #include "res_bg.h"
 
-static u16 myTileInd = TILE_USER_INDEX;
-
 namespace Game
 {
 
@@ -15,9 +13,7 @@ void IntroWorld::Init
 	Game& io_game
 )
 {
-	VDP_drawImageEx(VDPPlane::BG_B, &logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, myTileInd), 0, 0, false, true);
-	myTileInd += logo.tileset->numTile;
-	
+	VDP_drawImageEx(VDPPlane::BG_B, &logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 0), 0, 0, false, true);
 
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	m_fxScrollID = io_game.AddVBlankCallback([this]{ DMAScrollData(); });
@@ -69,6 +65,10 @@ void IntroWorld::Run
 	for (u16 i = 0; i < m_lineTable.size(); i++)
 	{
 		m_lineTable[i] = sinFix16((i << 5) + m_sineScroll) >> 4;
+		if(i&1)
+		{
+			m_lineTable[i] = -m_lineTable[i];
+		}
 	}
 
 	m_sineScroll += 4;

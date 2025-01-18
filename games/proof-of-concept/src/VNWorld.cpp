@@ -39,19 +39,13 @@ void HInt_TextArea_Reset()
 	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
 }
 
-// current VRAM upload tile position
-// TODO
-static u16 myTileInd = TILE_USER_INDEX;
-
 void VNWorld::Init
 (
 	Game& io_game
 )
 {
-	VDP_drawImageEx(VDPPlane::BG_B, &beach2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, myTileInd), 0, 0, false, true);
-	myTileInd += beach2.tileset->numTile;
-	VDP_drawImageEx(VDPPlane::BG_A, &stacey, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, myTileInd), 0, 0, false, true);
-	myTileInd += stacey.tileset->numTile;
+	VDP_drawImageEx(VDPPlane::BG_B, &beach2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0, false, true);
+	VDP_drawImageEx(VDPPlane::BG_A, &stacey, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - stacey.tileset->numTile), 0, 0, false, true);
 
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);

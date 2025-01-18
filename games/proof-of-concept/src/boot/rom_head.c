@@ -9,7 +9,7 @@ const ROMHeader rom_header = {
 #else
     "SEGA MEGA DRIVE ",
 #endif
-    "(C)KDEV 2024.NOV",                                 // Copyright, format `(C)XXXX YYYY.ZZZ` with X = dev ID, Y = year, Z = month
+    "(C)KDEV 2025.FEB",                                 // Copyright, format `(C)XXXX YYYY.ZZZ` with X = dev ID, Y = year, Z = month
     "SAMPLE PROGRAM                                  ", // Japan name
     "SAMPLE PROGRAM                                  ", // Overseas name
     "GM 00000000-00",                                   // Serial number, format `GM YYYYYYYY-ZZ` with Y = number, Z = revision
@@ -27,7 +27,7 @@ const ROMHeader rom_header = {
     // SRAM declaration.
     "RA",                                               // Always RA
     0xF820,                                             // F8 = 8-bit (odd addresses), RAM saves. 20 always
-    0x00200000,                                         // SRAM start address
+    0x00200001,                                         // SRAM start address
     0x0020FFFF,                                         // SRAM end address
     "            ",                                     // Modem support (leave blank)
     "                                        ",         // Memos
