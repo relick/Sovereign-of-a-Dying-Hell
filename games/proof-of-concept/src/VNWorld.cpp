@@ -93,7 +93,7 @@ void VNWorld::Init
 	myTileInd += stacey.tileset->numTile;
 
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
-	SYS_setVBlankCallback(FX_UpdateScroll);
+	m_fxScrollID = io_game.AddVBlankCallback(FX_UpdateScroll);
 
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
@@ -122,6 +122,7 @@ void VNWorld::Shutdown
 	Game& io_game
 )
 {
+	io_game.RemoveVBlankCallback(m_fxScrollID);
 }
 
 void VNWorld::Run
