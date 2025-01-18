@@ -11,7 +11,6 @@ set DIRS=games\proof-of-concept
 
 for /D %%i in (%DIRS%) do (
     echo "%%i"
-    %GDK_WIN%\bin\make -C "%%i" clean -f %GDK_WIN%\makefilecpp.gen
     %GDK_WIN%\bin\make -C "%%i" release -f %GDK_WIN%\makefilecpp.gen
     %GDK_WIN%\bin\make -C "%%i" distclean -f %GDK_WIN%\makefilecpp.gen 
 )  
