@@ -59,4 +59,6 @@ Game blits text to tiles in RAM and DMA streams them in, allowing for non-monosp
 
 TODOs:
 - Palette fading in RAM to allow for fading of text frame
-- Software text blitting
+- Software text blitting // done!
+- Intro world sounds
+- Text beeps

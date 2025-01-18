@@ -96,7 +96,7 @@ inline void TriggerPaletteDMA()
 		// Note: if it's an issue, just replace the while loop with more manual asm. Then everything between the pushes and pops is completely controlled by us.
 
 		// Save registers to respect ABI
-		pushl_reg("%d5"); // d5 will be used to store the DMA command
+		//pushl_reg("%d5"); // d5 will be used to store the DMA command
 		pushl_reg("%d4"); // d4 will be used to store the command for enabling VDP
 		pushl_reg("%d3"); // d3 will be used to store the command for disabling VDP
 		pushl_reg("%a3"); // a3 will be used to store the VDP ctrl port address
@@ -107,9 +107,9 @@ inline void TriggerPaletteDMA()
 		lea(VDP_CTRL_PORT, "%a3");
 
 		// Put DMA command into memory (apparently, popping from the stack is the fastest way to deliver the command)
-		//pushl_val(VDP_DMA_CRAM_ADDR((u32)(t_PalNum * 16 * sizeof(u16))));
+		pushl_val(VDP_DMA_CRAM_ADDR((u32)(t_PalNum * 16 * sizeof(u16))));
 		// Newly added: the above was a lie, doing it from register is faster.
-		movel_val_reg(VDP_DMA_CRAM_ADDR((u32)(t_PalNum * 16 * sizeof(u16))), "%d5");
+		//movel_val_reg(VDP_DMA_CRAM_ADDR((u32)(t_PalNum * 16 * sizeof(u16))), "%d5");
 	}
 	
 	// Wait until precise point near end of line (160 = end of line, but latency means we need to stop a little earlier)
@@ -126,8 +126,8 @@ inline void TriggerPaletteDMA()
 		}
 
 		// Initiate DMA
-		//popl_mem("%a3");
-		movel_reg_mem("%d5", "%a3");
+		popl_mem("%a3");
+		//movel_reg_mem("%d5", "%a3");
 
 		if constexpr (t_When == During::Active)
 		{
@@ -142,7 +142,7 @@ inline void TriggerPaletteDMA()
 		popl_reg("%a3");
 		popl_reg("%d3");
 		popl_reg("%d4");
-		popl_reg("%d5");
+		//popl_reg("%d5");
 	}
 
 	// Clean away macros
