@@ -15,9 +15,7 @@ inline void SetColour_DATA(u16 i_value)
 	*((vu16 *)VDP_DATA_PORT) = i_value;
 }
 
-// Stripped down from DMA_doDmaFast to specifically update palette mid-frame, at the cost of sprites
-template <During t_When, u16 t_PalNum, u8 t_Length = 16>
-inline void SetPalette_Fast(u16 const *i_pal)
+inline void SetupDMA(u16 const *i_pal)
 {
 	vu16 *pw = reinterpret_cast<vu16 *>(VDP_CTRL_PORT);
 
@@ -25,8 +23,9 @@ inline void SetPalette_Fast(u16 const *i_pal)
 	*pw = 0x8F00 | sizeof(u16);
 
 	// Setup DMA length (in word here)
-	*pw = 0x9300 + (t_Length & 0xff);
-	*pw = 0x9400 + ((t_Length >> 8) & 0xff);
+	// 16 is the length (hard coded for palette)
+	*pw = 0x9300 + (16 & 0xff);
+	*pw = 0x9400 + ((16 >> 8) & 0xff);
 
 	u32 fromAddr = (u32)(i_pal);
 
@@ -37,24 +36,47 @@ inline void SetPalette_Fast(u16 const *i_pal)
 	*pw = 0x9600 + (fromAddr & 0xff);
 	fromAddr >>= 8;
 	*pw = 0x9700 + (fromAddr & 0x7f);
+}
 
+inline void WaitForStartOfNextLine()
+{
 	// Wait for end of this line.
-	while (GET_HCOUNTER < 156) {}
+	while (GET_HCOUNTER < 156)
+	{
+	}
 
 	// Wait for start of next line.
-	while (GET_HCOUNTER >= 156) {}
+	while (GET_HCOUNTER >= 156)
+	{
+	}
+}
 
-	// We can't wait for the timing critical section to disable Z80, so we'll do it here
-	// which will potentially cost us a line's worth of Z80 but no more
+bool PauseZ80()
+{
 #if (HALT_Z80_ON_DMA != 0)
-	bool busTaken = Z80_isBusTaken();
-	// disable Z80 before processing DMA
-	if (!busTaken)
+	if (!Z80_isBusTaken())
 	{
 		Z80_requestBus(FALSE);
+		return true;
 	}
 #endif // HALT_Z80_ON_DMA
+	return false;
+}
 
+void StartZ80(bool i_z80Stopped)
+{
+#if (HALT_Z80_ON_DMA != 0)
+	// re-enable Z80 after DMA
+	if (i_z80Stopped)
+	{
+		Z80_releaseBus();
+	}
+#endif // HALT_Z80_ON_DMA
+}
+
+template<During t_When, u16 t_PalNum>
+inline void TriggerDMA()
+{
 	// Various macros to make the asm a little bit more readable
 	#define CONCAT_INST(INST, SRC, DEST) INST " " SRC ", " DEST
 	#define lea(ADDR, DEST_DREG) asm(CONCAT_INST("lea", "%a0", "%" DEST_DREG)::"i"(ADDR))
@@ -132,23 +154,55 @@ inline void SetPalette_Fast(u16 const *i_pal)
 	#undef movew_reg_mem
 	#undef popl_mem
 	#undef popl_reg
-
-#if (HALT_Z80_ON_DMA != 0)
-	// re-enable Z80 after DMA
-	if (!busTaken)
-	{
-		Z80_releaseBus();
-	}
-#endif // HALT_Z80_ON_DMA
 }
+
+// Stripped down from DMA_doDmaFast to specifically update palette mid-frame, at the cost of sprites
+template <During t_When, u16 t_PalNum>
+inline void SetPalette_Fast(u16 const *i_pal)
+{
+	SetupDMA(i_pal);
+
+	WaitForStartOfNextLine();
+
+	// We can't wait for the timing critical section to disable Z80, so we'll do it here
+	// which will potentially cost us a line's worth of Z80 but no more
+	bool const z80Stopped = PauseZ80();
+
+	TriggerDMA<t_When, t_PalNum>();
+
+	StartZ80(z80Stopped);
+}
+
+// Should be able to do 2 palettes in 3 lines instead of 4 with this
+template <During t_When, u16 t_PalNum0, u16 t_PalNum1>
+inline void Set2Palette_Fast(u16 const *i_pal0, u16 const *i_pal1)
+{
+	SetupDMA(i_pal0);
+
+	// Because of HInt lateness, it's more reliable to wait for start of next line the first time we enter the function
+	WaitForStartOfNextLine();
+
+	bool const z80Stopped = PauseZ80();
+
+	TriggerDMA<t_When, t_PalNum0>();
+
+	SetupDMA(i_pal1);
+	TriggerDMA<t_When, t_PalNum1>();
+
+	StartZ80(z80Stopped);
+}
+
 }
 
 namespace Game
 {
 
-// All code here works on the basis text frame is using PAL0
-inline u16 const* s_textFramePalette;
-inline void SetTextFramePalette(Palette const& i_pal) { s_textFramePalette = i_pal.data; }
+// All code here works on the basis BG text frame is using PAL0
+inline u16 const* s_bgTextFramePalette;
+inline void SetBGTextFramePalette(Palette const &i_pal) { s_bgTextFramePalette = i_pal.data; }
+// And char text frame is using PAL1
+inline u16 const* s_charTextFramePalette;
+inline void SetCharTextFramePalette(Palette const& i_pal) { s_charTextFramePalette = i_pal.data;}
 
 // Requires 1 line prior to prepare colours to start on t_LineToShow
 template <u8 t_LineToShow, u8 t_BaseLine = t_LineToShow - 1, u8 t_Line = t_BaseLine>
@@ -166,13 +220,13 @@ HINTERRUPT_CALLBACK HInt_TextFrame()
 		while (GET_HCOUNTER < 136)
 		{
 		}
-		System::SetColour_DATA(s_textFramePalette[t_Line - t_BaseLine]);
+		System::SetColour_DATA(s_bgTextFramePalette[t_Line - t_BaseLine]);
 		if constexpr (t_Line - t_BaseLine < 5)
 		{
 			System::SetColour_CTRL(t_Line - t_BaseLine + 1);
-			System::SetColour_DATA(s_textFramePalette[t_Line - t_BaseLine + 1]);
+			System::SetColour_DATA(s_bgTextFramePalette[t_Line - t_BaseLine + 1]);
 			System::SetColour_CTRL(t_Line - t_BaseLine + 2);
-			System::SetColour_DATA(s_textFramePalette[t_Line - t_BaseLine + 2]);
+			System::SetColour_DATA(s_bgTextFramePalette[t_Line - t_BaseLine + 2]);
 		}
 		else
 		{
@@ -189,9 +243,26 @@ HINTERRUPT_CALLBACK HInt_TextFrameDMA()
 {
 	if (GET_VCOUNTER == t_Line)
 	{
-		System::SetPalette_Fast<During::Active, t_PalNum>(s_textFramePalette);
+		System::SetPalette_Fast<During::Active, t_PalNum>(s_bgTextFramePalette);
 		T_Callback();
 	}
 }
 
+using CallbackFn = void();
+template <u16 t_PalNum0, u16 t_PalNum1, bool t_BGFirst, u8 t_LineToShow, CallbackFn *T_Callback, u8 t_Line = t_LineToShow - 2>
+HINTERRUPT_CALLBACK HInt_TextFrameDMA2()
+{
+	if (GET_VCOUNTER == t_Line)
+	{
+		if constexpr (t_BGFirst)
+		{
+			System::Set2Palette_Fast<During::Active, t_PalNum0, t_PalNum1>(s_bgTextFramePalette, s_charTextFramePalette);
+		}
+		else
+		{
+			System::Set2Palette_Fast<During::Active, t_PalNum1, t_PalNum0>(s_charTextFramePalette, s_bgTextFramePalette);
+		}
+		T_Callback();
+	}
+}
 }

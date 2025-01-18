@@ -14,37 +14,29 @@
 namespace Game
 {
 
-void HInt_TextArea_SetNameBG();
-void HInt_TextArea_SetNameChar_TextBG();
-void HInt_TextArea_SetTextChar_ResetBG();
-void HInt_TextArea_ResetChar();
+void HInt_TextArea_SetName();
+void HInt_TextArea_SetText();
+void HInt_TextArea_Reset();
 
-void HInt_TextArea_SetNameBG()
+void HInt_TextArea_SetName()
 {
-	SetTextFramePalette(stacey_name_pal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA<PAL1, c_textFramePos * 8 - 16, &HInt_TextArea_SetNameChar_TextBG>);
+	SetBGTextFramePalette(beach2_name_pal);
+	SetCharTextFramePalette(stacey_name_pal);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, false, c_textFramePos * 8 - 15, &HInt_TextArea_SetText>);
 }
 
-void HInt_TextArea_SetNameChar_TextBG()
+void HInt_TextArea_SetText()
 {
-	System::SetPalette_Fast<During::Active, PAL0>(beach2_name_pal.data);
-
-	SetTextFramePalette(beach2_text_pal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA<PAL0, c_textFramePos * 8 + 4, &HInt_TextArea_SetTextChar_ResetBG>);
+	SetBGTextFramePalette(beach2_text_pal);
+	SetCharTextFramePalette(stacey_text_pal);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 4, &HInt_TextArea_Reset>);
 }
 
-void HInt_TextArea_SetTextChar_ResetBG()
+void HInt_TextArea_Reset()
 {
-	System::SetPalette_Fast<During::Active, PAL1>(stacey_text_pal.data);
-
-	SetTextFramePalette(*(beach2.palette));
-	SYS_setHIntCallback(&HInt_TextFrameDMA<PAL0, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_ResetChar>);
-}
-
-void HInt_TextArea_ResetChar()
-{
-	System::SetPalette_Fast<During::Active, PAL1>(stacey.palette->data);
-	HInt_TextArea_SetNameBG();
+	SetBGTextFramePalette(*(beach2.palette));
+	SetCharTextFramePalette(*(stacey.palette));
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
 }
 
 // current VRAM upload tile position
@@ -70,7 +62,7 @@ void VNWorld::Init
 	PAL_fadeToAll(fullPal, FramesPerSecond(), false);
 
 	// Show palette-based text frame
-	HInt_TextArea_SetNameBG();
+	HInt_TextArea_SetName();
 	VDP_setHInterrupt(TRUE);
 	VDP_setHIntCounter(0);
 
