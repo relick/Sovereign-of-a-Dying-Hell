@@ -22,6 +22,7 @@ class IntroWorld
 	: public World
 {
 	f16 m_timer = 0;
+	bool m_fadeInStarted = false;
 	bool m_fadeOutStarted = false;
 
 	void Init(Game &io_game) override;
@@ -40,7 +41,8 @@ class TitleWorld
 class VNWorld
 	: public World
 {
-	//DialoguePrinter m_printer{2, c_textFramePos + 1, 36, 3};
+	bool m_fading = false;
+	// DialoguePrinter m_printer{2, c_textFramePos + 1, 36, 3};
 	DialoguePrinter2 m_printer;
 
 	void Init(Game &io_game) override;

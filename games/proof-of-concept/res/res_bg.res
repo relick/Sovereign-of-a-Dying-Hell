@@ -1,4 +1,4 @@
-IMAGE text_frame "bg/frame.png"
+IMAGE logo "bg/logo.png"
 
 IMAGE beach "bg/beachRGB.png"
 PALETTE beach_name_pal "bg/beachNamePalette.png"

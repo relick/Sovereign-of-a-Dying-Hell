@@ -41,37 +41,77 @@ void HInt_TextArea_Reset()
 
 // current VRAM upload tile position
 // TODO
-u16 curTileInd = TILE_USER_INDEX;
+static u16 myTileInd = TILE_USER_INDEX;
+
+#define LINETABLE_SIZE 224
+static s16 LineTable[LINETABLE_SIZE] = {0};
+static u16 SineScroll = 0;
+
+// Called once every frame in main loop
+void FX_SineWave()
+{
+	for (u8 i = 0; i < LINETABLE_SIZE; i++)
+	{
+		LineTable[i] = sinFix16(i + SineScroll);
+	}
+
+	SineScroll += 4;
+}
+
+// Called once every frame in vblank
+void FX_UpdateScroll()
+{
+	VDP_setHorizontalScrollLine(BG_A, 0, LineTable, LINETABLE_SIZE, DMA);
+}
+
+// From VDP_drawImageEx
+bool DrawImage_TMNoPalette(VDPPlane plane, const Image *image, u16 basetile, u16 x, u16 y, TransferMethod tm)
+{
+	if (!VDP_loadTileSet(image->tileset, basetile & TILE_INDEX_MASK, tm))
+	{
+		return false;
+	}
+
+	TileMap *tilemap = image->tilemap;
+
+	if (!VDP_setTileMapEx(plane, tilemap, basetile, x, y, 0, 0, tilemap->w, tilemap->h, tm))
+	{
+		return false;
+	}
+
+	return true;
+}
 
 void VNWorld::Init
 (
 	Game& io_game
 )
 {
-	VDP_drawImageEx(VDPPlane::BG_B, &beach2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, curTileInd), 0, 0, false, DMA);
-	curTileInd += beach2.tileset->numTile;
-	VDP_drawImageEx(VDPPlane::BG_A, &stacey, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, curTileInd), 0, 0, false, DMA);
-	curTileInd += stacey.tileset->numTile;
+	DrawImage_TMNoPalette(VDPPlane::BG_B, &beach2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, myTileInd), 0, 0, DMA);
+	myTileInd += beach2.tileset->numTile;
+	DrawImage_TMNoPalette(VDPPlane::BG_A, &stacey, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, myTileInd), 0, 0, DMA);
+	myTileInd += stacey.tileset->numTile;
 
-	PAL_setColorsDMA(0, palette_black, 64);
+	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
+	SYS_setVBlankCallback(FX_UpdateScroll);
+
+	// Enable shadow effects on text
+	VDP_setHilightShadow(1);
+
+	PAL_setColors(0, palette_black, 64, DMA);
 	u16 fullPal[64] = { 0 };
 
 	std::memcpy(fullPal, beach2.palette->data, 16 * sizeof(u16));
 	std::memcpy(fullPal + 16, stacey.palette->data, 16 * sizeof(u16));
 	std::memcpy(fullPal + 48, text_font_pal.data, 16 * sizeof(u16));
-	PAL_fadeToAll(fullPal, FramesPerSecond(), false);
+	PAL_fadeToAll(fullPal, FramesPerSecond(), true);
+	m_fading = true;
 
 	// Show palette-based text frame
 	HInt_TextArea_SetName();
-	VDP_setHInterrupt(TRUE);
 	VDP_setHIntCounter(0);
 
 	m_printer.Init(vn_font, name_font);
-	m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!");
-	m_printer.SetName("STACEY", false);
-
-	// Enable shadow effects on text
-	VDP_setHilightShadow(1);
 
 	// Playing music really is this easy
 	// XGM_startPlay(spacey);
@@ -89,6 +129,23 @@ void VNWorld::Run
 	Game& io_game
 )
 {
+	FX_SineWave();
+
+	if (m_fading)
+	{
+		if(!PAL_isDoingFade())
+		{
+			m_fading = false;
+			VDP_setHInterrupt(TRUE);
+			m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!");
+			m_printer.SetName("STACEY", false);
+		}
+		else
+		{
+			return;
+		}
+	}
+
 	u16 buttons = JOY_readJoypad(JOY_1);
 
 	static bool pressed = false;

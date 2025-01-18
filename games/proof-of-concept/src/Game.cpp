@@ -13,6 +13,7 @@ Game::Game
 {
 	VDP_setScreenWidth320();
 	VDP_setScreenHeight224();
+	PAL_setColorsDMA(0, palette_black, 64);
 }
 
 void Game::RequestNextWorld(std::unique_ptr<World> &&i_nextWorld)

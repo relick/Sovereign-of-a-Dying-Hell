@@ -3,7 +3,9 @@
 #include "Version.hpp"
 
 #include <genesis.h>
-#include "res_fonts.h"
+#include "res_bg.h"
+
+static u16 myTileInd = TILE_USER_INDEX;
 
 namespace Game
 {
@@ -13,11 +15,8 @@ void IntroWorld::Init
 	Game& io_game
 )
 {
-	PAL_setPalette(PAL0, intro_font_pal.data, TransferMethod::DMA);
-	VDP_loadFont(&intro_font, TransferMethod::DMA);
-	VDP_setTextPalette(PAL0);
-
-	VDP_drawText("kasha.dev", 15, 0);
+	VDP_drawImageEx(VDPPlane::BG_B, &logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, myTileInd), 0, 0, false, true);
+	myTileInd += logo.tileset->numTile;
 }
 
 void IntroWorld::Shutdown
@@ -25,8 +24,6 @@ void IntroWorld::Shutdown
 	Game& io_game
 )
 {
-	VDP_setVerticalScroll(VDP_getTextPlane(), 0);
-	VDP_clearPlane(VDP_getTextPlane(), true);
 }
 
 void IntroWorld::Run
@@ -36,20 +33,23 @@ void IntroWorld::Run
 {
 	if (JOY_readJoypad(JOY_1) != 0)
 	{
-		m_timer = FIX16(3);
+		m_timer = FIX16(6);
 	}
 
-	if (m_timer < FIX16(1))
+	if (m_timer > FIX16(0.5) && !m_fadeInStarted)
 	{
-		VDP_setVerticalScroll(VDP_getTextPlane(), -fix16ToInt(fix16Mul(intToFix16(c_screenHeightPx / 2), m_timer)));
+		PAL_fadeInPalette(PAL0, logo.palette->data, FramesPerSecond(), true);
+		m_fadeInStarted = true;
 	}
-	else if (m_timer < FIX16(2) && !m_fadeOutStarted)
+	else if (m_timer > FIX16(2) && !m_fadeOutStarted)
 	{
-		PAL_fadeOutAll(FramesPerSecond(), true);
+		PAL_fadeOutPalette(PAL0, FramesPerSecond(), true);
 		m_fadeOutStarted = true;
 	}
-	else if (m_timer > FIX16(3))
+	else if (m_timer > FIX16(3.5))
 	{
+		PAL_interruptFade();
+		PAL_setPalette(PAL0, palette_black, DMA_QUEUE);
 		io_game.RequestNextWorld(std::make_unique<VNWorld>());
 	}
 	m_timer += FrameStep();
