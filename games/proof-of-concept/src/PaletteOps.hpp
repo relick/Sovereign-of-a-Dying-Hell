@@ -15,29 +15,6 @@ inline void SetColour_DATA(u16 i_value)
 	*((vu16 *)VDP_DATA_PORT) = i_value;
 }
 
-inline void SetupDMA(u16 const *i_pal)
-{
-	vu16 *pw = reinterpret_cast<vu16 *>(VDP_CTRL_PORT);
-
-	// Set VDP auto inc
-	*pw = 0x8F00 | sizeof(u16);
-
-	// Setup DMA length (in word here)
-	// 16 is the length (hard coded for palette)
-	*pw = 0x9300 + (16 & 0xff);
-	*pw = 0x9400 + ((16 >> 8) & 0xff);
-
-	u32 fromAddr = (u32)(i_pal);
-
-	// Setup DMA address
-	fromAddr >>= 1;
-	*pw = 0x9500 + (fromAddr & 0xff);
-	fromAddr >>= 8;
-	*pw = 0x9600 + (fromAddr & 0xff);
-	fromAddr >>= 8;
-	*pw = 0x9700 + (fromAddr & 0x7f);
-}
-
 inline void WaitForStartOfNextLine()
 {
 	// Wait for end of this line.
@@ -74,8 +51,31 @@ void StartZ80(bool i_z80Stopped)
 #endif // HALT_Z80_ON_DMA
 }
 
+inline void SetupPaletteDMA(u16 const *i_pal)
+{
+	vu16 *pw = reinterpret_cast<vu16 *>(VDP_CTRL_PORT);
+
+	// Set VDP auto inc
+	*pw = 0x8F00 | sizeof(u16);
+
+	// Setup DMA length (in word here)
+	// 16 is the length (hard coded for palette)
+	*pw = 0x9300 + (16 & 0xff);
+	*pw = 0x9400 + ((16 >> 8) & 0xff);
+
+	u32 fromAddr = (u32)(i_pal);
+
+	// Setup DMA address
+	fromAddr >>= 1;
+	*pw = 0x9500 + (fromAddr & 0xff);
+	fromAddr >>= 8;
+	*pw = 0x9600 + (fromAddr & 0xff);
+	fromAddr >>= 8;
+	*pw = 0x9700 + (fromAddr & 0x7f);
+}
+
 template<During t_When, u16 t_PalNum>
-inline void TriggerDMA()
+inline void TriggerPaletteDMA()
 {
 	// Various macros to make the asm a little bit more readable
 	#define CONCAT_INST(INST, SRC, DEST) INST " " SRC ", " DEST
@@ -160,7 +160,7 @@ inline void TriggerDMA()
 template <During t_When, u16 t_PalNum>
 inline void SetPalette_Fast(u16 const *i_pal)
 {
-	SetupDMA(i_pal);
+	SetupPaletteDMA(i_pal);
 
 	WaitForStartOfNextLine();
 
@@ -168,7 +168,7 @@ inline void SetPalette_Fast(u16 const *i_pal)
 	// which will potentially cost us a line's worth of Z80 but no more
 	bool const z80Stopped = PauseZ80();
 
-	TriggerDMA<t_When, t_PalNum>();
+	TriggerPaletteDMA<t_When, t_PalNum>();
 
 	StartZ80(z80Stopped);
 }
@@ -177,17 +177,17 @@ inline void SetPalette_Fast(u16 const *i_pal)
 template <During t_When, u16 t_PalNum0, u16 t_PalNum1>
 inline void Set2Palette_Fast(u16 const *i_pal0, u16 const *i_pal1)
 {
-	SetupDMA(i_pal0);
+	SetupPaletteDMA(i_pal0);
 
 	// Because of HInt lateness, it's more reliable to wait for start of next line the first time we enter the function
 	WaitForStartOfNextLine();
 
 	bool const z80Stopped = PauseZ80();
 
-	TriggerDMA<t_When, t_PalNum0>();
+	TriggerPaletteDMA<t_When, t_PalNum0>();
 
-	SetupDMA(i_pal1);
-	TriggerDMA<t_When, t_PalNum1>();
+	SetupPaletteDMA(i_pal1);
+	TriggerPaletteDMA<t_When, t_PalNum1>();
 
 	StartZ80(z80Stopped);
 }
