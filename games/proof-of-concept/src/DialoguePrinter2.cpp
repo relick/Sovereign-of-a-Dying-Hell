@@ -24,10 +24,10 @@ inline constexpr u16 c_nameTilesAddress = c_nameTilesIndex * 32;
 
 inline constexpr u16 c_nameFontOffset = 26 * 8;
 inline constexpr u16 c_namePosSide = 10;
-inline constexpr u16 c_namePosUp = 5;
+inline constexpr s16 c_namePosDown = -9;
 
 inline constexpr u16 c_textPosSide = 24;
-inline constexpr u16 c_textPosDown = 0;
+inline constexpr s16 c_textPosDown = -4;
 inline constexpr u16 c_lineSeparation = 2;
 inline constexpr u16 c_lineIndent = 1;
 
@@ -138,16 +138,19 @@ void DialoguePrinter2::SetupSprites
 	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-101
 
 	// Name sprites
+	s8 z = -128;
+
 	u16 nameIndex = c_nameTilesIndex;
 	for (u16 i = 0; i < m_nameSprites.size(); ++i)
 	{
 		SpriteData spr;
 
 		spr.m_x = c_namePosSide + i * 32;
-		spr.m_y = -c_namePosUp + (c_textFramePos - 1) * 8;
+		spr.m_y = c_namePosDown + (c_textFramePos - 1) * 8;
 		spr.m_palette = SpritePalette::Pal3;
 		spr.m_highPriority = true;
 		spr.m_firstTileIndex = nameIndex;
+		spr.m_z = z++;
 
 		if (i == (m_nameSprites.size() - 1))
 		{
@@ -177,6 +180,7 @@ void DialoguePrinter2::SetupSprites
 			spr.m_palette = SpritePalette::Pal3;
 			spr.m_highPriority = true;
 			spr.m_firstTileIndex = textIndex;
+			spr.m_z = z++;
 			
 			if ((c_lineWidth - x) < 4)
 			{

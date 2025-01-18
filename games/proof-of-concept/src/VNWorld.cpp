@@ -22,14 +22,14 @@ void HInt_TextArea_SetName()
 {
 	SetBGTextFramePalette(beach2_name_pal);
 	SetCharTextFramePalette(stacey_name_pal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, false, c_textFramePos * 8 - 15, &HInt_TextArea_SetText>);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, false, c_textFramePos * 8 - 20, &HInt_TextArea_SetText>);
 }
 
 void HInt_TextArea_SetText()
 {
 	SetBGTextFramePalette(beach2_text_pal);
 	SetCharTextFramePalette(stacey_text_pal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 4, &HInt_TextArea_Reset>);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 0, &HInt_TextArea_Reset>);
 }
 
 void HInt_TextArea_Reset()
