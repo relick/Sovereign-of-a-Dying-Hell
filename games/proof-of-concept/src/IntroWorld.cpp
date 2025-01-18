@@ -17,6 +17,10 @@ void IntroWorld::Init
 {
 	VDP_drawImageEx(VDPPlane::BG_B, &logo, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, myTileInd), 0, 0, false, true);
 	myTileInd += logo.tileset->numTile;
+	
+
+	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
+	m_fxScrollID = io_game.AddVBlankCallback([this]{ DMAScrollData(); });
 }
 
 void IntroWorld::Shutdown
@@ -24,6 +28,13 @@ void IntroWorld::Shutdown
 	Game& io_game
 )
 {
+	io_game.RemoveVBlankCallback(m_fxScrollID);
+
+	for (u8 i = 0; i < m_lineTable.size(); i++)
+	{
+		m_lineTable[i] = 0;
+	}
+	DMAScrollData();
 }
 
 void IntroWorld::Run
@@ -53,5 +64,19 @@ void IntroWorld::Run
 		io_game.RequestNextWorld(std::make_unique<VNWorld>());
 	}
 	m_timer += FrameStep();
+	
+	// Update scroll
+	for (u16 i = 0; i < m_lineTable.size(); i++)
+	{
+		m_lineTable[i] = sinFix16((i << 3) + m_sineScroll);
+	}
+
+	m_sineScroll += 4;
 }
+
+void IntroWorld::DMAScrollData()
+{
+	VDP_setHorizontalScrollLine(BG_B, 0, m_lineTable.data(), m_lineTable.size(), DMA);
+}
+
 }

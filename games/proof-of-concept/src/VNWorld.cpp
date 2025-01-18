@@ -43,57 +43,15 @@ void HInt_TextArea_Reset()
 // TODO
 static u16 myTileInd = TILE_USER_INDEX;
 
-#define LINETABLE_SIZE 224
-static s16 LineTable[LINETABLE_SIZE] = {0};
-static u16 SineScroll = 0;
-
-// Called once every frame in main loop
-void FX_SineWave()
-{
-	for (u8 i = 0; i < LINETABLE_SIZE; i++)
-	{
-		LineTable[i] = sinFix16(i + SineScroll);
-	}
-
-	SineScroll += 4;
-}
-
-// Called once every frame in vblank
-void FX_UpdateScroll()
-{
-	VDP_setHorizontalScrollLine(BG_A, 0, LineTable, LINETABLE_SIZE, DMA);
-}
-
-// From VDP_drawImageEx
-bool DrawImage_TMNoPalette(VDPPlane plane, const Image *image, u16 basetile, u16 x, u16 y, TransferMethod tm)
-{
-	if (!VDP_loadTileSet(image->tileset, basetile & TILE_INDEX_MASK, tm))
-	{
-		return false;
-	}
-
-	TileMap *tilemap = image->tilemap;
-
-	if (!VDP_setTileMapEx(plane, tilemap, basetile, x, y, 0, 0, tilemap->w, tilemap->h, tm))
-	{
-		return false;
-	}
-
-	return true;
-}
-
 void VNWorld::Init
 (
 	Game& io_game
 )
 {
-	DrawImage_TMNoPalette(VDPPlane::BG_B, &beach2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, myTileInd), 0, 0, DMA);
+	VDP_drawImageEx(VDPPlane::BG_B, &beach2, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, myTileInd), 0, 0, false, true);
 	myTileInd += beach2.tileset->numTile;
-	DrawImage_TMNoPalette(VDPPlane::BG_A, &stacey, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, myTileInd), 0, 0, DMA);
+	VDP_drawImageEx(VDPPlane::BG_A, &stacey, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, myTileInd), 0, 0, false, true);
 	myTileInd += stacey.tileset->numTile;
-
-	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
-	m_fxScrollID = io_game.AddVBlankCallback(FX_UpdateScroll);
 
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
@@ -123,7 +81,6 @@ void VNWorld::Shutdown
 )
 {
 	m_printer.Shutdown(io_game);
-	io_game.RemoveVBlankCallback(m_fxScrollID);
 }
 
 void VNWorld::Run
@@ -131,8 +88,6 @@ void VNWorld::Run
 	Game& io_game
 )
 {
-	FX_SineWave();
-
 	if (m_fading)
 	{
 		if(!PAL_isDoingFade())

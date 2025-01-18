@@ -21,6 +21,10 @@ public:
 class IntroWorld
 	: public World
 {
+	std::array<s16, c_screenHeightPx> m_lineTable{};
+	u16 m_sineScroll{0};
+	VBlankCallbackID m_fxScrollID{};
+
 	f16 m_timer = 0;
 	bool m_fadeInStarted = false;
 	bool m_fadeOutStarted = false;
@@ -28,6 +32,9 @@ class IntroWorld
 	void Init(Game &io_game) override;
 	void Shutdown(Game &io_game) override;
 	void Run(Game &io_game) override;
+
+private:
+	void DMAScrollData();
 };
 
 class TitleWorld
@@ -41,7 +48,6 @@ class TitleWorld
 class VNWorld
 	: public World
 {
-	VBlankCallbackID m_fxScrollID{};
 	bool m_fading = false;
 	// DialoguePrinter m_printer{2, c_textFramePos + 1, 36, 3};
 	DialoguePrinter2 m_printer;
