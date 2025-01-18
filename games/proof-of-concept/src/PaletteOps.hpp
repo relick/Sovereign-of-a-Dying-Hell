@@ -184,12 +184,12 @@ HINTERRUPT_CALLBACK HInt_TextFrame()
 
 // Requires 2 lines for DMA setup and execution, to show changes on t_LineToShow
 using CallbackFn = void();
-template <u8 t_LineToShow, CallbackFn* T_Callback, u8 t_Line = t_LineToShow - 2>
+template <u16 t_PalNum, u8 t_LineToShow, CallbackFn* T_Callback, u8 t_Line = t_LineToShow - 2>
 HINTERRUPT_CALLBACK HInt_TextFrameDMA()
 {
 	if (GET_VCOUNTER == t_Line)
 	{
-		System::SetPalette_Fast<During::Active, PAL0>(s_textFramePalette);
+		System::SetPalette_Fast<During::Active, t_PalNum>(s_textFramePalette);
 		T_Callback();
 	}
 }
