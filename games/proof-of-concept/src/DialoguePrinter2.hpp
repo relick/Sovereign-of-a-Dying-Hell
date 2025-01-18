@@ -36,15 +36,6 @@ struct Char
 	u8 m_charWidth{8};
 };
 
-struct Sprite
-{
-	u16 y;
-	u8 size;
-	u8 link;
-	u16 id;
-	u16 x;
-};
-
 //------------------------------------------------------------------------------
 /// Blits text to a tile buffer in RAM then creates DMA calls for execution in VBlank
 /// TODO: First pass fills tilemap into Window plane. It would be better to use sprites instead to free up the tilemap space for the text tiles themselves. But this will potentially conflict with the palette swap so be careful.
@@ -68,18 +59,17 @@ class DialoguePrinter2
 	std::array<u16, 26> m_nameFontData{};
 	bool m_nameOnLeft{true};
 
-	// In structure ready to be DMA'd
 	struct
 	{
-		std::array<Sprite, 4> m_nameSprites;
-		std::array<Sprite, 27> m_textSprites;
+		std::array<SpriteID, 4> m_nameSprites;
+		std::array<SpriteID, 27> m_textSprites;
 	} m_sprites;
 
 public:
 	// Sets up tiles and tilemap
-	void Init(TileSet const& i_textFont, TileSet const& i_nameFont);
+	void Init(Game& io_game, TileSet const& i_textFont, TileSet const& i_nameFont);
 
-	void SetName(char const* i_name, bool i_left);
+	void SetName(Game& io_game, char const* i_name, bool i_left);
 	void SetText(char const *i_text);
 
 	// Advances render and queues DMA
@@ -89,7 +79,7 @@ public:
 	void Next();
 
 private:
-	void SetupSprites();
+	void SetupSprites(Game& io_game);
 
 	// Returns false when no more can be drawn until user progresses
 	bool DrawChar();

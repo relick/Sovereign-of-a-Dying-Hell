@@ -1,5 +1,7 @@
 #include "DialoguePrinter2.hpp"
 #include "Constants.hpp"
+#include "Game.hpp"
+#include "SpriteManager.hpp"
 
 #include <genesis.h>
 
@@ -24,7 +26,12 @@ inline constexpr u16 c_lineSeparation = 2;
 inline constexpr u16 c_lineIndent = 1;
 
 //------------------------------------------------------------------------------
-void DialoguePrinter2::Init(TileSet const &i_textFont, TileSet const &i_nameFont)
+void DialoguePrinter2::Init
+(
+	Game& io_game,
+	TileSet const &i_textFont,
+	TileSet const &i_nameFont
+)
 {
 	// Queue cleared tiles
 	VDP_fillTileData(0, c_textTilesLoc, m_tiles.size(), true);
@@ -58,11 +65,14 @@ void DialoguePrinter2::Init(TileSet const &i_textFont, TileSet const &i_nameFont
 		m_nameFontData[i] = i * 8;
 	}
 
-	SetupSprites();
+	SetupSprites(io_game);
 }
 
 //------------------------------------------------------------------------------
-void DialoguePrinter2::SetupSprites()
+void DialoguePrinter2::SetupSprites
+(
+	Game& io_game
+)
 {
 	// Tile indices setup as
 	// 102-XXXXXXXXX
@@ -75,19 +85,24 @@ void DialoguePrinter2::SetupSprites()
 	u16 nameIndex = (c_lineCount * c_lineWidth) + c_textTilesLoc;
 	for (u16 i = 0; i < m_sprites.m_nameSprites.size(); ++i)
 	{
-		Sprite &spr = m_sprites.m_nameSprites[i];
-		spr.x = 128 + c_namePosSide + i * 32;
-		spr.y = 128 - c_namePosUp + (c_textFramePos - 1) * 8;
-		spr.id = TILE_ATTR_FULL(PAL3, 1, 0, 0, nameIndex);
+		SpriteData spr;
+
+		spr.m_x = c_namePosSide + i * 32;
+		spr.m_y = -c_namePosUp + (c_textFramePos - 1) * 8;
+		spr.m_palette = SpritePalette::Pal3;
+		spr.m_highPriority = true;
+		spr.m_firstTileIndex = nameIndex;
+
 		if (i == (m_sprites.m_nameSprites.size() - 1))
 		{
-			spr.size = 0b0001; // 1x2
+			spr.m_size = SpriteSize::r2c1;
 		}
 		else
 		{
-			spr.size = 0b1101; // 4x2
+			spr.m_size = SpriteSize::r2c4;
 		}
-		spr.link = i + 1;
+		
+		m_sprites.m_nameSprites[i] = io_game.Sprites().AddSprite(std::move(spr)).first;
 
 		nameIndex += 8;
 	}
@@ -99,21 +114,26 @@ void DialoguePrinter2::SetupSprites()
 	{
 		for (u16 x = 0; x < c_lineWidth;)
 		{
-			Sprite &spr = m_sprites.m_textSprites[sprI];
-			spr.x = 128 + c_textPosSide + x * 8 + y * c_lineIndent;
-			spr.y = 128 + c_textPosDown + (c_textFramePos + 1 + y) * 8 + (c_lineSeparation * y);
-			spr.id = TILE_ATTR_FULL(PAL3, 1, 0, 0, textIndex);
+			SpriteData spr;
+
+			spr.m_x = c_textPosSide + x * 8 + y * c_lineIndent;
+			spr.m_y = c_textPosDown + (c_textFramePos + 1 + y) * 8 + (c_lineSeparation * y);
+			spr.m_palette = SpritePalette::Pal3;
+			spr.m_highPriority = true;
+			spr.m_firstTileIndex = textIndex;
+			
 			if ((c_lineWidth - x) < 4)
 			{
-				spr.size = 0b0100; // 2x1
+				spr.m_size = SpriteSize::r1c2;
 				textIndex += 2;
 			}
 			else
 			{
-				spr.size = 0b1100; // 4x1
+				spr.m_size = SpriteSize::r1c4;
 				textIndex += 4;
 			}
-			spr.link = sprI + 1 + m_sprites.m_nameSprites.size();
+
+			m_sprites.m_textSprites[sprI] = io_game.Sprites().AddSprite(std::move(spr)).first;
 
 			++sprI;
 			x += 4;
@@ -121,15 +141,12 @@ void DialoguePrinter2::SetupSprites()
 
 		++y;
 	}
-
-	m_sprites.m_textSprites.back().link = 0;
-
-	DMA_queueDmaFast(DMA_VRAM, &m_sprites, VDP_getSpriteListAddress(), sizeof(m_sprites) >> 1, 2);
 }
 
 //------------------------------------------------------------------------------
 void DialoguePrinter2::SetName
 (
+	Game& io_game,
 	char const* i_name,
 	bool i_left
 )
@@ -165,15 +182,13 @@ void DialoguePrinter2::SetName
 	{
 		for (u16 i = 0; i < m_sprites.m_nameSprites.size(); ++i)
 		{
-			Sprite &spr = m_sprites.m_nameSprites[i];
-			spr.x = 128 + c_namePosSide + i * 32;
+			SpriteData& spr = io_game.Sprites().EditSpriteData(m_sprites.m_nameSprites[i]);
+			spr.m_x = c_namePosSide + i * 32;
 			if(!i_left)
 			{
-				spr.x += 320 - 2 * c_namePosSide - ((limit >> 1) * 8);
+				spr.m_x += 320 - 2 * c_namePosSide - ((limit >> 1) * 8);
 			}
 		}
-
-		DMA_queueDmaFast(DMA_VRAM, &m_sprites.m_nameSprites, VDP_getSpriteListAddress(), sizeof(m_sprites.m_nameSprites) >> 1, 2);
 
 		m_nameOnLeft = i_left;
 	}

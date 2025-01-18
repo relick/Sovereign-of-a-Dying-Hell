@@ -39,6 +39,7 @@ void Game::Run()
 		}
 		m_curWorld->Run(*this);
 
+		m_sprites.Update();
 		SYS_doVBlankProcess();
 	}
 }
@@ -51,7 +52,11 @@ u8 Game::AddVBlankCallback(std::function<void()>&& i_callback)
 
 void Game::RemoveVBlankCallback(u8 i_callbackID)
 {
-	auto cbI = std::find_if(s_vBlankCallbacks.begin(), s_vBlankCallbacks.end(), [i_callbackID](auto const& cb) { return cb.first == i_callbackID; });
+	auto cbI = std::find_if(
+		s_vBlankCallbacks.begin(),
+		s_vBlankCallbacks.end(),
+		[i_callbackID](auto const& cb) { return cb.first == i_callbackID; }
+	);
 	
 	if(cbI != s_vBlankCallbacks.end())
 	{

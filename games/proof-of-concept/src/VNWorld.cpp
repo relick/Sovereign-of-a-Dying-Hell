@@ -111,7 +111,7 @@ void VNWorld::Init
 	HInt_TextArea_SetName();
 	VDP_setHIntCounter(0);
 
-	m_printer.Init(vn_font, name_font);
+	m_printer.Init(io_game, vn_font, name_font);
 
 	// Playing music really is this easy
 	// XGM_startPlay(spacey);
@@ -139,7 +139,7 @@ void VNWorld::Run
 			m_fading = false;
 			VDP_setHInterrupt(TRUE);
 			m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!");
-			m_printer.SetName("STACEY", false);
+			m_printer.SetName(io_game, "STACEY", false);
 		}
 		else
 		{
