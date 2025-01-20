@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Declare.hpp"
-#include "DialoguePrinter.hpp"
 #include "DialoguePrinter2.hpp"
 #include "Constants.hpp"
 
@@ -49,7 +48,6 @@ class VNWorld
 	: public World
 {
 	bool m_fading = false;
-	// DialoguePrinter m_printer{2, c_textFramePos + 1, 36, 3};
 	DialoguePrinter2 m_printer;
 
 	void Init(Game &io_game) override;
