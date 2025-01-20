@@ -97,10 +97,10 @@ void VNWorld::Run
 		}
 	}
 
-	u16 buttons = JOY_readJoypad(JOY_1);
+	u16 const buttons = JOY_readJoypad(JOY_1);
 
 	static bool pressed = false;
-	if (buttons != 0)
+	if ((buttons & (BUTTON_A | BUTTON_B | BUTTON_C)) != 0)
 	{
 		if (!pressed)
 		{
