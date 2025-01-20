@@ -4,6 +4,7 @@
 #include "SpriteManager.hpp"
 
 #include <genesis.h>
+#include "res_spr.h"
 
 #include <cstring>
 
@@ -31,6 +32,8 @@ inline constexpr s16 c_textPosDown = -4;
 inline constexpr u16 c_lineSeparation = 2;
 inline constexpr u16 c_lineIndent = 1;
 
+inline constexpr u8 c_arrowSpeed = 2; // Number of updates between arrow flashes i.e. higher number = longer.
+
 //------------------------------------------------------------------------------
 void DialoguePrinter2::Init
 (
@@ -39,6 +42,8 @@ void DialoguePrinter2::Init
 	TileSet const &i_nameFont
 )
 {
+	m_game = &io_game;
+
 	// Queue cleared tiles
 	VDP_fillTileData(0, c_textTilesIndex, m_tiles.size(), true);
 
@@ -71,9 +76,9 @@ void DialoguePrinter2::Init
 		m_nameFontData[i] = i * 8;
 	}
 
-	SetupSprites(io_game);
+	SetupSprites();
 
-	m_dmaCallbackID = io_game.AddVBlankCallback(
+	m_dmaCallbackID = m_game->AddVBlankCallback(
 		[this]{
 			if(m_nameTileRefresh)
 			{
@@ -108,26 +113,25 @@ void DialoguePrinter2::Init
 //------------------------------------------------------------------------------
 void DialoguePrinter2::Shutdown
 (
-	Game& io_game
 )
 {
 	// Remove vblank and sprites
-	io_game.RemoveVBlankCallback(m_dmaCallbackID);
+	m_game->RemoveVBlankCallback(m_dmaCallbackID);
 
 	for(SpriteID id : m_nameSprites)
 	{
-		io_game.Sprites().RemoveSprite(id);
+		m_game->Sprites().RemoveSprite(id);
 	}
 	for(SpriteID id : m_textSprites)
 	{
-		io_game.Sprites().RemoveSprite(id);
+		m_game->Sprites().RemoveSprite(id);
 	}
+	m_game->Sprites().RemoveSprite(m_nextArrow);
 }
 
 //------------------------------------------------------------------------------
 void DialoguePrinter2::SetupSprites
 (
-	Game& io_game
 )
 {
 	// Tile indices setup as
@@ -161,7 +165,7 @@ void DialoguePrinter2::SetupSprites
 			spr.m_size = SpriteSize::r2c4;
 		}
 		
-		m_nameSprites[i] = io_game.Sprites().AddSprite(std::move(spr)).first;
+		m_nameSprites[i] = m_game->Sprites().AddSprite(std::move(spr)).first;
 
 		nameIndex += 8;
 	}
@@ -193,7 +197,7 @@ void DialoguePrinter2::SetupSprites
 				textIndex += 4;
 			}
 
-			m_textSprites[sprI] = io_game.Sprites().AddSprite(std::move(spr)).first;
+			m_textSprites[sprI] = m_game->Sprites().AddSprite(std::move(spr)).first;
 
 			++sprI;
 			x += 4;
@@ -201,12 +205,25 @@ void DialoguePrinter2::SetupSprites
 
 		++y;
 	}
+
+	// Arrow sprite
+	{
+		SpriteData spr;
+		spr.m_firstTileIndex = m_game->Sprites().InsertMiscTiles(misc_spr);
+		spr.m_size = SpriteSize::r1c1;
+		spr.m_palette = SpritePalette::Pal3;
+		spr.m_highPriority = true;
+		spr.m_visible = false;
+		spr.m_x = 304;
+		spr.m_y = c_textPosDown + (c_textFramePos + 1 + 2) * 8 + (c_lineSeparation * 2) + 4;
+
+		m_nextArrow = m_game->Sprites().AddSprite(std::move(spr)).first;
+	}
 }
 
 //------------------------------------------------------------------------------
 void DialoguePrinter2::SetName
 (
-	Game& io_game,
 	char const* i_name,
 	bool i_left
 )
@@ -242,7 +259,7 @@ void DialoguePrinter2::SetName
 	{
 		for (u16 i = 0; i < m_nameSprites.size(); ++i)
 		{
-			SpriteData& spr = io_game.Sprites().EditSpriteData(m_nameSprites[i]);
+			SpriteData& spr = m_game->Sprites().EditSpriteData(m_nameSprites[i]);
 			spr.m_x = c_namePosSide + i * 32;
 			if(!i_left)
 			{
@@ -273,8 +290,20 @@ bool DialoguePrinter2::Update()
 {
 	if (m_curText && m_curTextIndex < m_curTextLen)
 	{
-		bool const noMoreThisDisp = DrawChar();
-		return noMoreThisDisp && m_curTextIndex == m_curTextLen;
+		bool const moreToDisplay = DrawChar();
+
+		if (!moreToDisplay && m_curTextIndex != m_curTextLen)
+		{
+			++m_arrowTimer;
+			if (m_arrowTimer >= c_arrowSpeed)
+			{
+				SpriteData &arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
+				arrowSpr.m_visible = !arrowSpr.m_visible;
+				m_arrowTimer = 0;
+			}
+		}
+
+		return !moreToDisplay && m_curTextIndex == m_curTextLen;
 	}
 	return true;
 }
@@ -289,6 +318,11 @@ void DialoguePrinter2::Next()
 
 	if(!DrawChar())
 	{
+		{
+			SpriteData &arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
+			arrowSpr.m_visible = false;
+		}
+
 		if (m_curTextIndex == m_curTextLen)
 		{
 			// End line
@@ -298,6 +332,8 @@ void DialoguePrinter2::Next()
 
 		// Can't print any more already, so move to next
 		std::fill(m_tiles.begin(), m_tiles.begin() + c_textTileCount, Tile{});
+		m_lineTileRefreshStart = 0;
+		m_lineTileRefreshEnd = c_textTileCount;
 		m_x = 0;
 		m_y = 0;
 		m_lastCharWasSpace = true;
@@ -325,6 +361,8 @@ bool DialoguePrinter2::DrawChar
 	if (m_curTextIndex == 0)
 	{
 		std::fill(m_tiles.begin(), m_tiles.begin() + c_textTileCount, Tile{});
+		m_lineTileRefreshStart = 0;
+		m_lineTileRefreshEnd = c_textTileCount;
 	}
 
 	// Word wrapping handling, run on first character of each word

@@ -13,7 +13,7 @@ namespace Game
 struct PackedPixel
 {
 	// 4 bits per pixel
-	u8 m_value;
+	u8 m_value{0};
 
 	u8 Pixel0() const { return m_value >> 4; }
 	u8 Pixel1() const { return m_value & 0xF; }
@@ -24,7 +24,7 @@ struct PackedPixel
 struct alignas(4) Tile
 {
 	// 8 rows of 8 pixels
-	std::array<PackedPixel, 32> m_pixels;
+	std::array<PackedPixel, 32> m_pixels{};
 
 	// Get pixel from 0 to 63
 	u8 operator[](u16 const i_pixel) const { return m_pixels[i_pixel >> 1][i_pixel & 1];}
@@ -43,6 +43,8 @@ struct Char
 //------------------------------------------------------------------------------
 class DialoguePrinter2
 {
+	Game* m_game{nullptr};
+
 	VBlankCallbackID m_dmaCallbackID{};
 
 	char const* m_curText{nullptr};
@@ -63,6 +65,9 @@ class DialoguePrinter2
 
 	std::array<SpriteID, 4> m_nameSprites{};
 	std::array<SpriteID, 27> m_textSprites{};
+	SpriteID m_nextArrow{};
+
+	u8 m_arrowTimer{0};
 
 	bool m_nameTileRefresh{true};
 	u16 m_lineTileRefreshStart{0};
@@ -71,9 +76,9 @@ class DialoguePrinter2
 public:
 	// Sets up tiles and tilemap
 	void Init(Game& io_game, TileSet const& i_textFont, TileSet const& i_nameFont);
-	void Shutdown(Game& io_game);
+	void Shutdown();
 
-	void SetName(Game& io_game, char const* i_name, bool i_left);
+	void SetName(char const* i_name, bool i_left);
 	void SetText(char const *i_text);
 
 	// Advances render and queues DMA
@@ -83,7 +88,7 @@ public:
 	void Next();
 
 private:
-	void SetupSprites(Game& io_game);
+	void SetupSprites();
 
 	// Returns false when no more can be drawn until user progresses
 	bool DrawChar();

@@ -74,7 +74,7 @@ void VNWorld::Shutdown
 	Game& io_game
 )
 {
-	m_printer.Shutdown(io_game);
+	m_printer.Shutdown();
 }
 
 void VNWorld::Run
@@ -88,8 +88,8 @@ void VNWorld::Run
 		{
 			m_fading = false;
 			VDP_setHInterrupt(TRUE);
-			m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!");
-			m_printer.SetName(io_game, "STACEY", false);
+			m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!\nWe could even go out for a picnic!");
+			m_printer.SetName("STACEY", false);
 		}
 		else
 		{
