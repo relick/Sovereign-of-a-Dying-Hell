@@ -1,4 +1,5 @@
 #include "SpriteManager.hpp"
+#include "Debug.hpp"
 
 #include <genesis.h>
 
@@ -114,8 +115,7 @@ SpriteData& SpriteManager::EditSpriteData
         return sprI->m_data;
     }
 
-    // ERROR!
-    kprintf("Error: tried to edit a sprite that no longer exists");
+    Error("Tried to edit a sprite that no longer exists");
     return m_sprites.back().m_data;
 }
 

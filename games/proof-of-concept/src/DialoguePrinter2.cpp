@@ -2,6 +2,7 @@
 #include "Constants.hpp"
 #include "Game.hpp"
 #include "SpriteManager.hpp"
+#include "Debug.hpp"
 
 #include <genesis.h>
 #include "res_spr.h"
@@ -382,10 +383,16 @@ bool DialoguePrinter2::DrawChar
 			{
 				return false;
 			}
-			else
+			else if (m_x > 0)
 			{
 				m_x = 0;
 				m_y++;
+			}
+			else
+			{
+				// Our word is too long for an *entire line*
+				// So we just need to start displaying it and chop it into the next line.
+				Error("Word was too long for entire line!");
 			}
 		}
 	}
@@ -436,9 +443,9 @@ bool DialoguePrinter2::DrawChar
 
 		m_x += m_textFontData[charFontDataI].m_charWidth;
 	}
-	else
+	else if (m_x > 0)
 	{
-		// Default space size
+		// Default space size, but only if we're not at the start of a line
 		m_x += 4;
 	}
 
