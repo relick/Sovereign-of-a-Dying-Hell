@@ -3,6 +3,7 @@
 #include "Declare.hpp"
 #include "DialoguePrinter2.hpp"
 #include "Constants.hpp"
+#include "Scene.hpp"
 
 namespace Game
 {
@@ -49,6 +50,9 @@ class VNWorld
 {
 	bool m_fading = false;
 	DialoguePrinter2 m_printer;
+	Scene m_scene;
+	SceneCoro m_sceneRun;
+	bool m_readyForNext{false};
 
 	void Init(Game &io_game) override;
 	void Shutdown(Game &io_game) override;

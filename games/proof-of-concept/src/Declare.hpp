@@ -14,7 +14,7 @@ namespace Game
 
 class Game;
 class World;
-class DialoguePrinter;
+class DialoguePrinter2;
 
 using VBlankCallbackID = u8;
 

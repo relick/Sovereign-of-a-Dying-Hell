@@ -67,6 +67,8 @@ void VNWorld::Init
 
 	// Playing music really is this easy
 	// XGM_startPlay(spacey);
+
+	m_sceneRun = m_scene.Run(io_game, m_printer);
 }
 
 void VNWorld::Shutdown
@@ -74,6 +76,8 @@ void VNWorld::Shutdown
 	Game& io_game
 )
 {
+	SYS_setHIntCallback(nullptr);
+	VDP_setHInterrupt(false);
 	m_printer.Shutdown();
 }
 
@@ -87,10 +91,13 @@ void VNWorld::Run
 		if(!PAL_isDoingFade())
 		{
 			m_fading = false;
-			VDP_setHInterrupt(TRUE);
+			VDP_setHInterrupt(true);
 			//m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!\nWe could even have a barbeque!");
-			m_printer.SetText("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-			m_printer.SetName("STACEY", false);
+			//m_printer.SetText("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+			//m_printer.SetName("STACEY", false);
+			
+			// Start the scene
+			m_sceneRun.resume();
 		}
 		else
 		{
@@ -105,7 +112,15 @@ void VNWorld::Run
 	{
 		if (!pressed)
 		{
-			m_printer.Next();
+			if(m_readyForNext)
+			{
+				m_sceneRun.resume();
+				m_readyForNext = false;
+			}
+			else
+			{
+				m_printer.Next();
+			}
 		}
 		pressed = true;
 	}
@@ -117,7 +132,10 @@ void VNWorld::Run
 	static u16 time = 0;
 	if(time == 3)
 	{
-		m_printer.Update();
+		if (m_printer.Update())
+		{
+			m_readyForNext = true;
+		}
 		time = 0;
 	}
 	else
