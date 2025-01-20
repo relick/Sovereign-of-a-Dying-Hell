@@ -64,7 +64,7 @@ void IntroWorld::Run
 	// Update scroll
 	for (u16 i = 0; i < m_lineTable.size(); i++)
 	{
-		m_lineTable[i] = sinFix16((i << 5) + m_sineScroll) >> 4;
+		m_lineTable[i] = fix16Mul(sinFix16((i << 5) + m_sineScroll), m_timer - FIX16(1.75)) >> 4;
 		if(i&1)
 		{
 			m_lineTable[i] = -m_lineTable[i];
