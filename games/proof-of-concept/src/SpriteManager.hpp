@@ -2,6 +2,8 @@
 
 #include "Declare.hpp"
 
+#include <genesis.h>
+
 #include <array>
 #include <vector>
 
@@ -47,6 +49,8 @@ class SpriteManager
     
     SpriteID m_nextSpriteID{0};
 
+    u16 m_miscSpriteTilesIndex{0};
+
 public:
     void Update();
 
@@ -55,6 +59,8 @@ public:
     void RemoveSprite(SpriteID i_id);
 
     SpriteData& EditSpriteData(SpriteID i_id);
+
+    u16 InsertMiscTiles(TileSet const& i_tileset);
 };
 
 }

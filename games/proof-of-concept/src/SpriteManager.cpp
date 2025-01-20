@@ -7,6 +7,10 @@
 namespace Game
 {
 
+inline constexpr u16 c_miscTilesBaseAddress = 0xF680; // Sprite list is last thing placed in VRAM, and it ends at F680.
+inline constexpr u16 c_miscTilesBaseIndex = c_miscTilesBaseAddress / 32;
+inline constexpr u16 c_maxMiscTiles = u16((0x10000 - u32(c_miscTilesBaseAddress)) / 32);
+
 //------------------------------------------------------------------------------
 void SpriteManager::Update()
 {
@@ -113,6 +117,26 @@ SpriteData& SpriteManager::EditSpriteData
     // ERROR!
     kprintf("Error: tried to edit a sprite that no longer exists");
     return m_sprites.back().m_data;
+}
+
+//------------------------------------------------------------------------------
+u16 SpriteManager::InsertMiscTiles
+(
+    TileSet const& i_tileset
+)
+{
+    if(m_miscSpriteTilesIndex + i_tileset.numTile > c_maxMiscTiles)
+    {
+        // start overwriting from the start!
+        m_miscSpriteTilesIndex = 0;
+    }
+
+    u16 const tileIndex = m_miscSpriteTilesIndex + c_miscTilesBaseIndex;
+    m_miscSpriteTilesIndex += i_tileset.numTile;
+
+    VDP_loadTileSet(&i_tileset, tileIndex & TILE_INDEX_MASK, DMA_QUEUE);
+
+    return tileIndex;
 }
 
 }
