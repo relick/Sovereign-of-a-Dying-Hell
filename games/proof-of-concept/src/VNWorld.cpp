@@ -88,7 +88,7 @@ void VNWorld::Run
 		{
 			m_fading = false;
 			VDP_setHInterrupt(TRUE);
-			m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!\nWe could even go out for a picnic!");
+			m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!\nWe could even have a barbeque!");
 			m_printer.SetName("STACEY", false);
 		}
 		else
