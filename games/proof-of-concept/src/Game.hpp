@@ -34,6 +34,8 @@ public:
 
 private:
 	static void VBlankCallback();
+
+	void PreWorldInit();
 };
 
 }

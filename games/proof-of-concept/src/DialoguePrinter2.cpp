@@ -119,6 +119,7 @@ void DialoguePrinter2::Shutdown
 	// Remove vblank and sprites
 	m_game->RemoveVBlankCallback(m_dmaCallbackID);
 
+	// Should clean up even if the world will do it, in case we spawn and kill multiple DialoguePrinters!
 	for(SpriteID id : m_nameSprites)
 	{
 		m_game->Sprites().RemoveSprite(id);
@@ -229,8 +230,22 @@ void DialoguePrinter2::SetName
 	bool i_left
 )
 {
+	if (i_name == m_curName)
+	{
+		return;
+	}
+
+	m_curName = i_name;
+
 	// Clear current name
 	std::fill(m_tiles.begin() + c_textTileCount, m_tiles.end(), Tile{});
+
+	QueueNameDMA();
+
+	if (!i_name || std::strlen(i_name) == 0)
+	{
+		return;
+	}
 
 	// Fill new name
 	u8 limit = 0;
@@ -252,8 +267,6 @@ void DialoguePrinter2::SetName
 
 		++i_name;
 	}
-
-	QueueNameDMA();
 
 	// Update sprites
 	if (m_nameOnLeft != i_left)

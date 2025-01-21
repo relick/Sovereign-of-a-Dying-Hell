@@ -38,9 +38,14 @@ void IntroWorld::Run
 	Game& io_game
 )
 {
-	if (JOY_readJoypad(JOY_1) != 0)
+	u16 const buttons = JOY_readJoypad(JOY_1);
+	if (m_joyUnpressed && buttons != 0)
 	{
 		m_timer = FIX16(6);
+	}
+	else if(buttons == 0)
+	{
+		m_joyUnpressed = true;
 	}
 
 	if (m_timer > FIX16(0.5) && !m_fadeInStarted)

@@ -25,6 +25,8 @@ class IntroWorld
 	u16 m_sineScroll{0};
 	VBlankCallbackID m_fxScrollID{};
 
+	bool m_joyUnpressed = false;
+
 	f16 m_timer = 0;
 	bool m_fadeInStarted = false;
 	bool m_fadeOutStarted = false;

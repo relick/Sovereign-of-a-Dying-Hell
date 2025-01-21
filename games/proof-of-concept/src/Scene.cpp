@@ -14,13 +14,9 @@ SceneCoro Scene::Run
     DialoguePrinter2& io_dp
 )
 {
-    io_dp.SetName("BOY", true);
-    io_dp.SetText("Hi!\nHow are you?\nWant to play?\nI have mahjong.");
-    wait;
+    say("BOY", "Hi!\nHow are you?\nWant to play?\nI have mahjong.");
 
-    io_dp.SetName("GIRL", false);
-    io_dp.SetText("Ewwwww.\nGet away, creep.");
-    wait;
+    say("GIRL", "Ewwwww.\nGet away, creep.");
 
     io_game.RequestNextWorld(std::make_unique<IntroWorld>());
 }

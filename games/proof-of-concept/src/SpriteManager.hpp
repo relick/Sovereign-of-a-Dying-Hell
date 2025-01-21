@@ -57,6 +57,7 @@ public:
     std::pair<SpriteID, SpriteData&> AddSprite(SpriteSize i_size, u16 i_firstTileIndex);
     std::pair<SpriteID, SpriteData&> AddSprite(SpriteData&& i_initData);
     void RemoveSprite(SpriteID i_id);
+    void ClearAllSprites();
 
     SpriteData& EditSpriteData(SpriteID i_id);
 

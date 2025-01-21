@@ -54,6 +54,8 @@ class DialoguePrinter2
 	u16 m_x{0}; // In pixels
 	u16 m_y{0}; // In tiles
 
+	char const* m_curName{nullptr};
+
 	std::array<Tile, 128> m_tiles{};
 
 	TileSet const* m_textFont{nullptr};

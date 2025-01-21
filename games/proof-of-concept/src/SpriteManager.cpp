@@ -99,6 +99,14 @@ void SpriteManager::RemoveSprite
 }
 
 //------------------------------------------------------------------------------
+void SpriteManager::ClearAllSprites
+(
+)
+{
+    m_sprites.clear();
+}
+
+//------------------------------------------------------------------------------
 SpriteData& SpriteManager::EditSpriteData
 (
     SpriteID i_id

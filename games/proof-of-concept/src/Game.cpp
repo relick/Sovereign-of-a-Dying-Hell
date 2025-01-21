@@ -15,7 +15,8 @@ Game::Game
 
 	VDP_setScreenWidth320();
 	VDP_setScreenHeight224();
-	PAL_setColorsDMA(0, palette_black, 64);
+
+	PreWorldInit();
 }
 
 void Game::RequestNextWorld(std::unique_ptr<World> &&i_nextWorld)
@@ -33,6 +34,7 @@ void Game::Run()
 			{
 				m_curWorld->Shutdown(*this);
 			}
+			PreWorldInit();
 			m_nextWorld->Init(*this);
 			std::swap(m_curWorld, m_nextWorld);
 			m_nextWorld = nullptr;
@@ -70,6 +72,16 @@ void Game::VBlankCallback()
 	{
 		f();
 	}
+}
+
+void Game::PreWorldInit()
+{
+	// Mostly just graphical resets
+	m_sprites.ClearAllSprites();
+	PAL_setColorsDMA(0, palette_black, 64);
+	VDP_clearTileMap(VDP_BG_A, 0, 64 * 32, false);
+	VDP_clearTileMap(VDP_BG_B, 0, 64 * 32, true);
+	VDP_setHilightShadow(0);
 }
 
 }
