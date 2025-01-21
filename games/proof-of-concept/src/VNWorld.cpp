@@ -67,8 +67,6 @@ void VNWorld::Init
 
 	// Playing music really is this easy
 	// XGM_startPlay(spacey);
-
-	m_sceneRun = m_scene.Run(io_game, m_printer);
 }
 
 void VNWorld::Shutdown
@@ -95,9 +93,9 @@ void VNWorld::Run
 			//m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!\nWe could even have a barbeque!");
 			//m_printer.SetText("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
 			//m_printer.SetName("STACEY", false);
-			
+
 			// Start the scene
-			m_sceneRun.resume();
+			m_sceneRun = m_scene.Run(io_game, m_printer);
 		}
 		else
 		{
@@ -114,7 +112,10 @@ void VNWorld::Run
 		{
 			if(m_readyForNext)
 			{
-				m_sceneRun.resume();
+				if(m_sceneRun)
+				{
+					m_sceneRun();
+				}
 				m_readyForNext = false;
 			}
 			else

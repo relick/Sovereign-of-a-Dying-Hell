@@ -19,6 +19,8 @@ SceneCoro Scene::Run
     say("GIRL", "Ewwwww.\nGet away, creep.");
 
     io_game.RequestNextWorld(std::make_unique<IntroWorld>());
+
+    end;
 }
 
 }

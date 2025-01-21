@@ -3,6 +3,7 @@
 // Make sure to include last, to avoid breaking other code
 
 #define wait co_yield 0
+#define end co_return 0
 
 #define scene(bg)
 
