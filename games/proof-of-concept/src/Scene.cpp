@@ -8,7 +8,7 @@
 namespace Game
 {
 
-SceneCoro Scene::Run
+SceneRoutine Scene::Run
 (
     Game& io_game,
     DialoguePrinter2& io_dp

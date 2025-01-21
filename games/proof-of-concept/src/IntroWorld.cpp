@@ -8,7 +8,7 @@
 namespace Game
 {
 
-void IntroWorld::Init
+WorldRoutine IntroWorld::Init
 (
 	Game& io_game
 )
@@ -17,9 +17,11 @@ void IntroWorld::Init
 
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
 	m_fxScrollID = io_game.AddVBlankCallback([this]{ DMAScrollData(); });
+
+	co_return;
 }
 
-void IntroWorld::Shutdown
+WorldRoutine IntroWorld::Shutdown
 (
 	Game& io_game
 )
@@ -31,6 +33,8 @@ void IntroWorld::Shutdown
 		m_lineTable[i] = 0;
 	}
 	DMAScrollData();
+
+	co_return;
 }
 
 void IntroWorld::Run

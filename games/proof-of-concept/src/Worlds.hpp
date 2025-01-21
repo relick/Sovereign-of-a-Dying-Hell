@@ -4,20 +4,18 @@
 #include "DialoguePrinter2.hpp"
 #include "Constants.hpp"
 #include "Scene.hpp"
-#include "Coro.hpp"
+#include "GameRoutines.hpp"
 
 namespace Game
 {
-
-using TransitionCoro = Coro<struct TransitionCoroTag, bool>;
 
 class World
 {
 public:
 	virtual ~World() = default;
 
-	virtual void Init(Game &io_game) = 0;
-	virtual void Shutdown(Game &io_game) = 0;
+	virtual WorldRoutine Init(Game &io_game) = 0;
+	virtual WorldRoutine Shutdown(Game &io_game) = 0;
 	virtual void Run(Game &io_game) = 0;
 };
 
@@ -34,8 +32,8 @@ class IntroWorld
 	bool m_fadeInStarted = false;
 	bool m_fadeOutStarted = false;
 
-	void Init(Game &io_game) override;
-	void Shutdown(Game &io_game) override;
+	WorldRoutine Init(Game &io_game) override;
+	WorldRoutine Shutdown(Game &io_game) override;
 	void Run(Game &io_game) override;
 
 private:
@@ -45,22 +43,21 @@ private:
 class TitleWorld
 	: public World
 {
-	void Init(Game &io_game) override {}
-	void Shutdown(Game &io_game) override {}
+	WorldRoutine Init(Game &io_game) override { co_return; }
+	WorldRoutine Shutdown(Game &io_game) override { co_return; }
 	void Run(Game &io_game) override {}
 };
 
 class VNWorld
 	: public World
 {
-	bool m_fading = false;
 	DialoguePrinter2 m_printer;
 	Scene m_scene;
-	SceneCoro m_sceneRun;
+	SceneRoutine m_sceneRun;
 	bool m_readyForNext{false};
 
-	void Init(Game &io_game) override;
-	void Shutdown(Game &io_game) override;
+	WorldRoutine Init(Game &io_game) override;
+	WorldRoutine Shutdown(Game &io_game) override;
 	void Run(Game &io_game) override;
 };
 

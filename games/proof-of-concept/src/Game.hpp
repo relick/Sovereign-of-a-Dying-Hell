@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 #include "SpriteManager.hpp"
+#include "GameRoutines.hpp"
 
 #include <functional>
 #include <memory>
@@ -14,6 +15,7 @@ class Game
 {
 	std::unique_ptr<World> m_curWorld;
 	std::unique_ptr<World> m_nextWorld;
+	WorldRoutine m_currentWorldRoutine;
 
 	SpriteManager m_sprites;
 
@@ -35,6 +37,7 @@ public:
 private:
 	static void VBlankCallback();
 
+	void PostWorldFrame();
 	void PreWorldInit();
 };
 

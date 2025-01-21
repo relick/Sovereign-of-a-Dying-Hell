@@ -7,9 +7,8 @@
 namespace Game
 {
 
-Game::Game
-(
-)
+//------------------------------------------------------------------------------
+Game::Game()
 {
 	SYS_setVBlankCallback(Game::VBlankCallback);
 
@@ -19,39 +18,58 @@ Game::Game
 	PreWorldInit();
 }
 
+//------------------------------------------------------------------------------
 void Game::RequestNextWorld(std::unique_ptr<World> &&i_nextWorld)
 {
 	m_nextWorld = std::move(i_nextWorld);
 }
 
+//------------------------------------------------------------------------------
 void Game::Run()
 {
 	while (true)
 	{
-		if (m_nextWorld)
+		if (!m_nextWorld)
+		{
+			m_curWorld->Run(*this);
+			PostWorldFrame();
+		}
+		else
 		{
 			if (m_curWorld)
 			{
-				m_curWorld->Shutdown(*this);
+				m_currentWorldRoutine = m_curWorld->Shutdown(*this);
+				while (m_currentWorldRoutine)
+				{
+					m_currentWorldRoutine();
+					PostWorldFrame();
+				}
 			}
+
 			PreWorldInit();
-			m_nextWorld->Init(*this);
+
+			m_currentWorldRoutine = m_nextWorld->Init(*this);
+			while (m_currentWorldRoutine)
+			{
+				m_currentWorldRoutine();
+				PostWorldFrame();
+			}
+
 			std::swap(m_curWorld, m_nextWorld);
 			m_nextWorld = nullptr;
+			m_currentWorldRoutine = {};
 		}
-		m_curWorld->Run(*this);
-
-		m_sprites.Update();
-		SYS_doVBlankProcess();
 	}
 }
 
+//------------------------------------------------------------------------------
 VBlankCallbackID Game::AddVBlankCallback(std::function<void()>&& i_callback)
 {
 	s_vBlankCallbacks.push_back({ s_callbackID, std::move(i_callback), });
 	return s_callbackID++;
 }
 
+//------------------------------------------------------------------------------
 void Game::RemoveVBlankCallback(VBlankCallbackID i_callbackID)
 {
 	auto cbI = std::find_if(
@@ -66,6 +84,7 @@ void Game::RemoveVBlankCallback(VBlankCallbackID i_callbackID)
 	}
 }
 
+//------------------------------------------------------------------------------
 void Game::VBlankCallback()
 {
 	for (auto const& [id, f] : s_vBlankCallbacks)
@@ -74,6 +93,14 @@ void Game::VBlankCallback()
 	}
 }
 
+//------------------------------------------------------------------------------
+void Game::PostWorldFrame()
+{
+	m_sprites.Update();
+	SYS_doVBlankProcess();
+}
+
+//------------------------------------------------------------------------------
 void Game::PreWorldInit()
 {
 	// Mostly just graphical resets

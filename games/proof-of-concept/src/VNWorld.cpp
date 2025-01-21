@@ -39,7 +39,7 @@ void HInt_TextArea_Reset()
 	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
 }
 
-void VNWorld::Init
+WorldRoutine VNWorld::Init
 (
 	Game& io_game
 )
@@ -50,26 +50,41 @@ void VNWorld::Init
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
 
-	PAL_setColors(0, palette_black, 64, DMA);
-	u16 fullPal[64] = { 0 };
-
-	std::memcpy(fullPal, beach2.palette->data, 16 * sizeof(u16));
-	std::memcpy(fullPal + 16, stacey.palette->data, 16 * sizeof(u16));
-	std::memcpy(fullPal + 48, text_font_pal.data, 16 * sizeof(u16));
-	PAL_fadeToAll(fullPal, FramesPerSecond(), true);
-	m_fading = true;
-
 	// Show palette-based text frame
 	HInt_TextArea_SetName();
 	VDP_setHIntCounter(0);
 
 	m_printer.Init(io_game, vn_font, name_font);
 
+	PAL_setColors(0, palette_black, 64, DMA);
+	u16 fullPal[64] = {0};
+
+	std::memcpy(fullPal, beach2.palette->data, 16 * sizeof(u16));
+	std::memcpy(fullPal + 16, stacey.palette->data, 16 * sizeof(u16));
+	std::memcpy(fullPal + 48, text_font_pal.data, 16 * sizeof(u16));
+	PAL_fadeToAll(fullPal, FramesPerSecond(), true);
+
+	// Wait for fade to complete
+	while (PAL_isDoingFade())
+	{
+		co_yield {};
+	}
+
+	VDP_setHInterrupt(true);
+	// m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!\nWe could even have a barbeque!");
+	// m_printer.SetText("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+	// m_printer.SetName("STACEY", false);
+
+	// Start the scene
+	m_sceneRun = m_scene.Run(io_game, m_printer);
+
 	// Playing music really is this easy
 	// XGM_startPlay(spacey);
+
+	co_return;
 }
 
-void VNWorld::Shutdown
+WorldRoutine VNWorld::Shutdown
 (
 	Game& io_game
 )
@@ -77,6 +92,8 @@ void VNWorld::Shutdown
 	SYS_setHIntCallback(nullptr);
 	VDP_setHInterrupt(false);
 	m_printer.Shutdown();
+
+	co_return;
 }
 
 void VNWorld::Run
@@ -84,25 +101,6 @@ void VNWorld::Run
 	Game& io_game
 )
 {
-	if (m_fading)
-	{
-		if(!PAL_isDoingFade())
-		{
-			m_fading = false;
-			VDP_setHInterrupt(true);
-			//m_printer.SetText("Wow...\nI've never been to the beach before.\nLet's have some fun!\nWe could even have a barbeque!");
-			//m_printer.SetText("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-			//m_printer.SetName("STACEY", false);
-
-			// Start the scene
-			m_sceneRun = m_scene.Run(io_game, m_printer);
-		}
-		else
-		{
-			return;
-		}
-	}
-
 	u16 const buttons = JOY_readJoypad(JOY_1);
 
 	static bool pressed = false;
