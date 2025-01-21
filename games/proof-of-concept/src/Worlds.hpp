@@ -6,6 +6,8 @@
 #include "Scene.hpp"
 #include "GameRoutines.hpp"
 
+#include "BuryYourGays_Scenes.hpp"
+
 namespace Game
 {
 
@@ -52,7 +54,7 @@ class VNWorld
 	: public World
 {
 	DialoguePrinter2 m_printer;
-	Scene m_scene;
+	BuryYourGays::forestShed_runningThroughWoods m_scene;
 	SceneRoutine m_sceneRun;
 	bool m_readyForNext{false};
 

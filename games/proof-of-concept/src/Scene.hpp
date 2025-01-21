@@ -9,7 +9,7 @@ namespace Game
 class Scene
 {
 public:
-    SceneRoutine Run(Game &io_game, DialoguePrinter2 &io_dp);
+    virtual SceneRoutine Run(Game &io_game, DialoguePrinter2 &io_dp) = 0;
 };
 
 }
