@@ -4,9 +4,12 @@
 #include "DialoguePrinter2.hpp"
 #include "Constants.hpp"
 #include "Scene.hpp"
+#include "Coro.hpp"
 
 namespace Game
 {
+
+using TransitionCoro = Coro<struct TransitionCoroTag, bool>;
 
 class World
 {
