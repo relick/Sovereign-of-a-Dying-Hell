@@ -104,9 +104,23 @@ VNWorld::VNWorld
 // Based on VDP_drawImageEx
 bool FastImageLoad(VDPPlane plane, const Image* image, u16 basetile, u16 x, u16 y)
 {
-	if (!VDP_loadTileSet(image->tileset, basetile & TILE_INDEX_MASK, DMA_QUEUE))
+	//if (!VDP_loadTileSet(image->tileset, basetile & TILE_INDEX_MASK, DMA_QUEUE))
 	{
-		return false;
+	//	return false;
+	}
+
+	u16 const tileChunks = image->tileset->numTile / 32;
+	u16 const tileIndex = basetile & TILE_INDEX_MASK;
+	for(u16 i = 0; i < tileChunks; ++i)
+	{
+		u16 const numTiles = i << 5;
+		DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (i << 8)), (tileIndex + numTiles) * 32, 32 * 16, 2);
+	}
+	u16 const remainder = image->tileset->numTile - (tileChunks * 32);
+	if (remainder > 0)
+	{
+		u16 const numTiles = tileChunks << 5;
+		DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (tileChunks << 8)), (tileIndex + numTiles) * 32, remainder * 16, 2);
 	}
 
 	if (!VDP_setTileMapEx(plane, image->tilemap, basetile, x, y, 0, 0, image->tilemap->w, image->tilemap->h, DMA_QUEUE))
@@ -123,7 +137,8 @@ WorldRoutine VNWorld::Init
 	Game& io_game
 )
 {
-	DMA_setMaxTransferSize(7000);
+	// Way low. It'll take several frames but we'll cope
+	DMA_setMaxTransferSize(512);
 
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
@@ -207,6 +222,8 @@ WorldRoutine VNWorld::Shutdown
 	Game& io_game
 )
 {
+	StopMusic(0);
+
 	io_game.RemoveVBlankCallback(m_nextBGCallbackID);
 	io_game.RemoveVBlankCallback(m_nextPoseCallbackID);
 
