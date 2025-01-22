@@ -1,12 +1,10 @@
 #pragma once
 
 #include "Declare.hpp"
-#include "DialoguePrinter2.hpp"
 #include "Constants.hpp"
-#include "Scene.hpp"
 #include "GameRoutines.hpp"
 
-#include "BuryYourGays_Scenes.hpp"
+#include <array>
 
 namespace Game
 {
@@ -48,19 +46,6 @@ class TitleWorld
 	WorldRoutine Init(Game &io_game) override { co_return; }
 	WorldRoutine Shutdown(Game &io_game) override { co_return; }
 	void Run(Game &io_game) override {}
-};
-
-class VNWorld
-	: public World
-{
-	DialoguePrinter2 m_printer;
-	BuryYourGays::forestShed_runningThroughWoods m_scene;
-	SceneRoutine m_sceneRun;
-	bool m_readyForNext{false};
-
-	WorldRoutine Init(Game &io_game) override;
-	WorldRoutine Shutdown(Game &io_game) override;
-	void Run(Game &io_game) override;
 };
 
 }

@@ -106,8 +106,8 @@ void Game::PreWorldInit()
 	// Mostly just graphical resets
 	m_sprites.ClearAllSprites();
 	PAL_setColorsDMA(0, palette_black, 64);
-	VDP_clearTileMap(VDP_BG_A, 0, 64 * 32, true);
-	VDP_clearTileMap(VDP_BG_B, 0, 64 * 32, true);
+	VDP_clearPlane(BG_A, true);
+	VDP_clearPlane(BG_B, true);
 	VDP_setHilightShadow(0);
 }
 

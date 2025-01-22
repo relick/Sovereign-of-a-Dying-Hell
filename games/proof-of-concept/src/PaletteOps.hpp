@@ -198,11 +198,11 @@ namespace Game
 {
 
 // All code here works on the basis BG text frame is using PAL0
-inline u16 const* s_bgTextFramePalette;
-inline void SetBGTextFramePalette(Palette const &i_pal) { s_bgTextFramePalette = i_pal.data; }
+inline u16 const* s_bgTextFramePalette{ nullptr };
+inline void SetBGTextFramePalette(u16 const* i_pal) { s_bgTextFramePalette = i_pal; }
 // And char text frame is using PAL1
-inline u16 const* s_charTextFramePalette;
-inline void SetCharTextFramePalette(Palette const& i_pal) { s_charTextFramePalette = i_pal.data;}
+inline u16 const* s_charTextFramePalette{ nullptr };
+inline void SetCharTextFramePalette(u16 const* i_pal) { s_charTextFramePalette = i_pal; }
 
 // Requires 1 line prior to prepare colours to start on t_LineToShow
 template <u8 t_LineToShow, u8 t_BaseLine = t_LineToShow - 1, u8 t_Line = t_BaseLine>

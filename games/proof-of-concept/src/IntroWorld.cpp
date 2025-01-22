@@ -2,6 +2,9 @@
 #include "Game.hpp"
 #include "Version.hpp"
 
+#include "VNWorld.hpp"
+#include "BuryYourGays_Script.hpp"
+
 #include <genesis.h>
 #include "res_bg.h"
 
@@ -66,7 +69,7 @@ void IntroWorld::Run
 	{
 		PAL_interruptFade();
 		PAL_setPalette(PAL0, palette_black, DMA_QUEUE);
-		io_game.RequestNextWorld(std::make_unique<VNWorld>());
+		io_game.RequestNextWorld(std::make_unique<VNWorld>(std::make_unique<BuryYourGays::Script>()));
 	}
 	m_timer += FrameStep();
 	

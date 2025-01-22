@@ -14,7 +14,12 @@ namespace Game
 
 class Game;
 class World;
+class CharacterData;
 class DialoguePrinter2;
+
+class VNWorld;
+class Script;
+class Scene;
 
 using VBlankCallbackID = u8;
 

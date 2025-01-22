@@ -9,7 +9,9 @@ namespace Game
 class Scene
 {
 public:
-    virtual SceneRoutine Run(Game &io_game, DialoguePrinter2 &io_dp) = 0;
+    virtual ~Scene() = default;
+
+    virtual SceneRoutine Run(Game& io_game, VNWorld& io_vn) = 0;
 };
 
 }

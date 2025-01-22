@@ -1,11 +1,13 @@
 #include "BuryYourGays_Scenes.hpp"
-#include "Game.hpp"
 #include "Worlds.hpp"
-#include "DialoguePrinter2.hpp"
 
 #include "SceneDefines.hpp"
 
-#define SCENE_RUN(scene_name) Game::SceneRoutine scene_name::Run(Game::Game &io_game, Game::DialoguePrinter2 &io_dp)
+#include <genesis.h>
+#include "res_music.h"
+#include "res_bg.h"
+
+#define SCENE_RUN(scene_name) Game::SceneRoutine scene_name::Run(Game::Game& io_game, Game::VNWorld& io_vn)
 
 namespace BuryYourGays
 {
@@ -14,7 +16,7 @@ SCENE_RUN(forestShed_runningThroughWoods)
 {
     scene(forest);
 
-    play_music(hallowbean_nature);
+    play_music(hallowbean_nature, 2.0, true);
 
     portrait(beans, tired);
     think("I'm so tired... and my feet hurt...");
