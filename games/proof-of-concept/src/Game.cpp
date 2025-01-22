@@ -24,6 +24,11 @@ void Game::RequestNextWorld(std::unique_ptr<World> &&i_nextWorld)
 	m_nextWorld = std::move(i_nextWorld);
 }
 
+#define CHECK_FPS 1
+#if CHECK_FPS
+static u16 fps[4] = {0};
+#endif
+
 //------------------------------------------------------------------------------
 void Game::Run()
 {
@@ -31,6 +36,9 @@ void Game::Run()
 	{
 		if (!m_nextWorld)
 		{
+#if CHECK_FPS
+			fps[0] = GET_VCOUNTER;
+#endif
 			m_curWorld->Run(*this);
 			PostWorldFrame();
 		}
@@ -41,6 +49,9 @@ void Game::Run()
 				m_currentWorldRoutine = m_curWorld->Shutdown(*this);
 				while (m_currentWorldRoutine)
 				{
+#if CHECK_FPS
+					fps[0] = GET_VCOUNTER;
+#endif
 					m_currentWorldRoutine();
 					PostWorldFrame();
 				}
@@ -51,6 +62,9 @@ void Game::Run()
 			m_currentWorldRoutine = m_nextWorld->Init(*this);
 			while (m_currentWorldRoutine)
 			{
+#if CHECK_FPS
+				fps[0] = GET_VCOUNTER;
+#endif
 				m_currentWorldRoutine();
 				PostWorldFrame();
 			}
@@ -96,8 +110,25 @@ void Game::VBlankCallback()
 //------------------------------------------------------------------------------
 void Game::PostWorldFrame()
 {
+#if CHECK_FPS
+	fps[1] = GET_VCOUNTER;
+#endif
 	m_sprites.Update();
+#if CHECK_FPS
+	fps[2] = GET_VCOUNTER;
+#endif
 	SYS_doVBlankProcess();
+#if CHECK_FPS
+	fps[3] = GET_VCOUNTER;
+
+	kprintf("VCounts: %u, %u, %u, %u. Frame time: %u. Sprites time: %u. VBlank time (wait/actual): %u, %u",
+		fps[0], fps[1], fps[2], fps[3],
+		fps[1] - fps[0] + (fps[0] <= fps[1] ? 0 : 261),
+		fps[2] - fps[1] + (fps[1] <= fps[2] ? 0 : 261),
+		fps[3] - fps[2] + (fps[2] <= fps[3] ? 0 : 261),
+		fps[3] - 229 + (229 <= fps[3] ? 0 : 256)
+	);
+#endif
 }
 
 //------------------------------------------------------------------------------
