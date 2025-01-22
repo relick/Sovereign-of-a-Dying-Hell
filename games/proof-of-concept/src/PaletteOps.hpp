@@ -252,17 +252,14 @@ using CallbackFn = void();
 template <u16 t_PalNum0, u16 t_PalNum1, bool t_BGFirst, u8 t_LineToShow, CallbackFn *T_Callback, u8 t_Line = t_LineToShow - 2>
 HINTERRUPT_CALLBACK HInt_TextFrameDMA2()
 {
-	if (GET_VCOUNTER == t_Line)
+	if constexpr (t_BGFirst)
 	{
-		if constexpr (t_BGFirst)
-		{
-			System::Set2Palette_Fast<During::Active, t_PalNum0, t_PalNum1>(s_bgTextFramePalette, s_charTextFramePalette);
-		}
-		else
-		{
-			System::Set2Palette_Fast<During::Active, t_PalNum1, t_PalNum0>(s_charTextFramePalette, s_bgTextFramePalette);
-		}
-		T_Callback();
+		System::Set2Palette_Fast<During::Active, t_PalNum0, t_PalNum1>(s_bgTextFramePalette, s_charTextFramePalette);
 	}
+	else
+	{
+		System::Set2Palette_Fast<During::Active, t_PalNum1, t_PalNum0>(s_charTextFramePalette, s_bgTextFramePalette);
+	}
+	T_Callback();
 }
 }
