@@ -67,14 +67,8 @@ void HInt_TextArea_SetName();
 void HInt_TextArea_SetText();
 void HInt_TextArea_Reset();
 
-void HInt_TextArea_Restart()
-{
-	VDP_setHInterrupt(false);
-}
-
 void HInt_TextArea_SetName()
 {
-	VDP_setHIntCounter((c_textFramePos * 8 - 20) - 2 - 1);
 	SetBGTextFramePalette(s_bgNamePal);
 	SetCharTextFramePalette(s_charaNamePal);
 	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, false, c_textFramePos * 8 - 20, &HInt_TextArea_SetText>);
@@ -82,7 +76,6 @@ void HInt_TextArea_SetName()
 
 void HInt_TextArea_SetText()
 {
-	VDP_setHIntCounter((c_textFramePos * 8 + 0) - 2 - 1);
 	SetBGTextFramePalette(s_bgTextPal);
 	SetCharTextFramePalette(s_charaTextPal);
 	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 0, &HInt_TextArea_Reset>);
@@ -90,12 +83,11 @@ void HInt_TextArea_SetText()
 
 void HInt_TextArea_Reset()
 {
-	VDP_setHIntCounter(((c_textFramePos + c_textFrameHeight) * 8) - 2 - 1);
 	SetBGTextFramePalette(s_bgNormalPal);
 	SetCharTextFramePalette(s_charaNormalPal);
 
 	// TODO: fix this more robustly. If the Hint at the end is interrupted by Vint, the game basically falls over because of all the DMA going on
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_Restart>);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
 	//SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 8, &HInt_TextArea_SetName>);
 }
 
@@ -153,6 +145,7 @@ WorldRoutine VNWorld::Init
 
 	// Show palette-based text frame
 	HInt_TextArea_SetName();
+	VDP_setHIntCounter(0);
 
 	m_printer.Init(io_game, vn_font, name_font);
 
@@ -169,14 +162,6 @@ WorldRoutine VNWorld::Init
 	m_script->Init(io_game, *this, m_characters);
 
 	VDP_setHInterrupt(true);
-
-	io_game.AddVBlankCallback(
-		[]
-		{
-			HInt_TextArea_SetName();
-			VDP_setHInterrupt(true);
-		}
-	);
 
 	m_nextBGCallbackID = io_game.AddVBlankCallback(
 		[this]
@@ -259,6 +244,8 @@ void VNWorld::Run
 	{
 		return;
 	}
+
+	VDP_setHInterrupt(true);
 
 	u16 const buttons = JOY_readJoypad(JOY_1);
 
