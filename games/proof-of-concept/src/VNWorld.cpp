@@ -12,6 +12,15 @@
 namespace Game
 {
 
+consteval std::array<u16, 64*32> FillHilightPlaneA()
+{
+	std::array<u16, 64 * 32> arr;
+	arr.fill(TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 2047));
+	return arr;
+}
+
+constexpr std::array<u16, 64 * 32> c_hilightEmptyPlaneA = FillHilightPlaneA();
+
 static u16 const* s_bgNormalPal{ palette_black };
 static u16 const* s_bgNamePal{ palette_black };
 static u16 const* s_bgTextPal{ palette_black };
@@ -43,7 +52,10 @@ void HInt_TextArea_Reset()
 {
 	SetBGTextFramePalette(s_bgNormalPal);
 	SetCharTextFramePalette(s_charaNormalPal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
+
+	// TODO: fix this more robustly. If the Hint at the end is interrupted by Vint, the game basically falls over because of all the DMA going on
+	//SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, 254, &HInt_TextArea_SetName>);
 }
 
 //------------------------------------------------------------------------------
@@ -91,11 +103,11 @@ WorldRoutine VNWorld::Init
 	std::memcpy(blackWithTextPal + 48, text_font_pal.data, 16 * sizeof(u16));
 	PAL_setColors(0, blackWithTextPal, 64, DMA_QUEUE_COPY);
 
-	// Wait a frame for colours to swap
-	co_yield {};
-
 	// Fill with reserved but highlighted empty tile
-	//VDP_fillTileMap(VDP_BG_A, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 2047), 0, 64 * 32);
+	VDP_setTileMapData(VDP_BG_A, c_hilightEmptyPlaneA.data(), 0, c_hilightEmptyPlaneA.size(), 2, DMA_QUEUE);
+
+	// Wait a frame for colours to swap and tilemap to fill
+	co_yield {};
 
 	m_script->Init(io_game, *this, m_characters);
 
@@ -132,7 +144,7 @@ WorldRoutine VNWorld::Init
 			if (m_nextPose)
 			{
 				// Fill with reserved but highlighted empty tile
-				//VDP_fillTileMap(VDP_BG_A, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 2047), 0, 64 * 32);
+				VDP_setTileMapData(VDP_BG_A, c_hilightEmptyPlaneA.data(), 0, c_hilightEmptyPlaneA.size(), 2, DMA);
 				FastImageLoad(BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
 				//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
 				PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
@@ -223,7 +235,7 @@ void VNWorld::StartMusic
 	bool i_loop
 )
 {
-	//XGM_startPlay(i_bgm);
+	XGM_startPlay(i_bgm);
 	//XGM_setLoopNumber(i_loop ? -1 : 0);
 }
 
@@ -265,7 +277,7 @@ void VNWorld::SetCharacter
 	if (pose)
 	{
 		m_nextPose = pose;
-		//VDP_setHInterrupt(false);
+		VDP_setHInterrupt(false);
 		//PAL_fadeOutPalette(PAL1, FramesPerSecond() / 4, true);
 	}
 }
@@ -274,7 +286,7 @@ void VNWorld::SetCharacter
 void VNWorld::HideCharacter()
 {
 	// Fill with reserved but highlighted empty tile
-	//VDP_fillTileMap(VDP_BG_A, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 2047), 0, 64 * 32);
+	VDP_setTileMapData(VDP_BG_A, c_hilightEmptyPlaneA.data(), 0, c_hilightEmptyPlaneA.size(), 2, DMA_QUEUE);
 }
 
 //------------------------------------------------------------------------------
