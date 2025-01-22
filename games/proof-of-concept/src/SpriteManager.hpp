@@ -51,6 +51,9 @@ class SpriteManager
 
     u16 m_miscSpriteTilesIndex{0};
 
+    bool m_needsSort{false};
+    bool m_dataChanged{false};
+
 public:
     void Update();
 
