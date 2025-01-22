@@ -20,7 +20,7 @@ void Script::Init
 	io_cd.AddCharacter("stacey", "STACEY", true);
 
 	// Set up poses
-	io_cd.AddPose("stacey", "annoyed", &stacey_excited, &stacey_annoyed_name_pal, &stacey_annoyed_text_pal);
+	io_cd.AddPose("stacey", "annoyed", &stacey_annoyed, &stacey_annoyed_name_pal, &stacey_annoyed_text_pal);
 	io_cd.AddPose("stacey", "excited", &stacey_excited, &stacey_excited_name_pal, &stacey_excited_text_pal);
 	io_cd.AddPose("stacey", "sigh", &stacey_sigh, stacey_sigh.palette, stacey_sigh.palette);
 

@@ -19,6 +19,39 @@ consteval std::array<u16, 64*32> FillHilightPlaneA()
 	return arr;
 }
 
+std::array<u16, 16> MinusOne(u16 const* i_pal)
+{
+	std::array<u16, 16> newPal;
+	for (u8 i = 0; i < 16; ++i)
+	{
+		u8 const r = (i_pal[i] & VDPPALETTE_REDMASK) >> VDPPALETTE_REDSFT;
+		u8 const g = (i_pal[i] & VDPPALETTE_GREENMASK) >> VDPPALETTE_GREENSFT;
+		u8 const b = (i_pal[i] & VDPPALETTE_BLUEMASK) >> VDPPALETTE_BLUESFT;
+		newPal[i] = RGB3_3_3_TO_VDPCOLOR(
+			(r > 0) ? r - 1 : 0,
+			(g > 0) ? g - 1 : 0,
+			(b > 0) ? b - 1 : 0
+		);
+	}
+
+	return newPal;
+}
+
+std::array<u16, 16> Halve(u16 const* i_pal)
+{
+	std::array<u16, 16> newPal;
+	for(u8 i = 0; i < 16; ++i)
+	{
+		newPal[i] = RGB3_3_3_TO_VDPCOLOR(
+			(i_pal[i] & VDPPALETTE_REDMASK) >> (VDPPALETTE_REDSFT + 1),
+			(i_pal[i] & VDPPALETTE_GREENMASK) >> (VDPPALETTE_GREENSFT + 1),
+			(i_pal[i] & VDPPALETTE_BLUEMASK) >> (VDPPALETTE_BLUESFT + 1)
+		);
+	}
+
+	return newPal;
+}
+
 constexpr std::array<u16, 64 * 32> c_hilightEmptyPlaneA = FillHilightPlaneA();
 
 static u16 const* s_bgNormalPal{ palette_black };
@@ -54,8 +87,8 @@ void HInt_TextArea_Reset()
 	SetCharTextFramePalette(s_charaNormalPal);
 
 	// TODO: fix this more robustly. If the Hint at the end is interrupted by Vint, the game basically falls over because of all the DMA going on
-	//SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, 254, &HInt_TextArea_SetName>);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
+	//SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 8, &HInt_TextArea_SetName>);
 }
 
 //------------------------------------------------------------------------------
@@ -71,12 +104,12 @@ VNWorld::VNWorld
 // Based on VDP_drawImageEx
 bool FastImageLoad(VDPPlane plane, const Image* image, u16 basetile, u16 x, u16 y)
 {
-	if (!VDP_loadTileSet(image->tileset, basetile & TILE_INDEX_MASK, DMA))
+	if (!VDP_loadTileSet(image->tileset, basetile & TILE_INDEX_MASK, DMA_QUEUE))
 	{
 		return false;
 	}
 
-	if (!VDP_setTileMapEx(plane, image->tilemap, basetile, x, y, 0, 0, image->tilemap->w, image->tilemap->h, DMA))
+	if (!VDP_setTileMapEx(plane, image->tilemap, basetile, x, y, 0, 0, image->tilemap->w, image->tilemap->h, DMA_QUEUE))
 	{
 		return false;
 	}
@@ -90,6 +123,8 @@ WorldRoutine VNWorld::Init
 	Game& io_game
 )
 {
+	DMA_setMaxTransferSize(7000);
+
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
 
@@ -126,8 +161,13 @@ WorldRoutine VNWorld::Init
 				FastImageLoad(VDPPlane::BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
 				PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
 				s_bgNormalPal = m_nextBG->palette->data;
-				s_bgNamePal = m_nextBG->palette->data;
-				s_bgTextPal = m_nextBG->palette->data;
+
+				m_bgNameCalcPal = Halve(s_bgNormalPal);
+				s_bgNamePal = m_bgNameCalcPal.data();
+
+				m_bgTextCalcPal = MinusOne(s_bgNamePal);
+				s_bgTextPal = m_bgTextCalcPal.data();
+
 				m_nextBG = nullptr;
 			}
 		}
@@ -143,14 +183,16 @@ WorldRoutine VNWorld::Init
 
 			if (m_nextPose)
 			{
-				// Fill with reserved but highlighted empty tile
-				VDP_setTileMapData(VDP_BG_A, c_hilightEmptyPlaneA.data(), 0, c_hilightEmptyPlaneA.size(), 2, DMA);
 				FastImageLoad(BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
 				//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
-				PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
+				//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
 				s_charaNormalPal = m_nextPose->m_image->palette->data;
-				s_charaNamePal = m_nextPose->m_namePal->data;
-				s_charaTextPal = m_nextPose->m_textPal->data;
+
+				m_charaNameCalcPal = Halve(s_charaNormalPal);
+				s_charaNamePal = m_charaNameCalcPal.data();
+
+				m_charaTextCalcPal = MinusOne(s_charaNamePal);
+				s_charaTextPal = m_charaTextCalcPal.data();
 				m_nextPose = nullptr;
 			}
 		}
@@ -236,7 +278,7 @@ void VNWorld::StartMusic
 )
 {
 	XGM_startPlay(i_bgm);
-	//XGM_setLoopNumber(i_loop ? -1 : 0);
+	XGM_setLoopNumber(i_loop ? -1 : 0);
 }
 
 //------------------------------------------------------------------------------
@@ -276,8 +318,9 @@ void VNWorld::SetCharacter
 	auto const [_, pose] = m_characters.FindPose(i_charName, i_poseName);
 	if (pose)
 	{
+		HideCharacter();
 		m_nextPose = pose;
-		VDP_setHInterrupt(false);
+		//VDP_setHInterrupt(false);
 		//PAL_fadeOutPalette(PAL1, FramesPerSecond() / 4, true);
 	}
 }

@@ -33,8 +33,8 @@ class VNWorld
 	std::array<u16, 16> m_bgNameCalcPal;
 	std::array<u16, 16> m_bgTextCalcPal;
 
-	std::array<u16, 16> m_charNameCalcPal;
-	std::array<u16, 16> m_charTextCalcPal;
+	std::array<u16, 16> m_charaNameCalcPal;
+	std::array<u16, 16> m_charaTextCalcPal;
 
 	WorldRoutine Init(Game &io_game) override;
 	WorldRoutine Shutdown(Game &io_game) override;
