@@ -149,25 +149,16 @@ void DialoguePrinter2::SetupSprites
 	u16 nameIndex = c_nameTilesIndex;
 	for (u16 i = 0; i < m_nameSprites.size(); ++i)
 	{
-		SpriteData spr;
+		auto [id, spr] = m_game->Sprites().AddSprite(
+			(i == (m_nameSprites.size() - 1)) ? SpriteSize::r2c1 : SpriteSize::r2c4,
+			TILE_ATTR_FULL(PAL3, true, false, false, nameIndex)
+		);
 
-		spr.m_x = c_namePosSide + i * 32;
-		spr.m_y = c_namePosDown + (c_textFramePos - 1) * 8;
-		spr.m_palette = SpritePalette::Pal3;
-		spr.m_highPriority = true;
-		spr.m_firstTileIndex = nameIndex;
-		spr.m_z = z++;
+		spr.SetX(c_namePosSide + i * 32);
+		spr.SetY(c_namePosDown + (c_textFramePos - 1) * 8);
+		spr.SetZ(z++);
 
-		if (i == (m_nameSprites.size() - 1))
-		{
-			spr.m_size = SpriteSize::r2c1;
-		}
-		else
-		{
-			spr.m_size = SpriteSize::r2c4;
-		}
-		
-		m_nameSprites[i] = m_game->Sprites().AddSprite(std::move(spr)).first;
+		m_nameSprites[i] = id;
 
 		nameIndex += 8;
 	}
@@ -179,27 +170,18 @@ void DialoguePrinter2::SetupSprites
 	{
 		for (u16 x = 0; x < c_lineWidth;)
 		{
-			SpriteData spr;
+			auto [id, spr] = m_game->Sprites().AddSprite(
+				((c_lineWidth - x) < 4) ? SpriteSize::r1c2 : SpriteSize::r1c4,
+				TILE_ATTR_FULL(PAL3, true, false, false, textIndex)
+			);
 
-			spr.m_x = c_textPosSide + x * 8 + y * c_lineIndent;
-			spr.m_y = c_textPosDown + (c_textFramePos + 1 + y) * 8 + (c_lineSeparation * y);
-			spr.m_palette = SpritePalette::Pal3;
-			spr.m_highPriority = true;
-			spr.m_firstTileIndex = textIndex;
-			spr.m_z = z++;
-			
-			if ((c_lineWidth - x) < 4)
-			{
-				spr.m_size = SpriteSize::r1c2;
-				textIndex += 2;
-			}
-			else
-			{
-				spr.m_size = SpriteSize::r1c4;
-				textIndex += 4;
-			}
+			spr.SetX(c_textPosSide + x * 8 + y * c_lineIndent);
+			spr.SetY(c_textPosDown + (c_textFramePos + 1 + y) * 8 + (c_lineSeparation * y));
+			spr.SetZ(z++);
 
-			m_textSprites[sprI] = m_game->Sprites().AddSprite(std::move(spr)).first;
+			textIndex += ((c_lineWidth - x) < 4) ? 2 : 4;
+
+			m_textSprites[sprI] = id;
 
 			++sprI;
 			x += 4;
@@ -210,16 +192,16 @@ void DialoguePrinter2::SetupSprites
 
 	// Arrow sprite
 	{
-		SpriteData spr;
-		spr.m_firstTileIndex = m_game->Sprites().InsertMiscTiles(misc_spr);
-		spr.m_size = SpriteSize::r1c1;
-		spr.m_palette = SpritePalette::Pal3;
-		spr.m_highPriority = true;
-		spr.m_visible = false;
-		spr.m_x = 304;
-		spr.m_y = c_textPosDown + (c_textFramePos + 1 + 2) * 8 + (c_lineSeparation * 2) + 4;
+		auto [id, spr] = m_game->Sprites().AddSprite(
+			SpriteSize::r1c1,
+			TILE_ATTR_FULL(PAL3, true, false, false, m_game->Sprites().InsertMiscTiles(misc_spr))
+		);
 
-		m_nextArrow = m_game->Sprites().AddSprite(std::move(spr)).first;
+		spr.SetVisible(false);
+		spr.SetX(304);
+		spr.SetY(c_textPosDown + (c_textFramePos + 1 + 2) * 8 + (c_lineSeparation * 2) + 4);
+		
+		m_nextArrow = id;
 	}
 }
 
@@ -273,12 +255,13 @@ void DialoguePrinter2::SetName
 	{
 		for (u16 i = 0; i < m_nameSprites.size(); ++i)
 		{
-			SpriteData& spr = m_game->Sprites().EditSpriteData(m_nameSprites[i]);
-			spr.m_x = c_namePosSide + i * 32;
+			s16 x = c_namePosSide + i * 32;
 			if(!i_left)
 			{
-				spr.m_x += 320 - 2 * c_namePosSide - ((limit >> 1) * 8);
+				x += 320 - 2 * c_namePosSide - ((limit >> 1) * 8);
 			}
+
+			m_game->Sprites().EditSpriteData(m_nameSprites[i]).SetX(x);
 		}
 
 		m_nameOnLeft = i_left;
@@ -311,8 +294,8 @@ bool DialoguePrinter2::Update()
 			++m_arrowTimer;
 			if (m_arrowTimer >= c_arrowSpeed)
 			{
-				SpriteData &arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
-				arrowSpr.m_visible = !arrowSpr.m_visible;
+				EditableSpriteData arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
+				arrowSpr.SetVisible(!arrowSpr.IsVisible());
 				m_arrowTimer = 0;
 			}
 		}
@@ -333,8 +316,7 @@ void DialoguePrinter2::Next()
 	if(!DrawChar())
 	{
 		{
-			SpriteData &arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
-			arrowSpr.m_visible = false;
+			m_game->Sprites().EditSpriteData(m_nextArrow).SetVisible(false);
 		}
 
 		if (m_curTextIndex == m_curTextLen)

@@ -4,6 +4,7 @@
 #include <genesis.h>
 
 #include <algorithm>
+#include <ranges>
 
 namespace Game
 {
@@ -15,86 +16,117 @@ inline constexpr u16 c_maxMiscTiles = u16((0x10000 - u32(c_miscTilesBaseAddress)
 //------------------------------------------------------------------------------
 void SpriteManager::Update()
 {
-    // Sort by Z (lower is drawn first)
-    if (m_needsSort)
+    bool const needsSorting = m_spritesAdded || m_orderingChanged;
+    bool const needsLinksUpdating = needsSorting || m_spritesRemoved || m_visibilitiesChanged;
+    bool const needsDMA = m_spriteDataEdited || needsLinksUpdating;
+
+    // Sort by Z if needed (lower is drawn first)
+    if (needsSorting)
     {
-        std::sort(m_sprites.begin(), m_sprites.end(), [](Sprite const& sprA, Sprite const& sprB) { return sprA.m_data.m_z < sprB.m_data.m_z; });
-        m_needsSort = false;
+        auto zipped = std::views::zip(m_sprites, m_vramSprites);
+        std::ranges::sort(zipped, [](auto const& sprA, auto const& sprB) { return std::get<0>(sprA).m_z < std::get<0>(sprB).m_z; });
     }
 
-    if (m_dataChanged)
+    // Update links if needed
+    if (needsLinksUpdating)
     {
-        u16 vramI = 0;
-        for(auto const& [id, spr] : m_sprites)
+        m_firstSpriteIndex = UINT16_MAX;
+        m_lastSpriteIndex = 0;
+        for (u16 i = 0; i < m_sprites.size(); ++i)
         {
-            if(vramI == m_vramSprites.size())
+            if (m_sprites[i].m_visible)
             {
+                m_firstSpriteIndex = i;
                 break;
-            }
-
-            if(spr.m_visible)
-            {
-                VRAMSprite& vSpr = m_vramSprites[vramI++];
-                vSpr.m_yPlus128 = u16(128 + spr.m_y);
-                vSpr.m_size = spr.m_size;
-                vSpr.m_link = vramI;
-                vSpr.m_tileAttr = TILE_ATTR_FULL(
-                    u8(spr.m_palette),
-                    spr.m_highPriority ? 1 : 0,
-                    spr.m_flipV ? 1 : 0,
-                    spr.m_flipH ? 1 : 0,
-                    spr.m_firstTileIndex
-                    );
-                vSpr.m_xPlus128 = u16(128 + spr.m_x);
             }
         }
 
-        if(vramI > 0)
+        for (u16 i = m_sprites.size(); i > 0; --i)
         {
-            m_vramSprites[vramI - 1].m_link = 0;
+            if (m_sprites[i - 1].m_visible)
+            {
+                m_lastSpriteIndex = i - 1;
+                break;
+            }
+        }
+
+        if (m_firstSpriteIndex <= m_lastSpriteIndex)
+        {
+            u16 prevVisibleIndex = m_firstSpriteIndex;
+            for (u16 i = m_firstSpriteIndex + 1; i <= m_lastSpriteIndex; ++i)
+            {
+                if (m_sprites[i].m_visible)
+                {
+                    m_vramSprites[prevVisibleIndex].m_link = i - m_firstSpriteIndex;
+                    prevVisibleIndex = i;
+                }
+            }
+
+            m_vramSprites[m_lastSpriteIndex].m_link = 0;
+        }
+    }
+
+    // Queue DMA if needed
+    if (needsDMA)
+    {
+        if (m_firstSpriteIndex <= m_lastSpriteIndex)
+        {
+            DMA_queueDmaFast(DMA_VRAM, m_vramSprites.data() + m_firstSpriteIndex, VDP_getSpriteListAddress(), (m_lastSpriteIndex + 1 - m_firstSpriteIndex) * (sizeof(VRAMSprite) >> 1), 2);
         }
         else
         {
-            m_vramSprites[0] = VRAMSprite{};
-            vramI = 1;
+            VRAMSprite noSprites{};
+            DMA_copyAndQueueDma(DMA_VRAM, &noSprites, VDP_getSpriteListAddress(), (sizeof(VRAMSprite) >> 1), 2);
         }
-
-        DMA_queueDmaFast(DMA_VRAM, &m_vramSprites, VDP_getSpriteListAddress(), vramI * (sizeof(VRAMSprite) >> 1), 2);
-
-        m_dataChanged = false;
     }
+
+    m_spritesAdded = false;
+    m_spritesRemoved = false;
+    m_spriteDataEdited = false;
+    m_visibilitiesChanged = false;
+    m_orderingChanged = false;
 }
 
 //------------------------------------------------------------------------------
-std::pair<SpriteID, SpriteData&> SpriteManager::AddSprite
+std::pair<SpriteID, EditableSpriteData> SpriteManager::AddSprite
 (
     SpriteSize i_size,
-    u16 i_firstTileIndex
+    u16 i_tileAttr
 )
 {
     Sprite& spr = m_sprites.emplace_back();
+    VRAMSprite& vSpr = m_vramSprites.emplace_back();
     spr.m_id = m_nextSpriteID++;
-    spr.m_data.m_size = i_size;
-    spr.m_data.m_firstTileIndex = i_firstTileIndex;
+    vSpr.m_size = i_size;
+    vSpr.m_tileAttr = i_tileAttr;
 
-    m_needsSort = true;
-    m_dataChanged = true;
+    m_spritesAdded = true;
 
-    return { spr.m_id, spr.m_data };
+    return { spr.m_id, { spr, vSpr, *this } };
 }
 
 //------------------------------------------------------------------------------
-std::pair<SpriteID, SpriteData&> SpriteManager::AddSprite
+std::pair<SpriteID, EditableSpriteData> SpriteManager::CloneSprite
 (
-    SpriteData&& i_initData
+    SpriteID i_id
 )
 {
-    Sprite& spr = m_sprites.emplace_back(Sprite{m_nextSpriteID++, std::move(i_initData)});
+    auto clonedSprI = std::find_if(
+        m_sprites.begin(),
+        m_sprites.end(),
+        [i_id](auto const& spr) { return spr.m_id == i_id; }
+    );
 
-    m_needsSort = true;
-    m_dataChanged = true;
+    if (clonedSprI != m_sprites.end())
+    {
+        Sprite& newSpr = m_sprites.emplace_back(*clonedSprI);
+        VRAMSprite& vSpr = m_vramSprites.emplace_back(*(m_vramSprites.begin() + std::distance(m_sprites.begin(), clonedSprI)));
+        m_spritesAdded = true;
 
-    return { spr.m_id, spr.m_data };
+        return { newSpr.m_id, { newSpr, vSpr, * this } };
+    }
+
+    return { {}, { m_sprites.back(), m_vramSprites.back(), *this } };
 }
 
 //------------------------------------------------------------------------------
@@ -112,7 +144,7 @@ void SpriteManager::RemoveSprite
     if(sprI != m_sprites.end())
     {
         m_sprites.erase(sprI);
-        m_dataChanged = true;
+        m_spritesRemoved = true;
     }
 }
 
@@ -122,11 +154,12 @@ void SpriteManager::ClearAllSprites
 )
 {
     m_sprites.clear();
-    m_dataChanged = true;
+    m_vramSprites.clear();
+    m_spritesRemoved = true;
 }
 
 //------------------------------------------------------------------------------
-SpriteData& SpriteManager::EditSpriteData
+EditableSpriteData SpriteManager::EditSpriteData
 (
     SpriteID i_id
 )
@@ -139,14 +172,12 @@ SpriteData& SpriteManager::EditSpriteData
 
     if(sprI != m_sprites.end())
     {
-        m_needsSort = true;
-        m_dataChanged = true;
-
-        return sprI->m_data;
+        m_spriteDataEdited = true;
+        return { *sprI, *(m_vramSprites.begin() + std::distance(m_sprites.begin(), sprI)), * this };
     }
 
     Error("Tried to edit a sprite that no longer exists");
-    return m_sprites.back().m_data;
+    return { m_sprites.back(), m_vramSprites.back(), *this };
 }
 
 //------------------------------------------------------------------------------
