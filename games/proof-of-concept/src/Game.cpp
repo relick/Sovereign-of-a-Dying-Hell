@@ -8,9 +8,9 @@
 namespace Game
 {
 
-#define CHECK_FPS 1
+#define CHECK_FPS 0
 #if CHECK_FPS
-static u16 frame{};
+static volatile u16 frame{};
 static std::array<std::pair<u16, u16>, 4> fps{};
 #endif
 
@@ -137,9 +137,9 @@ void Game::PostWorldFrame()
 	kprintf("VCounts: (%x, %x), (%x, %x), (%x, %x), (%x, %x).\nFrame time: %u. Sprites time: %u. VBlank time (wait/actual): %x, %u",
 		fps[0].first, fps[0].second, fps[1].first, fps[1].second, 
 		fps[2].first, fps[2].second, fps[3].first, fps[3].second,
-		fps[1].second - fps[0].second + ((fps[1].first - fps[0].first) * 261) + (fps[0].first <= fps[1].first ? 0 : 261),
-		fps[2].second - fps[1].second + ((fps[2].first - fps[1].first) * 261) + (fps[1].first <= fps[2].first ? 0 : 261),
-		fps[3].second - fps[2].second + ((fps[3].first - (fps[2].first + 1)) * 261) + (fps[2].first <= fps[3].first ? 0 : 261),
+		fps[1].second - fps[0].second + ((fps[1].first - fps[0].first) * 261) + (fps[0].second <= fps[1].second ? 0 : 261),
+		fps[2].second - fps[1].second + ((fps[2].first - fps[1].first) * 261) + (fps[1].second <= fps[2].second ? 0 : 261),
+		fps[3].second - fps[2].second + ((fps[3].first - (fps[2].first + 1)) * 261) + (fps[2].second <= fps[3].second ? 0 : 261),
 		fps[3].second - 229 + (229 <= fps[3].second ? 0 : 256) + ((fps[3].first - (fps[2].first + 1)) * 261)
 	);
 #endif
