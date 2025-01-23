@@ -102,7 +102,7 @@ VNWorld::VNWorld
 }
 
 // Based on VDP_setTileMapEx
-bool FastSetTileMap(VDPPlane plane, const TileMap* tilemap, u16 basetile)
+bool FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 {
 	u16 const* src = (u16 const*)FAR_SAFE(tilemap->tilemap, mulu(tilemap->w, tilemap->h) * 2);
 
@@ -111,39 +111,33 @@ bool FastSetTileMap(VDPPlane plane, const TileMap* tilemap, u16 basetile)
 	// we can only do logical OR on priority and HV flip
 	u16 const baseor = basetile & (TILE_ATTR_PRIORITY_MASK | TILE_ATTR_VFLIP_MASK | TILE_ATTR_HFLIP_MASK);
 
-	u16 row = 0;
 	u16 i = tilemap->h;
-
-	// otherwise we set region by row (faster)
-	u16 const addr = VDP_getPlaneAddress(plane, 0, row);
 
 	// get temp buffer and schedule DMA
 	u16 const bufSize = mulu(planeWidth, tilemap->h);
-	u16* buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, addr, bufSize, 2));
+	u16* buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, planeAddr, bufSize, 2));
 	u16 const bufInc = (planeWidth - tilemap->w);
 
 	u16 const quarterWidth = tilemap->w >> 2;
 
 	while (i--)
 	{
+		// then prepare data in buffer that will be transferred by DMA
+		u16 r = quarterWidth;
+
+		// prepare map data for row update
+		while (r--)
 		{
-			// then prepare data in buffer that will be transferred by DMA
-			u16 r = quarterWidth;
-
-			// prepare map data for row update
-			while (r--)
-			{
-				*buf++ = baseor | (*src++ + baseinc);
-				*buf++ = baseor | (*src++ + baseinc);
-				*buf++ = baseor | (*src++ + baseinc);
-				*buf++ = baseor | (*src++ + baseinc);
-			}
-
-			r = tilemap->w & 3;
-			// prepare map data for row update
-			while (r--) *buf++ = baseor | (*src++ + baseinc);
+			*buf++ = baseor | (*src++ + baseinc);
+			*buf++ = baseor | (*src++ + baseinc);
+			*buf++ = baseor | (*src++ + baseinc);
+			*buf++ = baseor | (*src++ + baseinc);
 		}
-		row++;
+
+		r = tilemap->w & 3;
+		// prepare map data for row update
+		while (r--) *buf++ = baseor | (*src++ + baseinc);
+
 		buf += bufInc;
 	}
 
@@ -151,15 +145,10 @@ bool FastSetTileMap(VDPPlane plane, const TileMap* tilemap, u16 basetile)
 }
 
 // Based on VDP_drawImageEx
-bool FastImageLoad(VDPPlane plane, const Image* image, u16 basetile, u16 x, u16 y)
+bool FastImageLoad(u16 planeAddr, const Image* image, u16 basetile, u16 x, u16 y)
 {
-	//if (!VDP_loadTileSet(image->tileset, basetile & TILE_INDEX_MASK, DMA_QUEUE))
-	{
-	//	return false;
-	}
-
-	{
-		AutoProfileScope profile("FastImageLoad::DMA_queueDma: %lu");
+	//{
+		//AutoProfileScope profile("FastImageLoad::DMA_queueDma: %lu");
 
 		u16 const tileChunks = image->tileset->numTile / 32;
 		u16 const tileIndex = basetile & TILE_INDEX_MASK;
@@ -174,18 +163,13 @@ bool FastImageLoad(VDPPlane plane, const Image* image, u16 basetile, u16 x, u16 
 			u16 const numTiles = tileChunks << 5;
 			DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (tileChunks << 8)), (tileIndex + numTiles) * 32, remainder * 16, 2);
 		}
-	}
+	//}
 
-	{
-		AutoProfileScope profile("FastImageLoad::FastSetTileMap: %lu");
+	//{
+		//AutoProfileScope profile("FastImageLoad::FastSetTileMap: %lu");
 
-		FastSetTileMap(plane, image->tilemap, basetile);
-		//VDP_setTileMap(plane, image->tilemap, x, y, image->tilemap->w, image->tilemap->h, DMA_QUEUE);
-		//if (!VDP_setTileMapEx(plane, image->tilemap, basetile, x, y, 0, 0, 64, 32, DMA_QUEUE))
-		{
-		//	return false;
-		}
-	}
+		FastSetTileMap(planeAddr, image->tilemap, basetile);
+	//}
 
 	return true;
 }
@@ -254,7 +238,7 @@ void VNWorld::Run
 	{
 		{
 			AutoProfileScope profile("m_nextBG::FastImageLoad: %lu");
-			FastImageLoad(VDPPlane::BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
+			FastImageLoad(VDP_BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
 		}
 		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
 		s_bgNormalPal = m_nextBG->palette->data;
@@ -273,7 +257,7 @@ void VNWorld::Run
 	{
 		{
 			AutoProfileScope profile("m_nextPose::FastImageLoad: %lu");
-			FastImageLoad(BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
+			FastImageLoad(VDP_BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
 		}
 		//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
 		//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
