@@ -138,7 +138,7 @@ WorldRoutine VNWorld::Init
 )
 {
 	// Way low. It'll take several frames but we'll cope
-	DMA_setMaxTransferSize(512);
+	DMA_setMaxTransferSize(640);
 
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
@@ -163,56 +163,6 @@ WorldRoutine VNWorld::Init
 
 	VDP_setHInterrupt(true);
 
-	m_nextBGCallbackID = io_game.AddVBlankCallback(
-		[this]
-		{
-			if (PAL_isDoingFade())
-			{
-				return;
-			}
-
-			if (m_nextBG)
-			{
-				FastImageLoad(VDPPlane::BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
-				PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
-				s_bgNormalPal = m_nextBG->palette->data;
-
-				m_bgNameCalcPal = Halve(s_bgNormalPal);
-				s_bgNamePal = m_bgNameCalcPal.data();
-
-				m_bgTextCalcPal = MinusOne(s_bgNamePal);
-				s_bgTextPal = m_bgTextCalcPal.data();
-
-				m_nextBG = nullptr;
-			}
-		}
-	);
-
-	m_nextPoseCallbackID = io_game.AddVBlankCallback(
-		[this]
-		{
-			if (PAL_isDoingFade())
-			{
-				return;
-			}
-
-			if (m_nextPose)
-			{
-				FastImageLoad(BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
-				//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
-				//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
-				s_charaNormalPal = m_nextPose->m_image->palette->data;
-
-				m_charaNameCalcPal = Halve(s_charaNormalPal);
-				s_charaNamePal = m_charaNameCalcPal.data();
-
-				m_charaTextCalcPal = MinusOne(s_charaNamePal);
-				s_charaTextPal = m_charaTextCalcPal.data();
-				m_nextPose = nullptr;
-			}
-		}
-	);
-
 	co_return;
 }
 
@@ -223,9 +173,6 @@ WorldRoutine VNWorld::Shutdown
 )
 {
 	StopMusic(0);
-
-	io_game.RemoveVBlankCallback(m_nextBGCallbackID);
-	io_game.RemoveVBlankCallback(m_nextPoseCallbackID);
 
 	SYS_setHIntCallback(nullptr);
 	VDP_setHInterrupt(false);
@@ -240,8 +187,40 @@ void VNWorld::Run
 	Game& io_game
 )
 {
-	if (PAL_isDoingFade() || m_nextPose || m_nextBG)
+	if (PAL_isDoingFade() || DMA_getQueueSize() > 0)
 	{
+		return;
+	}
+
+	if (m_nextBG)
+	{
+		FastImageLoad(VDPPlane::BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
+		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
+		s_bgNormalPal = m_nextBG->palette->data;
+
+		m_bgNameCalcPal = Halve(s_bgNormalPal);
+		s_bgNamePal = m_bgNameCalcPal.data();
+
+		m_bgTextCalcPal = MinusOne(s_bgNamePal);
+		s_bgTextPal = m_bgTextCalcPal.data();
+
+		m_nextBG = nullptr;
+		return;
+	}
+
+	if (m_nextPose)
+	{
+		FastImageLoad(BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
+		//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
+		//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
+		s_charaNormalPal = m_nextPose->m_image->palette->data;
+
+		m_charaNameCalcPal = Halve(s_charaNormalPal);
+		s_charaNamePal = m_charaNameCalcPal.data();
+
+		m_charaTextCalcPal = MinusOne(s_charaNamePal);
+		s_charaTextPal = m_charaTextCalcPal.data();
+		m_nextPose = nullptr;
 		return;
 	}
 

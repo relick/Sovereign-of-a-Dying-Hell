@@ -27,9 +27,6 @@ class VNWorld
 	Image const* m_nextBG{ nullptr };
 	Pose const* m_nextPose{ nullptr };
 
-	VBlankCallbackID m_nextBGCallbackID{};
-	VBlankCallbackID m_nextPoseCallbackID{};
-
 	std::array<u16, 16> m_bgNameCalcPal;
 	std::array<u16, 16> m_bgTextCalcPal;
 
