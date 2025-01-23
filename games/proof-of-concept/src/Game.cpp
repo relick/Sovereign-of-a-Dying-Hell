@@ -3,13 +3,23 @@
 #include "Worlds.hpp"
 
 #include <genesis.h>
+#include <array>
 
 namespace Game
 {
 
+#define CHECK_FPS 1
+#if CHECK_FPS
+static u16 frame{};
+static std::array<std::pair<u16, u16>, 4> fps{};
+#endif
+
 //------------------------------------------------------------------------------
 Game::Game()
 {
+#if CHECK_FPS
+	SYS_setVIntCallback(Game::VIntCallback);
+#endif
 	SYS_setVBlankCallback(Game::VBlankCallback);
 
 	VDP_setScreenWidth320();
@@ -24,11 +34,6 @@ void Game::RequestNextWorld(std::unique_ptr<World> &&i_nextWorld)
 	m_nextWorld = std::move(i_nextWorld);
 }
 
-#define CHECK_FPS 0
-#if CHECK_FPS
-static u16 fps[4] = {0};
-#endif
-
 //------------------------------------------------------------------------------
 void Game::Run()
 {
@@ -37,7 +42,7 @@ void Game::Run()
 		if (!m_nextWorld)
 		{
 #if CHECK_FPS
-			fps[0] = GET_VCOUNTER;
+			fps[0] = {frame, GET_VCOUNTER};
 #endif
 			m_curWorld->Run(*this);
 			PostWorldFrame();
@@ -50,7 +55,7 @@ void Game::Run()
 				while (m_currentWorldRoutine)
 				{
 #if CHECK_FPS
-					fps[0] = GET_VCOUNTER;
+					fps[0] = {frame, GET_VCOUNTER};
 #endif
 					m_currentWorldRoutine();
 					PostWorldFrame();
@@ -63,7 +68,7 @@ void Game::Run()
 			while (m_currentWorldRoutine)
 			{
 #if CHECK_FPS
-				fps[0] = GET_VCOUNTER;
+				fps[0] = {frame, GET_VCOUNTER};
 #endif
 				m_currentWorldRoutine();
 				PostWorldFrame();
@@ -99,6 +104,14 @@ void Game::RemoveVBlankCallback(VBlankCallbackID i_callbackID)
 }
 
 //------------------------------------------------------------------------------
+void Game::VIntCallback()
+{
+#if CHECK_FPS
+	++frame;
+#endif
+}
+
+//------------------------------------------------------------------------------
 void Game::VBlankCallback()
 {
 	for (auto const& [id, f] : s_vBlankCallbacks)
@@ -111,22 +124,23 @@ void Game::VBlankCallback()
 void Game::PostWorldFrame()
 {
 #if CHECK_FPS
-	fps[1] = GET_VCOUNTER;
+	fps[1] = {frame, GET_VCOUNTER};
 #endif
 	m_sprites.Update();
 #if CHECK_FPS
-	fps[2] = GET_VCOUNTER;
+	fps[2] = {frame, GET_VCOUNTER};
 #endif
 	SYS_doVBlankProcess();
 #if CHECK_FPS
-	fps[3] = GET_VCOUNTER;
+	fps[3] = {frame, GET_VCOUNTER};
 
-	kprintf("VCounts: %u, %u, %u, %u. Frame time: %u. Sprites time: %u. VBlank time (wait/actual): %u, %u",
-		fps[0], fps[1], fps[2], fps[3],
-		fps[1] - fps[0] + (fps[0] <= fps[1] ? 0 : 261),
-		fps[2] - fps[1] + (fps[1] <= fps[2] ? 0 : 261),
-		fps[3] - fps[2] + (fps[2] <= fps[3] ? 0 : 261),
-		fps[3] - 229 + (229 <= fps[3] ? 0 : 256)
+	kprintf("VCounts: (%x, %x), (%x, %x), (%x, %x), (%x, %x).\nFrame time: %u. Sprites time: %u. VBlank time (wait/actual): %x, %u",
+		fps[0].first, fps[0].second, fps[1].first, fps[1].second, 
+		fps[2].first, fps[2].second, fps[3].first, fps[3].second,
+		fps[1].second - fps[0].second + ((fps[1].first - fps[0].first) * 261) + (fps[0].first <= fps[1].first ? 0 : 261),
+		fps[2].second - fps[1].second + ((fps[2].first - fps[1].first) * 261) + (fps[1].first <= fps[2].first ? 0 : 261),
+		fps[3].second - fps[2].second + ((fps[3].first - (fps[2].first + 1)) * 261) + (fps[2].first <= fps[3].first ? 0 : 261),
+		fps[3].second - 229 + (229 <= fps[3].second ? 0 : 256) + ((fps[3].first - (fps[2].first + 1)) * 261)
 	);
 #endif
 }

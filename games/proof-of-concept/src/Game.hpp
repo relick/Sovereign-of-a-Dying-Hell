@@ -35,6 +35,7 @@ public:
 	SpriteManager& Sprites() { return m_sprites; }
 
 private:
+	static void VIntCallback();
 	static void VBlankCallback();
 
 	void PostWorldFrame();
