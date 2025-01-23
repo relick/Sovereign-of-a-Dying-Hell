@@ -26,10 +26,10 @@ inline constexpr u16 c_nameTilesAddress = c_nameTilesIndex * 32;
 
 inline constexpr u16 c_nameFontOffset = 26 * 8;
 inline constexpr u16 c_namePosSide = 10;
-inline constexpr s16 c_namePosDown = -9;
+inline constexpr s16 c_namePosDown = -10;
 
 inline constexpr u16 c_textPosSide = 24;
-inline constexpr s16 c_textPosDown = -4;
+inline constexpr s16 c_textPosDown = -5;
 inline constexpr u16 c_lineSeparation = 2;
 inline constexpr u16 c_lineIndent = 1;
 

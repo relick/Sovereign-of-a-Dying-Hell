@@ -8,16 +8,18 @@
 namespace Game
 {
 
-#define CHECK_FPS 0
-#if CHECK_FPS
-static volatile u16 frame{};
+#if PROFILER
+static u32 volatile s_frameLineCount{};
+#endif
+
+#if LOG_WHOLE_FRAME_TIMES
 static std::array<std::pair<u16, u16>, 4> fps{};
 #endif
 
 //------------------------------------------------------------------------------
 Game::Game()
 {
-#if CHECK_FPS
+#if PROFILER
 	SYS_setVIntCallback(Game::VIntCallback);
 #endif
 	SYS_setVBlankCallback(Game::VBlankCallback);
@@ -41,8 +43,8 @@ void Game::Run()
 	{
 		if (!m_nextWorld)
 		{
-#if CHECK_FPS
-			fps[0] = {frame, GET_VCOUNTER};
+#if LOG_WHOLE_FRAME_TIMES
+			fps[0] = {s_frameLineCount, GET_VCOUNTER};
 #endif
 			m_curWorld->Run(*this);
 			PostWorldFrame();
@@ -54,8 +56,8 @@ void Game::Run()
 				m_currentWorldRoutine = m_curWorld->Shutdown(*this);
 				while (m_currentWorldRoutine)
 				{
-#if CHECK_FPS
-					fps[0] = {frame, GET_VCOUNTER};
+#if LOG_WHOLE_FRAME_TIMES
+					fps[0] = {s_frameLineCount, GET_VCOUNTER};
 #endif
 					m_currentWorldRoutine();
 					PostWorldFrame();
@@ -67,8 +69,8 @@ void Game::Run()
 			m_currentWorldRoutine = m_nextWorld->Init(*this);
 			while (m_currentWorldRoutine)
 			{
-#if CHECK_FPS
-				fps[0] = {frame, GET_VCOUNTER};
+#if LOG_WHOLE_FRAME_TIMES
+				fps[0] = {s_frameLineCount, GET_VCOUNTER};
 #endif
 				m_currentWorldRoutine();
 				PostWorldFrame();
@@ -80,6 +82,16 @@ void Game::Run()
 		}
 	}
 }
+
+#if PROFILER
+//------------------------------------------------------------------------------
+u32 Game::GetVCount()
+{
+	u8 const vCount = GET_VCOUNTER;
+	u8 constexpr offset = 224;
+	return u32{ static_cast<u8>(vCount - offset) } + s_frameLineCount;
+}
+#endif
 
 //------------------------------------------------------------------------------
 VBlankCallbackID Game::AddVBlankCallback(std::function<void()>&& i_callback)
@@ -106,8 +118,8 @@ void Game::RemoveVBlankCallback(VBlankCallbackID i_callbackID)
 //------------------------------------------------------------------------------
 void Game::VIntCallback()
 {
-#if CHECK_FPS
-	++frame;
+#if PROFILER
+	s_frameLineCount += 261;
 #endif
 }
 
@@ -123,16 +135,20 @@ void Game::VBlankCallback()
 //------------------------------------------------------------------------------
 void Game::PostWorldFrame()
 {
-#if CHECK_FPS
-	fps[1] = {frame, GET_VCOUNTER};
+#if LOG_WHOLE_FRAME_TIMES
+	fps[1] = {s_frameLineCount, GET_VCOUNTER};
 #endif
+
 	m_sprites.Update();
-#if CHECK_FPS
-	fps[2] = {frame, GET_VCOUNTER};
+
+#if LOG_WHOLE_FRAME_TIMES
+	fps[2] = {s_frameLineCount, GET_VCOUNTER};
 #endif
+
 	SYS_doVBlankProcess();
-#if CHECK_FPS
-	fps[3] = {frame, GET_VCOUNTER};
+
+#if LOG_WHOLE_FRAME_TIMES
+	fps[3] = {s_frameLineCount, GET_VCOUNTER};
 
 	kprintf("VCounts: (%x, %x), (%x, %x), (%x, %x), (%x, %x).\nFrame time: %u. Sprites time: %u. VBlank time (wait/actual): %x, %u",
 		fps[0].first, fps[0].second, fps[1].first, fps[1].second, 

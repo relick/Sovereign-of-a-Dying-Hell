@@ -71,14 +71,14 @@ void HInt_TextArea_SetName()
 {
 	SetBGTextFramePalette(s_bgNamePal);
 	SetCharTextFramePalette(s_charaNamePal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, false, c_textFramePos * 8 - 20, &HInt_TextArea_SetText>);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, false, c_textFramePos * 8 - 21, &HInt_TextArea_SetText>);
 }
 
 void HInt_TextArea_SetText()
 {
 	SetBGTextFramePalette(s_bgTextPal);
 	SetCharTextFramePalette(s_charaTextPal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 0, &HInt_TextArea_Reset>);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 - 1, &HInt_TextArea_Reset>);
 }
 
 void HInt_TextArea_Reset()
@@ -87,7 +87,7 @@ void HInt_TextArea_Reset()
 	SetCharTextFramePalette(s_charaNormalPal);
 
 	// TODO: fix this more robustly. If the Hint at the end is interrupted by Vint, the game basically falls over because of all the DMA going on
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8, &HInt_TextArea_SetName>);
+	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8 + 1, &HInt_TextArea_SetName>);
 	//SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 8, &HInt_TextArea_SetName>);
 }
 
@@ -101,6 +101,55 @@ VNWorld::VNWorld
 	if (!m_script) { Error("Must provide a script to VNWorld"); }
 }
 
+// Based on VDP_setTileMapEx
+bool FastSetTileMap(VDPPlane plane, const TileMap* tilemap, u16 basetile)
+{
+	u16 const* src = (u16 const*)FAR_SAFE(tilemap->tilemap, mulu(tilemap->w, tilemap->h) * 2);
+
+	// we can increment both index and palette
+	u16 const baseinc = basetile & (TILE_INDEX_MASK | TILE_ATTR_PALETTE_MASK);
+	// we can only do logical OR on priority and HV flip
+	u16 const baseor = basetile & (TILE_ATTR_PRIORITY_MASK | TILE_ATTR_VFLIP_MASK | TILE_ATTR_HFLIP_MASK);
+
+	u16 row = 0;
+	u16 i = tilemap->h;
+
+	// otherwise we set region by row (faster)
+	u16 const addr = VDP_getPlaneAddress(plane, 0, row);
+
+	// get temp buffer and schedule DMA
+	u16 const bufSize = mulu(planeWidth, tilemap->h);
+	u16* buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, addr, bufSize, 2));
+	u16 const bufInc = (planeWidth - tilemap->w);
+
+	u16 const quarterWidth = tilemap->w >> 2;
+
+	while (i--)
+	{
+		{
+			// then prepare data in buffer that will be transferred by DMA
+			u16 r = quarterWidth;
+
+			// prepare map data for row update
+			while (r--)
+			{
+				*buf++ = baseor | (*src++ + baseinc);
+				*buf++ = baseor | (*src++ + baseinc);
+				*buf++ = baseor | (*src++ + baseinc);
+				*buf++ = baseor | (*src++ + baseinc);
+			}
+
+			r = tilemap->w & 3;
+			// prepare map data for row update
+			while (r--) *buf++ = baseor | (*src++ + baseinc);
+		}
+		row++;
+		buf += bufInc;
+	}
+
+	return true;
+}
+
 // Based on VDP_drawImageEx
 bool FastImageLoad(VDPPlane plane, const Image* image, u16 basetile, u16 x, u16 y)
 {
@@ -109,23 +158,33 @@ bool FastImageLoad(VDPPlane plane, const Image* image, u16 basetile, u16 x, u16 
 	//	return false;
 	}
 
-	u16 const tileChunks = image->tileset->numTile / 32;
-	u16 const tileIndex = basetile & TILE_INDEX_MASK;
-	for(u16 i = 0; i < tileChunks; ++i)
 	{
-		u16 const numTiles = i << 5;
-		DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (i << 8)), (tileIndex + numTiles) * 32, 32 * 16, 2);
-	}
-	u16 const remainder = image->tileset->numTile - (tileChunks * 32);
-	if (remainder > 0)
-	{
-		u16 const numTiles = tileChunks << 5;
-		DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (tileChunks << 8)), (tileIndex + numTiles) * 32, remainder * 16, 2);
+		AutoProfileScope profile("FastImageLoad::DMA_queueDma: %lu");
+
+		u16 const tileChunks = image->tileset->numTile / 32;
+		u16 const tileIndex = basetile & TILE_INDEX_MASK;
+		for(u16 i = 0; i < tileChunks; ++i)
+		{
+			u16 const numTiles = i << 5;
+			DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (i << 8)), (tileIndex + numTiles) * 32, 32 * 16, 2);
+		}
+		u16 const remainder = image->tileset->numTile - (tileChunks * 32);
+		if (remainder > 0)
+		{
+			u16 const numTiles = tileChunks << 5;
+			DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (tileChunks << 8)), (tileIndex + numTiles) * 32, remainder * 16, 2);
+		}
 	}
 
-	if (!VDP_setTileMapEx(plane, image->tilemap, basetile, x, y, 0, 0, image->tilemap->w, image->tilemap->h, DMA_QUEUE))
 	{
-		return false;
+		AutoProfileScope profile("FastImageLoad::FastSetTileMap: %lu");
+
+		FastSetTileMap(plane, image->tilemap, basetile);
+		//VDP_setTileMap(plane, image->tilemap, x, y, image->tilemap->w, image->tilemap->h, DMA_QUEUE);
+		//if (!VDP_setTileMapEx(plane, image->tilemap, basetile, x, y, 0, 0, 64, 32, DMA_QUEUE))
+		{
+		//	return false;
+		}
 	}
 
 	return true;
@@ -145,7 +204,7 @@ WorldRoutine VNWorld::Init
 
 	// Show palette-based text frame
 	HInt_TextArea_SetName();
-	VDP_setHIntCounter(0);
+	VDP_setHIntCounter(1);
 
 	m_printer.Init(io_game, vn_font, name_font);
 
@@ -193,7 +252,10 @@ void VNWorld::Run
 
 	if (m_nextBG)
 	{
-		FastImageLoad(VDPPlane::BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
+		{
+			AutoProfileScope profile("m_nextBG::FastImageLoad: %lu");
+			FastImageLoad(VDPPlane::BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
+		}
 		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
 		s_bgNormalPal = m_nextBG->palette->data;
 
@@ -209,7 +271,10 @@ void VNWorld::Run
 
 	if (m_nextPose)
 	{
-		FastImageLoad(BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
+		{
+			AutoProfileScope profile("m_nextPose::FastImageLoad: %lu");
+			FastImageLoad(BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
+		}
 		//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
 		//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
 		s_charaNormalPal = m_nextPose->m_image->palette->data;
@@ -234,6 +299,8 @@ void VNWorld::Run
 		{
 			if (m_readyForNext)
 			{
+				AutoProfileScope profile("BuryYourGays_Script::Update: %lu");
+
 				m_script->Update(io_game, *this);
 				m_readyForNext = false;
 			}
@@ -323,6 +390,7 @@ void VNWorld::SetCharacter
 //------------------------------------------------------------------------------
 void VNWorld::HideCharacter()
 {
+	AutoProfileScope profile("VNWorld::HideCharacter: %lu");
 	// Fill with reserved but highlighted empty tile
 	VDP_setTileMapData(VDP_BG_A, c_hilightEmptyPlaneA.data(), 0, c_hilightEmptyPlaneA.size(), 2, DMA_QUEUE);
 }

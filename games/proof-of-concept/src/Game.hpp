@@ -11,6 +11,9 @@
 namespace Game
 {
 
+#define PROFILER (1)
+#define LOG_WHOLE_FRAME_TIMES (0 && PROFILER)
+
 class Game
 {
 	std::unique_ptr<World> m_curWorld;
@@ -29,6 +32,10 @@ public:
 
 	void Run();
 
+#if PROFILER
+	static u32 GetVCount();
+#endif
+
 	VBlankCallbackID AddVBlankCallback(std::function<void()>&& i_callback);
 	void RemoveVBlankCallback(VBlankCallbackID i_callbackID);
 
@@ -41,5 +48,27 @@ private:
 	void PostWorldFrame();
 	void PreWorldInit();
 };
+
+#if PROFILER
+
+struct AutoProfileScope
+{
+	char const* m_fmt;
+	u32 m_before;
+	AutoProfileScope(char const* i_fmt) : m_fmt(i_fmt), m_before(Game::GetVCount()) {}
+	~AutoProfileScope() {
+		u32 after = Game::GetVCount();
+		kprintf(m_fmt, after - m_before);
+	}
+};
+
+#else
+
+struct AutoProfileScope
+{
+	AutoProfileScope(char const* i_fmt) {}
+};
+
+#endif
 
 }
