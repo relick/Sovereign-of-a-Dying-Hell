@@ -24,7 +24,7 @@ void Game::RequestNextWorld(std::unique_ptr<World> &&i_nextWorld)
 	m_nextWorld = std::move(i_nextWorld);
 }
 
-#define CHECK_FPS 1
+#define CHECK_FPS 0
 #if CHECK_FPS
 static u16 fps[4] = {0};
 #endif

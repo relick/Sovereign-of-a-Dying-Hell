@@ -153,8 +153,7 @@ WorldRoutine VNWorld::Init
 	std::memcpy(blackWithTextPal + 48, text_font_pal.data, 16 * sizeof(u16));
 	PAL_setColors(0, blackWithTextPal, 64, DMA_QUEUE_COPY);
 
-	// Fill with reserved but highlighted empty tile
-	VDP_setTileMapData(VDP_BG_A, c_hilightEmptyPlaneA.data(), 0, c_hilightEmptyPlaneA.size(), 2, DMA_QUEUE);
+	HideCharacter();
 
 	// Wait a frame for colours to swap and tilemap to fill
 	co_yield {};
