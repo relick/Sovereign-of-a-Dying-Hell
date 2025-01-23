@@ -236,10 +236,10 @@ void VNWorld::Run
 
 	if (m_nextBG)
 	{
-		{
-			AutoProfileScope profile("m_nextBG::FastImageLoad: %lu");
+		//{
+			//AutoProfileScope profile("m_nextBG::FastImageLoad: %lu");
 			FastImageLoad(VDP_BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
-		}
+		//}
 		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
 		s_bgNormalPal = m_nextBG->palette->data;
 
@@ -255,10 +255,10 @@ void VNWorld::Run
 
 	if (m_nextPose)
 	{
-		{
-			AutoProfileScope profile("m_nextPose::FastImageLoad: %lu");
+		//{
+			//AutoProfileScope profile("m_nextPose::FastImageLoad: %lu");
 			FastImageLoad(VDP_BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
-		}
+		//}
 		//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
 		//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
 		s_charaNormalPal = m_nextPose->m_image->palette->data;
@@ -283,7 +283,7 @@ void VNWorld::Run
 		{
 			if (m_readyForNext)
 			{
-				AutoProfileScope profile("BuryYourGays_Script::Update: %lu");
+				//AutoProfileScope profile("BuryYourGays_Script::Update: %lu");
 
 				m_script->Update(io_game, *this);
 				m_readyForNext = false;
@@ -374,8 +374,8 @@ void VNWorld::SetCharacter
 //------------------------------------------------------------------------------
 void VNWorld::HideCharacter()
 {
-	AutoProfileScope profile("VNWorld::HideCharacter: %lu");
 	// Fill with reserved but highlighted empty tile
+	//AutoProfileScope profile("VNWorld::HideCharacter: %lu");
 	VDP_setTileMapData(VDP_BG_A, c_hilightEmptyPlaneA.data(), 0, c_hilightEmptyPlaneA.size(), 2, DMA_QUEUE);
 }
 

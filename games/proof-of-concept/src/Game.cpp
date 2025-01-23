@@ -8,12 +8,14 @@
 namespace Game
 {
 
+#define LOG_WHOLE_FRAME_TIMES (1 && PROFILER)
+
 #if PROFILER
 static u32 volatile s_frameLineCount{};
 #endif
 
 #if LOG_WHOLE_FRAME_TIMES
-static std::array<std::pair<u16, u16>, 4> fps{};
+static std::array<u32, 5> s_frameLogPoints{};
 #endif
 
 //------------------------------------------------------------------------------
@@ -44,7 +46,7 @@ void Game::Run()
 		if (!m_nextWorld)
 		{
 #if LOG_WHOLE_FRAME_TIMES
-			fps[0] = {s_frameLineCount, GET_VCOUNTER};
+			s_frameLogPoints[0] = GetVCount();
 #endif
 			m_curWorld->Run(*this);
 			PostWorldFrame();
@@ -57,7 +59,7 @@ void Game::Run()
 				while (m_currentWorldRoutine)
 				{
 #if LOG_WHOLE_FRAME_TIMES
-					fps[0] = {s_frameLineCount, GET_VCOUNTER};
+					s_frameLogPoints[0] = GetVCount();
 #endif
 					m_currentWorldRoutine();
 					PostWorldFrame();
@@ -70,7 +72,7 @@ void Game::Run()
 			while (m_currentWorldRoutine)
 			{
 #if LOG_WHOLE_FRAME_TIMES
-				fps[0] = {s_frameLineCount, GET_VCOUNTER};
+				s_frameLogPoints[0] = GetVCount();
 #endif
 				m_currentWorldRoutine();
 				PostWorldFrame();
@@ -121,6 +123,9 @@ void Game::VIntCallback()
 #if PROFILER
 	s_frameLineCount += 261;
 #endif
+#if LOG_WHOLE_FRAME_TIMES
+	s_frameLogPoints[3] = GetVCount();
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -136,27 +141,27 @@ void Game::VBlankCallback()
 void Game::PostWorldFrame()
 {
 #if LOG_WHOLE_FRAME_TIMES
-	fps[1] = {s_frameLineCount, GET_VCOUNTER};
+	s_frameLogPoints[1] = GetVCount();
 #endif
 
 	m_sprites.Update();
 
 #if LOG_WHOLE_FRAME_TIMES
-	fps[2] = {s_frameLineCount, GET_VCOUNTER};
+	s_frameLogPoints[2] = GetVCount();
 #endif
 
 	SYS_doVBlankProcess();
 
 #if LOG_WHOLE_FRAME_TIMES
-	fps[3] = {s_frameLineCount, GET_VCOUNTER};
+	s_frameLogPoints[4] = GetVCount();
 
-	kprintf("VCounts: (%x, %x), (%x, %x), (%x, %x), (%x, %x).\nFrame time: %u. Sprites time: %u. VBlank time (wait/actual): %x, %u",
-		fps[0].first, fps[0].second, fps[1].first, fps[1].second, 
-		fps[2].first, fps[2].second, fps[3].first, fps[3].second,
-		fps[1].second - fps[0].second + ((fps[1].first - fps[0].first) * 261) + (fps[0].second <= fps[1].second ? 0 : 261),
-		fps[2].second - fps[1].second + ((fps[2].first - fps[1].first) * 261) + (fps[1].second <= fps[2].second ? 0 : 261),
-		fps[3].second - fps[2].second + ((fps[3].first - (fps[2].first + 1)) * 261) + (fps[2].second <= fps[3].second ? 0 : 261),
-		fps[3].second - 229 + (229 <= fps[3].second ? 0 : 256) + ((fps[3].first - (fps[2].first + 1)) * 261)
+	kprintf("VCounts: %lx, %lx, %lx, %lx.\nFrame time: %u. Sprites time: %u. VProcess time (actual total/estimate in blank): (%u, %u).",
+		s_frameLogPoints[0], s_frameLogPoints[1], s_frameLogPoints[2], s_frameLogPoints[3],
+		static_cast<u16>(s_frameLogPoints[1] - s_frameLogPoints[0] + (s_frameLogPoints[0] <= s_frameLogPoints[1] ? 0 : 5)),
+		static_cast<u16>(s_frameLogPoints[2] - s_frameLogPoints[1] + (s_frameLogPoints[1] <= s_frameLogPoints[2] ? 0 : 5)),
+		static_cast<u16>(s_frameLogPoints[4] - s_frameLogPoints[2] + (s_frameLogPoints[2] <= s_frameLogPoints[4] ? 0 : 5)),
+		static_cast<u16>(s_frameLogPoints[4] - s_frameLogPoints[3] + (s_frameLogPoints[3] <= s_frameLogPoints[4] ? 0 : 5))
+
 	);
 #endif
 }

@@ -12,7 +12,6 @@ namespace Game
 {
 
 #define PROFILER (1)
-#define LOG_WHOLE_FRAME_TIMES (0 && PROFILER)
 
 class Game
 {
