@@ -11,7 +11,7 @@
 namespace Game
 {
 
-#define PROFILER (1)
+#define PROFILER (0)
 
 class Game
 {
