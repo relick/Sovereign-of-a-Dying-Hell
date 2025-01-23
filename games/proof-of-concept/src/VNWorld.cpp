@@ -149,19 +149,25 @@ bool FastImageLoad(u16 planeAddr, const Image* image, u16 basetile, u16 x, u16 y
 {
 	//{
 		//AutoProfileScope profile("FastImageLoad::DMA_queueDma: %lu");
+		u16 constexpr chunkShift = 5;
+		u16 constexpr chunkSize = 1 << chunkShift;
 
-		u16 const tileChunks = image->tileset->numTile / 32;
-		u16 const tileIndex = basetile & TILE_INDEX_MASK;
+		u16 const tileChunks = image->tileset->numTile >> chunkShift;
+		u16 const baseTileIndex = basetile & TILE_INDEX_MASK;
+		u16 tileIndex = baseTileIndex << 5;
+		u16 tileInc = 1 << (chunkShift + 5);
+		u32 const* srcTiles = image->tileset->tiles;
+		u16 srcTilesInc = 1 << (chunkShift + 3);
 		for(u16 i = 0; i < tileChunks; ++i)
 		{
-			u16 const numTiles = i << 5;
-			DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (i << 8)), (tileIndex + numTiles) * 32, 32 * 16, 2);
+			DMA_queueDma(DMA_VRAM, srcTiles, tileIndex, chunkSize * 16, 2);
+			srcTiles += srcTilesInc;
+			tileIndex += tileInc;
 		}
-		u16 const remainder = image->tileset->numTile - (tileChunks * 32);
+		u16 const remainder = image->tileset->numTile - (tileChunks << chunkShift);
 		if (remainder > 0)
 		{
-			u16 const numTiles = tileChunks << 5;
-			DMA_queueDma(DMA_VRAM, (void*)(image->tileset->tiles + (tileChunks << 8)), (tileIndex + numTiles) * 32, remainder * 16, 2);
+			DMA_queueDma(DMA_VRAM, srcTiles, tileIndex, remainder * 16, 2);
 		}
 	//}
 
