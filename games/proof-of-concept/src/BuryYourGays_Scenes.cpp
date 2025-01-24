@@ -38,6 +38,17 @@ SCENE_RUN(forestShed_runningThroughWoods)
     show(stacey, annoyed);
     say(stacey, "Can't you keep up, Beans?");
 
+    portrait(beans, stressed);
+    say(beans, "I'm going as fast as I can!");
+    think("How am I meant to keep up with a champion cheerleader?");
+    hide();
+
+    wait_for_tasks();
+
+    portrait(beans, tired);
+    think("I can barely see where I'm putting my feet!");
+    hide_portrait();
+
     io_game.RequestNextWorld(std::make_unique<Game::IntroWorld>());
 
     end;
