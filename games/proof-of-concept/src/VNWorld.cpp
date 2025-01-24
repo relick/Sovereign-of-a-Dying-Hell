@@ -156,7 +156,7 @@ Task FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 	co_return;
 }
 
-template<bool t_Down, u16 t_Speed = 2>
+template<bool t_Down, u16 t_Speed = 8>
 Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
 {
 	//AutoProfileScope profile("SetTileMap_WipeDown: %lu");
@@ -378,7 +378,7 @@ void VNWorld::Run
 	Game& io_game
 )
 {
-	if (PAL_isDoingFade() || io_game.TasksInProgress())
+	if (io_game.TasksInProgress())
 	{
 		return;
 	}
@@ -457,18 +457,12 @@ void VNWorld::SetBG
 	m_nextBG = &i_bg;
 	VDP_setHInterrupt(false);
 
-	io_game.QueueFunctionTask([] -> Task {
+	io_game.QueueLambdaTask([this] -> Task {
 		PAL_fadeOutPalette(PAL0, FramesPerSecond() / 4, true);
 		while (PAL_isDoingFade())
 		{
 			co_yield{};
 		}
-
-		co_return;
-	}());
-	io_game.QueueFunctionTask(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
-	io_game.QueueFunctionTask(FastSetTileMap(VDP_BG_B, m_nextBG->tilemap, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
-	io_game.QueueLambdaTask([this]() -> Task {
 
 		s_bgNormalPal = m_nextBG->palette->data;
 
@@ -478,7 +472,17 @@ void VNWorld::SetBG
 		m_bgTextCalcPal = MinusOne(s_bgNamePal);
 		s_bgTextPal = m_bgTextCalcPal.data();
 
+		co_return;
+	});
+	io_game.QueueFunctionTask(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueFunctionTask(FastSetTileMap(VDP_BG_B, m_nextBG->tilemap, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueLambdaTask([this]() -> Task {
 		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
+
+		while (PAL_isDoingFade())
+		{
+			co_yield{};
+		}
 
 		m_nextBG = nullptr;
 		co_return;
