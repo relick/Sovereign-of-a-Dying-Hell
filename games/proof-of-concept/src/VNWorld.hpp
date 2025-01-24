@@ -45,7 +45,7 @@ public:
 	void SetBG(Image const& i_bg);
 	void BlackBG();
 	void SetCharacter(Game& io_game, char const* i_charName, char const* i_poseName);
-	void HideCharacter(Game& io_game);
+	void HideCharacter(Game& io_game, bool i_fast);
 	void SetCharName(char const* i_charName);
 	void SetText(char const* i_text);
 };

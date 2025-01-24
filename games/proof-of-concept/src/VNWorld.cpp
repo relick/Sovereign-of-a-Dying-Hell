@@ -156,6 +156,132 @@ DMARoutine FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 	co_return;
 }
 
+template<bool t_Down, u16 t_Speed = 2>
+DMARoutine SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
+{
+	//AutoProfileScope profile("SetTileMap_WipeDown: %lu");
+
+	u16 const* src = (u16 const*)FAR_SAFE(tilemap, mulu(w, h) * 2);
+
+	// we can increment both index and palette
+	u16 const baseinc = basetile & (TILE_INDEX_MASK | TILE_ATTR_PALETTE_MASK);
+	// we can only do logical OR on priority and HV flip
+	u16 const baseor = basetile & (TILE_ATTR_PRIORITY_MASK | TILE_ATTR_VFLIP_MASK | TILE_ATTR_HFLIP_MASK);
+
+	u16 i = h;
+
+	// Disable ints whilst we fill the DMA buffer
+	//SYS_disableInts();
+
+	u16 const quarterWidth = w >> 2;
+
+	u16 rowsDone = 0;
+
+	if constexpr (t_Down)
+	{
+		u16 addr = planeAddr;
+		u16 const addrInc = planeWidth * 2;
+
+		while (i--)
+		{
+			// get temp buffer and schedule DMA
+			u16* buf = nullptr;
+			while (!(buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, addr, w, 2))))
+			{
+				co_yield{};
+			}
+
+			if (basetile != 0)
+			{
+				// then prepare data in buffer that will be transferred by DMA
+				u16 r = quarterWidth;
+
+				// prepare map data for row update
+				while (r--)
+				{
+					*buf++ = baseor | (*src++ + baseinc);
+					*buf++ = baseor | (*src++ + baseinc);
+					*buf++ = baseor | (*src++ + baseinc);
+					*buf++ = baseor | (*src++ + baseinc);
+				}
+
+				r = w & 3;
+				// prepare map data for row update
+				while (r--) *buf++ = baseor | (*src++ + baseinc);
+			}
+			else
+			{
+				std::memcpy(buf, src, sizeof(u16) * w);
+				src += w;
+			}
+
+			addr += addrInc;
+
+			++rowsDone;
+			if (rowsDone >= t_Speed)
+			{
+				co_yield{};
+			}
+		}
+	}
+	else
+	{
+		u16 addr = planeAddr + (planeWidth * (h - 1) * 2);
+		u16 const addrDec = planeWidth * 2;
+
+		src += mulu(w, h - 1);
+		u16 const srcDec = w * 2;
+
+		while (i--)
+		{
+			// get temp buffer and schedule DMA
+			u16* buf = nullptr;
+			while (!(buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, addr, w, 2))))
+			{
+				co_yield{};
+			}
+
+			if (basetile != 0)
+			{
+				// then prepare data in buffer that will be transferred by DMA
+				u16 r = quarterWidth;
+
+				// prepare map data for row update
+				while (r--)
+				{
+					*buf++ = baseor | (*src++ + baseinc);
+					*buf++ = baseor | (*src++ + baseinc);
+					*buf++ = baseor | (*src++ + baseinc);
+					*buf++ = baseor | (*src++ + baseinc);
+				}
+
+				r = w & 3;
+				// prepare map data for row update
+				while (r--) *buf++ = baseor | (*src++ + baseinc);
+
+				src -= srcDec;
+			}
+			else
+			{
+				std::memcpy(buf, src, sizeof(u16) * w);
+				src -= w;
+			}
+
+			addr -= addrDec;
+
+			++rowsDone;
+			if (rowsDone >= t_Speed)
+			{
+				co_yield{};
+			}
+		}
+	}
+
+	//SYS_enableInts();
+
+	co_return;
+}
+
 // Based on VDP_drawImageEx in part
 DMARoutine FastTilesLoad(const Image* image, u16 basetile)
 {
@@ -213,7 +339,7 @@ WorldRoutine VNWorld::Init
 	std::memcpy(blackWithTextPal + 48, text_font_pal.data, 16 * sizeof(u16));
 	PAL_setColors(0, blackWithTextPal, 64, DMA_QUEUE_COPY);
 
-	HideCharacter(io_game);
+	HideCharacter(io_game, true);
 
 	// Wait a frame for colours to swap and tilemap to fill
 	co_yield{};
@@ -374,7 +500,7 @@ void VNWorld::SetCharacter
 	auto const [_, pose] = m_characters.FindPose(i_charName, i_poseName);
 	if (pose)
 	{
-		HideCharacter(io_game);
+		HideCharacter(io_game, false);
 		m_nextPose = pose;
 		io_game.AddDMARoutine([this] -> DMARoutine {
 			s_charaNormalPal = m_nextPose->m_image->palette->data;
@@ -388,7 +514,7 @@ void VNWorld::SetCharacter
 			co_return;
 		}());
 		io_game.AddDMARoutine(FastTilesLoad(m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
-		io_game.AddDMARoutine(FastSetTileMap(VDP_BG_A, m_nextPose->m_image->tilemap, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
+		io_game.AddDMARoutine(SetTileMap_Wipe<false>(VDP_BG_A, m_nextPose->m_image->tilemap->tilemap, m_nextPose->m_image->tilemap->w, m_nextPose->m_image->tilemap->h, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
 		//VDP_setHInterrupt(false);
 		//PAL_fadeOutPalette(PAL1, FramesPerSecond() / 4, true);
 	}
@@ -397,19 +523,27 @@ void VNWorld::SetCharacter
 //------------------------------------------------------------------------------
 void VNWorld::HideCharacter
 (
-	Game& io_game
+	Game& io_game,
+	bool i_fast
 )
 {
 	// Fill with reserved but highlighted empty tile
-	io_game.AddDMARoutine([] -> DMARoutine {
-		//AutoProfileScope profile("VNWorld::HideCharacter: %lu");
-		while (!DMA_transfer(DMA_QUEUE, DMA_VRAM, (void*)c_hilightEmptyPlaneA.data(), VDP_BG_A, c_hilightEmptyPlaneA.size(), 2))
-		{
-			co_yield {};
-		}
+	if (i_fast)
+	{
+		io_game.AddDMARoutine([] -> DMARoutine {
+			//AutoProfileScope profile("VNWorld::HideCharacter: %lu");
+			while (!DMA_transfer(DMA_QUEUE, DMA_VRAM, (void*)c_hilightEmptyPlaneA.data(), VDP_BG_A, c_hilightEmptyPlaneA.size(), 2))
+			{
+				co_yield {};
+			}
 
-		co_return;
-	}());
+			co_return;
+		}());
+	}
+	else
+	{
+		io_game.AddDMARoutine(SetTileMap_Wipe<true>(VDP_BG_A, c_hilightEmptyPlaneA.data(), 40, 28, 0));
+	}
 }
 
 //------------------------------------------------------------------------------
