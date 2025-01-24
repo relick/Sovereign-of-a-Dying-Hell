@@ -13,6 +13,7 @@ namespace Game
 inline constexpr u16 c_miscTilesBaseAddress = 0xF680; // Sprite list is last thing placed in VRAM, and it ends at F680.
 inline constexpr u16 c_miscTilesBaseIndex = c_miscTilesBaseAddress / 32;
 inline constexpr u16 c_maxMiscTiles = u16((0x10000 - u32(c_miscTilesBaseAddress)) / 32);
+inline constexpr VRAMSprite c_noSprites{};
 
 //------------------------------------------------------------------------------
 void SpriteManager::Update
@@ -20,7 +21,7 @@ void SpriteManager::Update
     Game& io_game
 )
 {
-    if (io_game.DMAsInProgress())
+    if (io_game.TasksInProgress())
     {
         return;
     }
@@ -80,19 +81,19 @@ void SpriteManager::Update
     {
         if (m_firstSpriteIndex <= m_lastSpriteIndex)
         {
-            io_game.AddDMARoutine([this] -> DMARoutine {
+            io_game.QueueLambdaTask([this] -> Task {
                 while (!DMA_queueDmaFast(DMA_VRAM, m_vramSprites.data() + m_firstSpriteIndex, VDP_getSpriteListAddress(), (m_lastSpriteIndex + 1 - m_firstSpriteIndex) * (sizeof(VRAMSprite) >> 1), 2))
                 {
                     co_yield{};
                 }
                 co_return;
-            }());
+            });
         }
         else
         {
-            io_game.AddDMARoutine([] -> DMARoutine {
-                VRAMSprite noSprites{};
-                while (!DMA_copyAndQueueDma(DMA_VRAM, &noSprites, VDP_getSpriteListAddress(), (sizeof(VRAMSprite) >> 1), 2))
+            io_game.QueueFunctionTask([] -> Task {
+                
+                while (!DMA_copyAndQueueDma(DMA_VRAM, (void*)&c_noSprites, VDP_getSpriteListAddress(), (sizeof(VRAMSprite) >> 1), 2))
                 {
                     co_yield{};
                 }

@@ -42,7 +42,7 @@ public:
 
 	void StartMusic(u8 const* i_bgm, u16 i_fadeInFrames, bool i_loop);
 	void StopMusic(u16 i_fadeOutFrames);
-	void SetBG(Image const& i_bg);
+	void SetBG(Game& io_game, Image const& i_bg);
 	void BlackBG();
 	void SetCharacter(Game& io_game, char const* i_charName, char const* i_poseName);
 	void HideCharacter(Game& io_game, bool i_fast);

@@ -14,6 +14,22 @@ namespace Game
 
 #define PROFILER (0)
 
+template<typename T>
+concept NotTaskCoroutine = !std::convertible_to<T, Task>;
+
+struct Erasure
+{
+	virtual ~Erasure() = default;
+};
+
+template<NotTaskCoroutine T_Lambda>
+struct LambdaHolder
+	: Erasure
+{
+	LambdaHolder(T_Lambda&& i_lambda) : m_lambda(std::move(i_lambda)) {}
+	T_Lambda m_lambda;
+};
+
 class Game
 {
 	std::unique_ptr<World> m_curWorld;
@@ -22,7 +38,7 @@ class Game
 
 	SpriteManager m_sprites;
 
-	std::deque<DMARoutine> m_dmaRoutines;
+	std::deque<std::pair<Task, std::unique_ptr<Erasure>>> m_tasks;
 
 	static inline VBlankCallbackID s_callbackID = 0;
 	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
@@ -43,8 +59,10 @@ public:
 
 	SpriteManager& Sprites() { return m_sprites; }
 
-	void AddDMARoutine(DMARoutine&& i_routine);
-	bool DMAsInProgress() const;
+	void QueueFunctionTask(Task&& i_task);
+	template<NotTaskCoroutine T_Lambda, typename... T_Args>
+	void QueueLambdaTask(T_Lambda&& i_lambda, T_Args&&... i_args);
+	bool TasksInProgress() const;
 
 private:
 	static void VIntCallback();
@@ -75,5 +93,19 @@ struct AutoProfileScope
 };
 
 #endif
+
+template<NotTaskCoroutine T_Lambda, typename... T_Args>
+void Game::QueueLambdaTask
+(
+	T_Lambda&& i_lambda,
+	T_Args&&... i_args
+)
+{
+	LambdaHolder<T_Lambda>* holder = new LambdaHolder<T_Lambda>{ std::move(i_lambda) };
+	m_tasks.push_back({
+		holder->m_lambda(std::forward<T_Args>(i_args)...),
+		std::unique_ptr<Erasure>(holder)
+	});
+}
 
 }

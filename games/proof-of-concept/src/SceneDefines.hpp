@@ -9,7 +9,7 @@
 #define wait co_yield {}
 #define end co_return
 
-#define scene(bg) io_vn.SetBG(bg)
+#define scene(bg) io_vn.SetBG(io_game, bg)
 
 #define play_music(music, fadeInSeconds, loop) io_vn.StartMusic(music, fix16ToInt(fix16Mul(FIX16(fadeInSeconds), FramesPerSecond())), loop)
 

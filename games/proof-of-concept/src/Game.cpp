@@ -66,9 +66,12 @@ void Game::Run()
 				}
 			}
 
+			std::swap(m_curWorld, m_nextWorld);
+			m_nextWorld = nullptr;
+
 			PreWorldInit();
 
-			m_currentWorldRoutine = m_nextWorld->Init(*this);
+			m_currentWorldRoutine = m_curWorld->Init(*this);
 			while (m_currentWorldRoutine)
 			{
 #if LOG_WHOLE_FRAME_TIMES
@@ -78,8 +81,6 @@ void Game::Run()
 				PostWorldFrame();
 			}
 
-			std::swap(m_curWorld, m_nextWorld);
-			m_nextWorld = nullptr;
 			m_currentWorldRoutine = {};
 		}
 	}
@@ -118,18 +119,18 @@ void Game::RemoveVBlankCallback(VBlankCallbackID i_callbackID)
 }
 
 //------------------------------------------------------------------------------
-void Game::AddDMARoutine
+void Game::QueueFunctionTask
 (
-	DMARoutine&& i_routine
+	Task&& i_task
 )
 {
-	m_dmaRoutines.push_back(std::move(i_routine));
+	m_tasks.push_back({ std::move(i_task), {} });
 }
 
 //------------------------------------------------------------------------------
-bool Game::DMAsInProgress() const
+bool Game::TasksInProgress() const
 {
-	return DMA_getQueueSize() > 0 || !m_dmaRoutines.empty();
+	return DMA_getQueueSize() > 0 || !m_tasks.empty();
 }
 
 //------------------------------------------------------------------------------
@@ -165,16 +166,16 @@ void Game::PostWorldFrame()
 	s_frameLogPoints[2] = GetVCount();
 #endif
 
-	if (!m_dmaRoutines.empty())
+	if (!m_tasks.empty())
 	{
-		while (!m_dmaRoutines.front())
+		while (!m_tasks.front().first)
 		{
-			m_dmaRoutines.pop_front();
+			m_tasks.pop_front();
 		}
 
-		if (!m_dmaRoutines.empty())
+		if (!m_tasks.empty())
 		{
-			m_dmaRoutines.front()();
+			m_tasks.front().first();
 		}
 	}
 

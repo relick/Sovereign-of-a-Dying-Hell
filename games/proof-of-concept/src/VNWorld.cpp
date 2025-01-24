@@ -102,7 +102,7 @@ VNWorld::VNWorld
 }
 
 // Based on VDP_setTileMapEx
-DMARoutine FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
+Task FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 {
 	//AutoProfileScope profile("FastSetTileMap: %lu");
 
@@ -157,7 +157,7 @@ DMARoutine FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 }
 
 template<bool t_Down, u16 t_Speed = 2>
-DMARoutine SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
+Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
 {
 	//AutoProfileScope profile("SetTileMap_WipeDown: %lu");
 
@@ -285,7 +285,7 @@ DMARoutine SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 
 }
 
 // Based on VDP_drawImageEx in part
-DMARoutine FastTilesLoad(const Image* image, u16 basetile)
+Task FastTilesLoad(const Image* image, u16 basetile)
 {
 	//AutoProfileScope profile("FastTilesLoad: %lu");
 	u16 constexpr chunkShift = 5;
@@ -345,7 +345,7 @@ WorldRoutine VNWorld::Init
 
 	// Wait a frame for colours to swap and tilemap to fill
 	co_yield{};
-	while (io_game.DMAsInProgress())
+	while (io_game.TasksInProgress())
 	{
 		co_yield{};
 	}
@@ -378,34 +378,8 @@ void VNWorld::Run
 	Game& io_game
 )
 {
-	if (PAL_isDoingFade() || io_game.DMAsInProgress())
+	if (PAL_isDoingFade() || io_game.TasksInProgress())
 	{
-		return;
-	}
-
-	if (m_nextBG)
-	{
-		io_game.AddDMARoutine(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
-		io_game.AddDMARoutine(FastSetTileMap(VDP_BG_B, m_nextBG->tilemap, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
-		io_game.AddDMARoutine([this] -> DMARoutine { PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true); co_return; }());
-
-		s_bgNormalPal = m_nextBG->palette->data;
-
-		m_bgNameCalcPal = Halve(s_bgNormalPal);
-		s_bgNamePal = m_bgNameCalcPal.data();
-
-		m_bgTextCalcPal = MinusOne(s_bgNamePal);
-		s_bgTextPal = m_bgTextCalcPal.data();
-
-		m_nextBG = nullptr;
-		return;
-	}
-
-	if (m_nextPose)
-	{
-		//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
-		//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
-		m_nextPose = nullptr;
 		return;
 	}
 
@@ -476,12 +450,39 @@ void VNWorld::StopMusic
 //------------------------------------------------------------------------------
 void VNWorld::SetBG
 (
+	Game& io_game,
 	Image const& i_bg
 )
 {
 	m_nextBG = &i_bg;
 	VDP_setHInterrupt(false);
-	PAL_fadeOutPalette(PAL0, FramesPerSecond() / 4, true);
+
+	io_game.QueueFunctionTask([] -> Task {
+		PAL_fadeOutPalette(PAL0, FramesPerSecond() / 4, true);
+		while (PAL_isDoingFade())
+		{
+			co_yield{};
+		}
+
+		co_return;
+	}());
+	io_game.QueueFunctionTask(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueFunctionTask(FastSetTileMap(VDP_BG_B, m_nextBG->tilemap, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueLambdaTask([this]() -> Task {
+
+		s_bgNormalPal = m_nextBG->palette->data;
+
+		m_bgNameCalcPal = Halve(s_bgNormalPal);
+		s_bgNamePal = m_bgNameCalcPal.data();
+
+		m_bgTextCalcPal = MinusOne(s_bgNamePal);
+		s_bgTextPal = m_bgTextCalcPal.data();
+
+		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
+
+		m_nextBG = nullptr;
+		co_return;
+	});
 }
 
 //------------------------------------------------------------------------------
@@ -504,7 +505,9 @@ void VNWorld::SetCharacter
 	{
 		HideCharacter(io_game, false);
 		m_nextPose = pose;
-		io_game.AddDMARoutine([this] -> DMARoutine {
+		//VDP_setHInterrupt(false);
+		//PAL_fadeOutPalette(PAL1, FramesPerSecond() / 4, true);
+		io_game.QueueLambdaTask([this] -> Task {
 			s_charaNormalPal = m_nextPose->m_image->palette->data;
 
 			m_charaNameCalcPal = Halve(s_charaNormalPal);
@@ -514,11 +517,16 @@ void VNWorld::SetCharacter
 			s_charaTextPal = m_charaTextCalcPal.data();
 
 			co_return;
-		}());
-		io_game.AddDMARoutine(FastTilesLoad(m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
-		io_game.AddDMARoutine(SetTileMap_Wipe<false>(VDP_BG_A, m_nextPose->m_image->tilemap->tilemap, m_nextPose->m_image->tilemap->w, m_nextPose->m_image->tilemap->h, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
-		//VDP_setHInterrupt(false);
-		//PAL_fadeOutPalette(PAL1, FramesPerSecond() / 4, true);
+		});
+		io_game.QueueFunctionTask(FastTilesLoad(m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
+		io_game.QueueFunctionTask(SetTileMap_Wipe<false>(VDP_BG_A, m_nextPose->m_image->tilemap->tilemap, m_nextPose->m_image->tilemap->w, m_nextPose->m_image->tilemap->h, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
+		io_game.QueueLambdaTask([this] -> Task {
+			//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
+			//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
+			m_nextPose = nullptr;
+
+			co_return;
+		});
 	}
 }
 
@@ -532,7 +540,7 @@ void VNWorld::HideCharacter
 	// Fill with reserved but highlighted empty tile
 	if (i_fast)
 	{
-		io_game.AddDMARoutine([] -> DMARoutine {
+		io_game.QueueFunctionTask([] -> Task {
 			//AutoProfileScope profile("VNWorld::HideCharacter: %lu");
 			while (!DMA_transfer(DMA_QUEUE, DMA_VRAM, (void*)c_hilightEmptyPlaneA.data(), VDP_BG_A, c_hilightEmptyPlaneA.size(), 2))
 			{
@@ -544,7 +552,7 @@ void VNWorld::HideCharacter
 	}
 	else
 	{
-		io_game.AddDMARoutine(SetTileMap_Wipe<true>(VDP_BG_A, c_hilightEmptyPlaneA.data(), 40, 28, 0));
+		io_game.QueueFunctionTask(SetTileMap_Wipe<true>(VDP_BG_A, c_hilightEmptyPlaneA.data(), 40, 28, 0));
 	}
 }
 
