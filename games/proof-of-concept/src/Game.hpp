@@ -4,6 +4,7 @@
 #include "SpriteManager.hpp"
 #include "GameRoutines.hpp"
 
+#include <deque>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -20,6 +21,8 @@ class Game
 	WorldRoutine m_currentWorldRoutine;
 
 	SpriteManager m_sprites;
+
+	std::deque<DMARoutine> m_dmaRoutines;
 
 	static inline VBlankCallbackID s_callbackID = 0;
 	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
@@ -39,6 +42,9 @@ public:
 	void RemoveVBlankCallback(VBlankCallbackID i_callbackID);
 
 	SpriteManager& Sprites() { return m_sprites; }
+
+	void AddDMARoutine(DMARoutine&& i_routine);
+	bool DMAsInProgress() const;
 
 private:
 	static void VIntCallback();

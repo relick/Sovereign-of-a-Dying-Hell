@@ -56,7 +56,7 @@ class SpriteManager
 public:
     SpriteManager() { m_sprites.reserve(80); m_vramSprites.reserve(80); /* Max sprite count */ }
 
-    void Update();
+    void Update(Game& io_game);
 
     std::pair<SpriteID, EditableSpriteData> AddSprite(SpriteSize i_size, u16 i_tileAttr);
     std::pair<SpriteID, EditableSpriteData> CloneSprite(SpriteID i_id);

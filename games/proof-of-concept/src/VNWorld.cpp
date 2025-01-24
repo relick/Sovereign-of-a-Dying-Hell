@@ -102,8 +102,10 @@ VNWorld::VNWorld
 }
 
 // Based on VDP_setTileMapEx
-bool FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
+DMARoutine FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 {
+	//AutoProfileScope profile("FastSetTileMap: %lu");
+
 	u16 const* src = (u16 const*)FAR_SAFE(tilemap->tilemap, mulu(tilemap->w, tilemap->h) * 2);
 
 	// we can increment both index and palette
@@ -115,7 +117,15 @@ bool FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 
 	// get temp buffer and schedule DMA
 	u16 const bufSize = mulu(planeWidth, tilemap->h);
-	u16* buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, planeAddr, bufSize, 2));
+
+	u16* buf = nullptr;
+	while (!(buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, planeAddr, bufSize, 2))))
+	{
+		co_yield{};
+	}
+
+	// Disable ints whilst we fill the DMA buffer
+	//SYS_disableInts();
 	u16 const bufInc = (planeWidth - tilemap->w);
 
 	u16 const quarterWidth = tilemap->w >> 2;
@@ -141,43 +151,43 @@ bool FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 		buf += bufInc;
 	}
 
-	return true;
+	//SYS_enableInts();
+
+	co_return;
 }
 
-// Based on VDP_drawImageEx
-bool FastImageLoad(u16 planeAddr, const Image* image, u16 basetile, u16 x, u16 y)
+// Based on VDP_drawImageEx in part
+DMARoutine FastTilesLoad(const Image* image, u16 basetile)
 {
-	//{
-		//AutoProfileScope profile("FastImageLoad::DMA_queueDma: %lu");
-		u16 constexpr chunkShift = 5;
-		u16 constexpr chunkSize = 1 << chunkShift;
+	//AutoProfileScope profile("FastTilesLoad: %lu");
+	u16 constexpr chunkShift = 5;
+	u16 constexpr chunkSize = 1 << chunkShift;
 
-		u16 const tileChunks = image->tileset->numTile >> chunkShift;
-		u16 const baseTileIndex = basetile & TILE_INDEX_MASK;
-		u16 tileIndex = baseTileIndex << 5;
-		u16 tileInc = 1 << (chunkShift + 5);
-		u32 const* srcTiles = image->tileset->tiles;
-		u16 srcTilesInc = 1 << (chunkShift + 3);
-		for(u16 i = 0; i < tileChunks; ++i)
+	u16 const tileChunks = image->tileset->numTile >> chunkShift;
+	u16 const baseTileIndex = basetile & TILE_INDEX_MASK;
+	u16 tileIndex = baseTileIndex << 5;
+	u16 tileInc = 1 << (chunkShift + 5);
+	u32 const* srcTiles = image->tileset->tiles;
+	u16 srcTilesInc = 1 << (chunkShift + 3);
+	for(u16 i = 0; i < tileChunks; ++i)
+	{
+		while (!DMA_queueDma(DMA_VRAM, (void*)srcTiles, tileIndex, chunkSize * 16, 2))
 		{
-			DMA_queueDma(DMA_VRAM, srcTiles, tileIndex, chunkSize * 16, 2);
-			srcTiles += srcTilesInc;
-			tileIndex += tileInc;
+			co_yield {};
 		}
-		u16 const remainder = image->tileset->numTile - (tileChunks << chunkShift);
-		if (remainder > 0)
+		srcTiles += srcTilesInc;
+		tileIndex += tileInc;
+	}
+	u16 const remainder = image->tileset->numTile - (tileChunks << chunkShift);
+	if (remainder > 0)
+	{
+		while (!DMA_queueDma(DMA_VRAM, (void*)srcTiles, tileIndex, remainder * 16, 2))
 		{
-			DMA_queueDma(DMA_VRAM, srcTiles, tileIndex, remainder * 16, 2);
+			co_yield {};
 		}
-	//}
+	}
 
-	//{
-		//AutoProfileScope profile("FastImageLoad::FastSetTileMap: %lu");
-
-		FastSetTileMap(planeAddr, image->tilemap, basetile);
-	//}
-
-	return true;
+	co_return;
 }
 
 //------------------------------------------------------------------------------
@@ -187,7 +197,8 @@ WorldRoutine VNWorld::Init
 )
 {
 	// Way low. It'll take several frames but we'll cope
-	DMA_setMaxTransferSize(640);
+	DMA_setMaxTransferSize(4096);
+	DMA_setIgnoreOverCapacity(true);
 
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
@@ -202,10 +213,14 @@ WorldRoutine VNWorld::Init
 	std::memcpy(blackWithTextPal + 48, text_font_pal.data, 16 * sizeof(u16));
 	PAL_setColors(0, blackWithTextPal, 64, DMA_QUEUE_COPY);
 
-	HideCharacter();
+	HideCharacter(io_game);
 
 	// Wait a frame for colours to swap and tilemap to fill
-	co_yield {};
+	co_yield{};
+	while (io_game.DMAsInProgress())
+	{
+		co_yield{};
+	}
 
 	m_script->Init(io_game, *this, m_characters);
 
@@ -235,18 +250,17 @@ void VNWorld::Run
 	Game& io_game
 )
 {
-	if (PAL_isDoingFade() || DMA_getQueueSize() > 0)
+	if (PAL_isDoingFade() || io_game.DMAsInProgress())
 	{
 		return;
 	}
 
 	if (m_nextBG)
 	{
-		//{
-			//AutoProfileScope profile("m_nextBG::FastImageLoad: %lu");
-			FastImageLoad(VDP_BG_B, m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0), 0, 0);
-		//}
-		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
+		io_game.AddDMARoutine(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+		io_game.AddDMARoutine(FastSetTileMap(VDP_BG_B, m_nextBG->tilemap, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+		io_game.AddDMARoutine([this] -> DMARoutine { PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true); co_return; }());
+
 		s_bgNormalPal = m_nextBG->palette->data;
 
 		m_bgNameCalcPal = Halve(s_bgNormalPal);
@@ -261,19 +275,8 @@ void VNWorld::Run
 
 	if (m_nextPose)
 	{
-		//{
-			//AutoProfileScope profile("m_nextPose::FastImageLoad: %lu");
-			FastImageLoad(VDP_BG_A, m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile), 0, 0);
-		//}
 		//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
 		//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
-		s_charaNormalPal = m_nextPose->m_image->palette->data;
-
-		m_charaNameCalcPal = Halve(s_charaNormalPal);
-		s_charaNamePal = m_charaNameCalcPal.data();
-
-		m_charaTextCalcPal = MinusOne(s_charaNamePal);
-		s_charaTextPal = m_charaTextCalcPal.data();
 		m_nextPose = nullptr;
 		return;
 	}
@@ -363,6 +366,7 @@ void VNWorld::BlackBG()
 //------------------------------------------------------------------------------
 void VNWorld::SetCharacter
 (
+	Game& io_game,
 	char const* i_charName,
 	char const* i_poseName
 )
@@ -370,19 +374,42 @@ void VNWorld::SetCharacter
 	auto const [_, pose] = m_characters.FindPose(i_charName, i_poseName);
 	if (pose)
 	{
-		HideCharacter();
+		HideCharacter(io_game);
 		m_nextPose = pose;
+		io_game.AddDMARoutine([this] -> DMARoutine {
+			s_charaNormalPal = m_nextPose->m_image->palette->data;
+
+			m_charaNameCalcPal = Halve(s_charaNormalPal);
+			s_charaNamePal = m_charaNameCalcPal.data();
+
+			m_charaTextCalcPal = MinusOne(s_charaNamePal);
+			s_charaTextPal = m_charaTextCalcPal.data();
+
+			co_return;
+		}());
+		io_game.AddDMARoutine(FastTilesLoad(m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
+		io_game.AddDMARoutine(FastSetTileMap(VDP_BG_A, m_nextPose->m_image->tilemap, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
 		//VDP_setHInterrupt(false);
 		//PAL_fadeOutPalette(PAL1, FramesPerSecond() / 4, true);
 	}
 }
 
 //------------------------------------------------------------------------------
-void VNWorld::HideCharacter()
+void VNWorld::HideCharacter
+(
+	Game& io_game
+)
 {
 	// Fill with reserved but highlighted empty tile
-	//AutoProfileScope profile("VNWorld::HideCharacter: %lu");
-	VDP_setTileMapData(VDP_BG_A, c_hilightEmptyPlaneA.data(), 0, c_hilightEmptyPlaneA.size(), 2, DMA_QUEUE);
+	io_game.AddDMARoutine([] -> DMARoutine {
+		//AutoProfileScope profile("VNWorld::HideCharacter: %lu");
+		while (!DMA_transfer(DMA_QUEUE, DMA_VRAM, (void*)c_hilightEmptyPlaneA.data(), VDP_BG_A, c_hilightEmptyPlaneA.size(), 2))
+		{
+			co_yield {};
+		}
+
+		co_return;
+	}());
 }
 
 //------------------------------------------------------------------------------

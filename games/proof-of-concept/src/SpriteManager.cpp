@@ -1,5 +1,6 @@
 #include "SpriteManager.hpp"
 #include "Debug.hpp"
+#include "Game.hpp"
 
 #include <genesis.h>
 
@@ -14,8 +15,16 @@ inline constexpr u16 c_miscTilesBaseIndex = c_miscTilesBaseAddress / 32;
 inline constexpr u16 c_maxMiscTiles = u16((0x10000 - u32(c_miscTilesBaseAddress)) / 32);
 
 //------------------------------------------------------------------------------
-void SpriteManager::Update()
+void SpriteManager::Update
+(
+    Game& io_game
+)
 {
+    if (io_game.DMAsInProgress())
+    {
+        return;
+    }
+
     bool const needsSorting = m_spritesAdded || m_orderingChanged;
     bool const needsLinksUpdating = needsSorting || m_spritesRemoved || m_visibilitiesChanged;
     bool const needsDMA = m_spriteDataEdited || needsLinksUpdating;
@@ -71,12 +80,24 @@ void SpriteManager::Update()
     {
         if (m_firstSpriteIndex <= m_lastSpriteIndex)
         {
-            DMA_queueDmaFast(DMA_VRAM, m_vramSprites.data() + m_firstSpriteIndex, VDP_getSpriteListAddress(), (m_lastSpriteIndex + 1 - m_firstSpriteIndex) * (sizeof(VRAMSprite) >> 1), 2);
+            io_game.AddDMARoutine([this] -> DMARoutine {
+                while (!DMA_queueDmaFast(DMA_VRAM, m_vramSprites.data() + m_firstSpriteIndex, VDP_getSpriteListAddress(), (m_lastSpriteIndex + 1 - m_firstSpriteIndex) * (sizeof(VRAMSprite) >> 1), 2))
+                {
+                    co_yield{};
+                }
+                co_return;
+            }());
         }
         else
         {
-            VRAMSprite noSprites{};
-            DMA_copyAndQueueDma(DMA_VRAM, &noSprites, VDP_getSpriteListAddress(), (sizeof(VRAMSprite) >> 1), 2);
+            io_game.AddDMARoutine([] -> DMARoutine {
+                VRAMSprite noSprites{};
+                while (!DMA_copyAndQueueDma(DMA_VRAM, &noSprites, VDP_getSpriteListAddress(), (sizeof(VRAMSprite) >> 1), 2))
+                {
+                    co_yield{};
+                }
+                co_return;
+            }());
         }
     }
 

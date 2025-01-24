@@ -44,8 +44,8 @@ public:
 	void StopMusic(u16 i_fadeOutFrames);
 	void SetBG(Image const& i_bg);
 	void BlackBG();
-	void SetCharacter(char const* i_charName, char const* i_poseName);
-	void HideCharacter();
+	void SetCharacter(Game& io_game, char const* i_charName, char const* i_poseName);
+	void HideCharacter(Game& io_game);
 	void SetCharName(char const* i_charName);
 	void SetText(char const* i_text);
 };

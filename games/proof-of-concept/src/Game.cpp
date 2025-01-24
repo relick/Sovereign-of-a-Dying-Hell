@@ -15,7 +15,7 @@ static u32 volatile s_frameLineCount{};
 #endif
 
 #if LOG_WHOLE_FRAME_TIMES
-static std::array<u32, 5> s_frameLogPoints{};
+static std::array<u32, 6> s_frameLogPoints{};
 #endif
 
 //------------------------------------------------------------------------------
@@ -118,13 +118,28 @@ void Game::RemoveVBlankCallback(VBlankCallbackID i_callbackID)
 }
 
 //------------------------------------------------------------------------------
+void Game::AddDMARoutine
+(
+	DMARoutine&& i_routine
+)
+{
+	m_dmaRoutines.push_back(std::move(i_routine));
+}
+
+//------------------------------------------------------------------------------
+bool Game::DMAsInProgress() const
+{
+	return DMA_getQueueSize() > 0 || !m_dmaRoutines.empty();
+}
+
+//------------------------------------------------------------------------------
 void Game::VIntCallback()
 {
 #if PROFILER
 	s_frameLineCount += 261;
 #endif
 #if LOG_WHOLE_FRAME_TIMES
-	s_frameLogPoints[3] = GetVCount();
+	s_frameLogPoints[4] = GetVCount();
 #endif
 }
 
@@ -144,23 +159,41 @@ void Game::PostWorldFrame()
 	s_frameLogPoints[1] = GetVCount();
 #endif
 
-	m_sprites.Update();
+	m_sprites.Update(*this);
 
 #if LOG_WHOLE_FRAME_TIMES
 	s_frameLogPoints[2] = GetVCount();
 #endif
 
+	if (!m_dmaRoutines.empty())
+	{
+		while (!m_dmaRoutines.front())
+		{
+			m_dmaRoutines.pop_front();
+		}
+
+		if (!m_dmaRoutines.empty())
+		{
+			m_dmaRoutines.front()();
+		}
+	}
+
+#if LOG_WHOLE_FRAME_TIMES
+	s_frameLogPoints[3] = GetVCount();
+#endif
+
 	SYS_doVBlankProcess();
 
 #if LOG_WHOLE_FRAME_TIMES
-	s_frameLogPoints[4] = GetVCount();
+	s_frameLogPoints[5] = GetVCount();
 
-	kprintf("VCounts: %lx, %lx, %lx, %lx.\nFrame time: %u. Sprites time: %u. VProcess time (actual total/estimate in blank): (%u, %u).",
-		s_frameLogPoints[0], s_frameLogPoints[1], s_frameLogPoints[2], s_frameLogPoints[3],
+	//kprintf("VCounts: %lx, %lx, %lx, %lx.", s_frameLogPoints[0], s_frameLogPoints[1], s_frameLogPoints[2], s_frameLogPoints[3]);
+	kprintf("Game Frame: %u. Sprites: %u. DMA Routines: %u. VBlankProcess (total/blank): (%u, %u).",
 		static_cast<u16>(s_frameLogPoints[1] - s_frameLogPoints[0] + (s_frameLogPoints[0] <= s_frameLogPoints[1] ? 0 : 5)),
 		static_cast<u16>(s_frameLogPoints[2] - s_frameLogPoints[1] + (s_frameLogPoints[1] <= s_frameLogPoints[2] ? 0 : 5)),
-		static_cast<u16>(s_frameLogPoints[4] - s_frameLogPoints[2] + (s_frameLogPoints[2] <= s_frameLogPoints[4] ? 0 : 5)),
-		static_cast<u16>(s_frameLogPoints[4] - s_frameLogPoints[3] + (s_frameLogPoints[3] <= s_frameLogPoints[4] ? 0 : 5))
+		static_cast<u16>(s_frameLogPoints[3] - s_frameLogPoints[2] + (s_frameLogPoints[2] <= s_frameLogPoints[3] ? 0 : 5)),
+		static_cast<u16>(s_frameLogPoints[5] - s_frameLogPoints[3] + (s_frameLogPoints[3] <= s_frameLogPoints[5] ? 0 : 5)),
+		static_cast<u16>(s_frameLogPoints[5] - s_frameLogPoints[4] + (s_frameLogPoints[4] <= s_frameLogPoints[5] ? 0 : 5))
 
 	);
 #endif
