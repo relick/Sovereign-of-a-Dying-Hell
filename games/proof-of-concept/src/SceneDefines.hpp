@@ -13,6 +13,8 @@
 
 #define play_music(music, fadeInSeconds, loop) io_vn.StartMusic(music, fix16ToInt(fix16Mul(FIX16(fadeInSeconds), FramesPerSecond())), loop)
 
+#define wait_for_tasks() { bool waited = false; io_game.QueueLambdaTask([&waited] -> Game::Task { waited = true; co_return; }); while (!waited) { co_yield{}; } }
+
 #define portrait(chara, pose)
 #define hide_portrait()
 

@@ -18,6 +18,8 @@ SCENE_RUN(forestShed_runningThroughWoods)
 
     play_music(hallowbean_nature, 2.0, true);
 
+    wait_for_tasks();
+
     portrait(beans, tired);
     think("I'm so tired... and my feet hurt...");
     think("It's getting dark so fast...");

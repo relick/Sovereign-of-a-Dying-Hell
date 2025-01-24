@@ -21,11 +21,6 @@ void SpriteManager::Update
     Game& io_game
 )
 {
-    if (io_game.TasksInProgress())
-    {
-        return;
-    }
-
     bool const needsSorting = m_spritesAdded || m_orderingChanged;
     bool const needsLinksUpdating = needsSorting || m_spritesRemoved || m_visibilitiesChanged;
     bool const needsDMA = m_spriteDataEdited || needsLinksUpdating;

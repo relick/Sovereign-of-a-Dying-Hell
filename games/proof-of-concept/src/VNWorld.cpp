@@ -102,9 +102,9 @@ VNWorld::VNWorld
 }
 
 // Based on VDP_setTileMapEx
-Task SetTileMap(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
+Task SetTileMap_Full(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
 {
-	//AutoProfileScope profile("SetTileMap: %lu");
+	//AutoProfileScope profile("SetTileMap_Full: %lu");
 
 	u16 const* src = (u16 const*)FAR_SAFE(tilemap, mulu(w, h) * 2);
 
@@ -389,13 +389,6 @@ void VNWorld::Run
 	Game& io_game
 )
 {
-	if (io_game.TasksInProgress())
-	{
-		return;
-	}
-
-	VDP_setHInterrupt(true);
-
 	u16 const buttons = JOY_readJoypad(JOY_1);
 
 	static bool pressed = false;
@@ -466,10 +459,10 @@ void VNWorld::SetBG
 )
 {
 	m_nextBG = &i_bg;
-	VDP_setHInterrupt(false);
-
 	io_game.QueueLambdaTask([this] -> Task {
-		PAL_fadeOutPalette(PAL0, FramesPerSecond() / 4, true);
+		VDP_setHInterrupt(false);
+
+		PAL_fadeOutPalette(PAL0, FramesPerSecond() >> 1, true);
 		while (PAL_isDoingFade())
 		{
 			co_yield{};
@@ -486,14 +479,16 @@ void VNWorld::SetBG
 		co_return;
 	});
 	io_game.QueueFunctionTask(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
-	io_game.QueueFunctionTask(SetTileMap(VDP_BG_B, m_nextBG->tilemap->tilemap, m_nextBG->tilemap->w, m_nextBG->tilemap->h, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueFunctionTask(SetTileMap_Full(VDP_BG_B, m_nextBG->tilemap->tilemap, m_nextBG->tilemap->w, m_nextBG->tilemap->h, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
 	io_game.QueueLambdaTask([this]() -> Task {
-		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
+		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() >> 1, true);
 
 		while (PAL_isDoingFade())
 		{
 			co_yield{};
 		}
+		HInt_TextArea_SetName();
+		VDP_setHInterrupt(true);
 
 		m_nextBG = nullptr;
 		co_return;
@@ -501,10 +496,29 @@ void VNWorld::SetBG
 }
 
 //------------------------------------------------------------------------------
-void VNWorld::BlackBG()
+void VNWorld::BlackBG
+(
+	Game& io_game
+)
 {
-	VDP_setHInterrupt(false);
-	PAL_fadeOutPalette(PAL0, FramesPerSecond() / 4, true);
+	io_game.QueueFunctionTask([] -> Task {
+		VDP_setHInterrupt(false);
+
+		PAL_fadeOutPalette(PAL0, FramesPerSecond() >> 2, true);
+		while (PAL_isDoingFade())
+		{
+			co_yield{};
+		}
+
+		s_bgNormalPal = palette_black;
+		s_bgNamePal = palette_black;
+		s_bgTextPal = palette_black;
+
+		HInt_TextArea_SetName();
+		VDP_setHInterrupt(true);
+
+		co_return;
+	}());
 }
 
 //------------------------------------------------------------------------------
