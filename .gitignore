@@ -35,3 +35,6 @@
 **/out/**
 .gdbinit
 **/dev/**
+
+// Ignore generated res headers
+**/res/*.h
