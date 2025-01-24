@@ -220,6 +220,7 @@ DMARoutine SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 
 			++rowsDone;
 			if (rowsDone >= t_Speed)
 			{
+				rowsDone = 0;
 				co_yield{};
 			}
 		}
@@ -272,6 +273,7 @@ DMARoutine SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 
 			++rowsDone;
 			if (rowsDone >= t_Speed)
 			{
+				rowsDone = 0;
 				co_yield{};
 			}
 		}
