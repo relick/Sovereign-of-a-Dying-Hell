@@ -102,21 +102,21 @@ VNWorld::VNWorld
 }
 
 // Based on VDP_setTileMapEx
-Task FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
+Task SetTileMap(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
 {
-	//AutoProfileScope profile("FastSetTileMap: %lu");
+	//AutoProfileScope profile("SetTileMap: %lu");
 
-	u16 const* src = (u16 const*)FAR_SAFE(tilemap->tilemap, mulu(tilemap->w, tilemap->h) * 2);
+	u16 const* src = (u16 const*)FAR_SAFE(tilemap, mulu(w, h) * 2);
 
 	// we can increment both index and palette
 	u16 const baseinc = basetile & (TILE_INDEX_MASK | TILE_ATTR_PALETTE_MASK);
 	// we can only do logical OR on priority and HV flip
 	u16 const baseor = basetile & (TILE_ATTR_PRIORITY_MASK | TILE_ATTR_VFLIP_MASK | TILE_ATTR_HFLIP_MASK);
 
-	u16 i = tilemap->h;
+	u16 i = h;
 
 	// get temp buffer and schedule DMA
-	u16 const bufSize = mulu(planeWidth, tilemap->h);
+	u16 const bufSize = mulu(planeWidth, h);
 
 	u16* buf = nullptr;
 	while (!(buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, planeAddr, bufSize, 2))))
@@ -126,29 +126,39 @@ Task FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 
 	// Disable ints whilst we fill the DMA buffer
 	//SYS_disableInts();
-	u16 const bufInc = (planeWidth - tilemap->w);
+	u16 const bufInc = (planeWidth - w);
 
-	u16 const quarterWidth = tilemap->w >> 2;
+	u16 const quarterWidth = w >> 2;
+	u16 const doubleWidth = w << 1;
 
 	while (i--)
 	{
-		// then prepare data in buffer that will be transferred by DMA
-		u16 r = quarterWidth;
-
-		// prepare map data for row update
-		while (r--)
+		if (basetile != 0)
 		{
-			*buf++ = baseor | (*src++ + baseinc);
-			*buf++ = baseor | (*src++ + baseinc);
-			*buf++ = baseor | (*src++ + baseinc);
-			*buf++ = baseor | (*src++ + baseinc);
+			// then prepare data in buffer that will be transferred by DMA
+			u16 r = quarterWidth;
+
+			// prepare map data for row update
+			while (r--)
+			{
+				*buf++ = baseor | (*src++ + baseinc);
+				*buf++ = baseor | (*src++ + baseinc);
+				*buf++ = baseor | (*src++ + baseinc);
+				*buf++ = baseor | (*src++ + baseinc);
+			}
+
+			r = w & 3;
+			// prepare map data for row update
+			while (r--) *buf++ = baseor | (*src++ + baseinc);
+
+			buf += bufInc;
 		}
-
-		r = tilemap->w & 3;
-		// prepare map data for row update
-		while (r--) *buf++ = baseor | (*src++ + baseinc);
-
-		buf += bufInc;
+		else
+		{
+			std::memcpy(buf, src, doubleWidth);
+			src += w;
+			buf += planeWidth;
+		}
 	}
 
 	//SYS_enableInts();
@@ -156,7 +166,7 @@ Task FastSetTileMap(u16 planeAddr, const TileMap* tilemap, u16 basetile)
 	co_return;
 }
 
-template<bool t_Down, u16 t_Speed = 8>
+template<bool t_Down, u16 t_Speed = 4>
 Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
 {
 	//AutoProfileScope profile("SetTileMap_WipeDown: %lu");
@@ -174,6 +184,7 @@ Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 baseti
 	//SYS_disableInts();
 
 	u16 const quarterWidth = w >> 2;
+	u16 const doubleWidth = w << 1;
 
 	u16 rowsDone = 0;
 
@@ -211,7 +222,7 @@ Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 baseti
 			}
 			else
 			{
-				std::memcpy(buf, src, sizeof(u16) * w);
+				std::memcpy(buf, src, doubleWidth);
 				src += w;
 			}
 
@@ -264,7 +275,7 @@ Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 baseti
 			}
 			else
 			{
-				std::memcpy(buf, src, sizeof(u16) * w);
+				std::memcpy(buf, src, doubleWidth);
 				src -= w;
 			}
 
@@ -475,7 +486,7 @@ void VNWorld::SetBG
 		co_return;
 	});
 	io_game.QueueFunctionTask(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
-	io_game.QueueFunctionTask(FastSetTileMap(VDP_BG_B, m_nextBG->tilemap, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueFunctionTask(SetTileMap(VDP_BG_B, m_nextBG->tilemap->tilemap, m_nextBG->tilemap->w, m_nextBG->tilemap->h, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
 	io_game.QueueLambdaTask([this]() -> Task {
 		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() / 4, true);
 
