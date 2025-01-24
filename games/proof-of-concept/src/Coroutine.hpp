@@ -2,13 +2,17 @@
 
 #include "Declare.hpp"
 
+#include <concepts>
 #include <coroutine>
 #include <optional>
 
 namespace Game
 {
 
-template<typename T_CoroTag, typename T_YieldReturnType = void>
+template<typename T>
+concept Suspension = std::same_as<T, std::suspend_always> || std::same_as<T, std::suspend_never>;
+
+template<typename T_CoroTag, Suspension T_InitialSuspend, typename T_YieldReturnType = void>
 class Coroutine
 {
 public:
@@ -20,7 +24,7 @@ public:
         std::optional<T_YieldReturnType> m_val;
 
         Coroutine get_return_object() { return { handle_type::from_promise(*this) }; }
-        std::suspend_never initial_suspend() noexcept { return {}; }
+        T_InitialSuspend initial_suspend() noexcept { return {}; }
         std::suspend_always final_suspend() noexcept { return {}; }
         void return_value(T_YieldReturnType&& i_val) { m_val = std::move(i_val); }
         void unhandled_exception() {}
@@ -69,8 +73,8 @@ private:
     std::optional<handle_type> m_handle;
 };
 
-template<typename T_CoroTag>
-class Coroutine<T_CoroTag, void>
+template<typename T_CoroTag, Suspension T_InitialSuspend>
+class Coroutine<T_CoroTag, T_InitialSuspend, void>
 {
 public:
     struct empty {};
@@ -81,7 +85,7 @@ public:
     struct promise_type
     {
         Coroutine get_return_object() { return { handle_type::from_promise(*this) }; }
-        std::suspend_never initial_suspend() noexcept { return {}; }
+        T_InitialSuspend initial_suspend() noexcept { return {}; }
         std::suspend_always final_suspend() noexcept { return {}; }
         void return_void() {}
         void unhandled_exception() {}

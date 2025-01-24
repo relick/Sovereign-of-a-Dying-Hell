@@ -5,10 +5,10 @@
 namespace Game
 {
 
-using DMARoutine = Coroutine<struct DMARoutineTag>;
+using DMARoutine = Coroutine<struct DMARoutineTag, std::suspend_always>;
 
-using WorldRoutine = Coroutine<struct WorldRoutineCoroTag>;
+using WorldRoutine = Coroutine<struct WorldRoutineCoroTag, std::suspend_always>;
 
-using SceneRoutine = Coroutine<struct SceneRoutineTag>;
+using SceneRoutine = Coroutine<struct SceneRoutineTag, std::suspend_never>;
 
 }
