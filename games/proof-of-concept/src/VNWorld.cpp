@@ -531,11 +531,8 @@ void VNWorld::SetCharacter
 	{
 		HideCharacter(io_game, false);
 		m_nextPose = pose;
-		//VDP_setHInterrupt(false);
-		//PAL_fadeOutPalette(PAL1, FramesPerSecond() / 4, true);
+		
 		io_game.QueueLambdaTask([this] -> Task {
-
-
 			m_charaSrcPal = m_nextPose->m_image->palette->data;
 
 			std::memcpy(m_mainPals.data() + 16, m_charaSrcPal, sizeof(u16) * 16);
@@ -551,10 +548,7 @@ void VNWorld::SetCharacter
 		io_game.QueueFunctionTask(FastTilesLoad(m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
 		io_game.QueueFunctionTask(SetTileMap_Wipe<false>(VDP_BG_A, m_nextPose->m_image->tilemap->tilemap, m_nextPose->m_image->tilemap->w, m_nextPose->m_image->tilemap->h, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
 		io_game.QueueLambdaTask([this] -> Task {
-			//PAL_fadeInPalette(PAL1, m_nextPose->m_image->palette->data, FramesPerSecond() / 4, true);
-			//PAL_setColors(PAL1 * 16, m_nextPose->m_image->palette->data, 16, DMA);
 			m_nextPose = nullptr;
-
 			co_return;
 		});
 	}
