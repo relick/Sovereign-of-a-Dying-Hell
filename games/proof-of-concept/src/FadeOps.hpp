@@ -24,7 +24,9 @@ struct FadeOp
 };
 
 // io_startDstPal should hold the starting palette, and will also be used as the target for fading
-std::optional<FadeOp> CreateFade(u16* io_startDstPal, u16 const* i_endPal, u16 i_size, u16 i_numFrame);
+// i_size max is 32
+FadeOp CreateFade(u16* io_startDstPal, u16 const* i_endPal, u16 i_size, u16 i_numFrame);
+
 bool DoFadeStep(FadeOp& io_fadeOp);
 
 }
