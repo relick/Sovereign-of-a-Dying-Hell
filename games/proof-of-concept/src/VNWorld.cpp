@@ -525,11 +525,12 @@ void VNWorld::BlackBG
 void VNWorld::SetCharacter
 (
 	Game& io_game,
-	char const* i_charName,
-	char const* i_poseName
+	CharacterID i_charID,
+	PoseID i_poseID
 )
 {
-	auto const [_, pose] = m_characters.FindPose(i_charName, i_poseName);
+	auto const [_, pose] = m_characters.GetPose(i_charID, i_poseID);
+
 	if (pose)
 	{
 		HideCharacter(io_game, false);
@@ -588,10 +589,10 @@ void VNWorld::HideCharacter
 //------------------------------------------------------------------------------
 void VNWorld::SetCharName
 (
-	char const* i_charName
+	CharacterID i_charID
 )
 {
-	auto const chara = m_characters.FindCharacter(i_charName);
+	auto const chara = m_characters.GetCharacter(i_charID);
 	if (chara)
 	{
 		m_printer.SetName(chara->m_displayName, chara->m_showOnLeft);

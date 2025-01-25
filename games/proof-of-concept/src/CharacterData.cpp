@@ -7,36 +7,27 @@ namespace Game
 {
 
 //------------------------------------------------------------------------------
-void CharacterData::AddCharacter
+CharacterID CharacterData::AddCharacter
 (
-	char const* i_name,
 	char const* i_displayName,
 	bool i_showOnLeft
 )
 {
-	m_characters.push_back({ i_name, i_displayName, i_showOnLeft, {} });
+	m_characters.push_back({ i_displayName, i_showOnLeft, {} });
+	return static_cast<u8>(m_characters.size() - 1);
 }
 
 //------------------------------------------------------------------------------
-void CharacterData::AddPose
+PoseID CharacterData::AddPose
 (
-	char const* i_charName,
-	char const* i_poseName,
+	CharacterID i_charID,
 	Image const* i_image,
 	Palette const* i_namePal,
 	Palette const* i_textPal
 )
 {
-	auto charI = std::find_if(
-		m_characters.begin(),
-		m_characters.end(),
-		[i_charName](auto const& chara){ return chara.m_name == i_charName || std::strcmp(chara.m_name, i_charName) == 0; }
-	);
-
-	if (charI != m_characters.end())
-	{
-		charI->m_poses.push_back({ i_poseName, i_image, i_namePal, i_textPal });
-	}
+	m_characters[i_charID].m_poses.push_back({ i_image, i_namePal, i_textPal });
+	return static_cast<u8>(m_characters[i_charID].m_poses.size() - 1);
 }
 
 //------------------------------------------------------------------------------
@@ -46,52 +37,26 @@ void CharacterData::Clear()
 }
 
 //------------------------------------------------------------------------------
-Character const* CharacterData::FindCharacter
+Character const* CharacterData::GetCharacter
 (
-	char const* i_charName
+	CharacterID i_charID
 )
 {
-	if(i_charName)
-	{
-		auto charI = std::find_if(
-			m_characters.begin(),
-			m_characters.end(),
-			[i_charName](auto const& chara) { return chara.m_name == i_charName || std::strcmp(chara.m_name, i_charName) == 0; }
-		);
-
-		if (charI != m_characters.end())
-		{
-			return &*charI;
-		}
-	}
-
-	return {};
+	return i_charID < m_characters.size()
+		? &m_characters[i_charID]
+		: nullptr;
 }
 
 //------------------------------------------------------------------------------
-std::pair<Character const*, Pose const*> CharacterData::FindPose
+std::pair<Character const*, Pose const*> CharacterData::GetPose
 (
-	char const* i_charName,
-	char const* i_poseName
+	CharacterID i_charID,
+	PoseID i_poseID
 )
 {
-	Character const* chara = FindCharacter(i_charName);
-
-	if (chara)
-	{
-		auto poseI = std::find_if(
-			chara->m_poses.begin(),
-			chara->m_poses.end(),
-			[i_poseName](auto const& pose) { return pose.m_name == i_poseName || std::strcmp(pose.m_name, i_poseName) == 0; }
-		);
-
-		if (poseI != chara->m_poses.end())
-		{
-			return { chara, &*poseI };
-		}
-	}
-
-	return {};
+	return i_charID < m_characters.size() && i_poseID < m_characters[i_charID].m_poses.size()
+		? std::pair<Character const*, Pose const*>{ &m_characters[i_charID], & m_characters[i_charID].m_poses[i_poseID] }
+	: std::pair<Character const*, Pose const*>{ nullptr, nullptr };
 }
 
 }

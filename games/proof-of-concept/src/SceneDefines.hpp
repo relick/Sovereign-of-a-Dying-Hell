@@ -18,9 +18,9 @@
 #define portrait(chara, pose)
 #define hide_portrait()
 
-#define show(chara, pose) io_vn.SetCharacter(io_game, #chara, #pose)
+#define show(chara, pose) io_vn.SetCharacter(io_game, script.chara, script.chara ## _ ## pose)
 #define hide() io_vn.HideCharacter(io_game, false)
 
-#define think(text) io_vn.SetCharName(nullptr); io_vn.SetText("(" text ")"); wait
+#define think(text) io_vn.SetCharName(-1); io_vn.SetText("(" text ")"); wait
 
-#define say(chara_name, text) io_vn.SetCharName(#chara_name); io_vn.SetText(text); wait
+#define say(chara, text) io_vn.SetCharName(script.chara); io_vn.SetText(text); wait

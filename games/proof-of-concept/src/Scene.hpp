@@ -11,7 +11,7 @@ class Scene
 public:
     virtual ~Scene() = default;
 
-    virtual SceneRoutine Run(Game& io_game, VNWorld& io_vn) = 0;
+    virtual SceneRoutine Run(Game& io_game, VNWorld& io_vn, Script const& i_script) = 0;
 };
 
 }

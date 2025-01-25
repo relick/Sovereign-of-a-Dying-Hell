@@ -16,13 +16,13 @@ void Script::Init
 )
 {
 	// Set up characters
-	io_cd.AddCharacter("beans", "BEANS", true);
-	io_cd.AddCharacter("stacey", "STACEY", true);
+	beans = io_cd.AddCharacter("BEANS", true);
+	stacey = io_cd.AddCharacter("STACEY", true);
 
 	// Set up poses
-	io_cd.AddPose("stacey", "annoyed", &stacey_annoyed, &stacey_annoyed_name_pal, &stacey_annoyed_text_pal);
-	io_cd.AddPose("stacey", "excited", &stacey_excited, &stacey_excited_name_pal, &stacey_excited_text_pal);
-	io_cd.AddPose("stacey", "sigh", &stacey_sigh, stacey_sigh.palette, stacey_sigh.palette);
+	stacey_annoyed = io_cd.AddPose(stacey, &stacey_annoyed_img, &stacey_annoyed_name_pal, &stacey_annoyed_text_pal);
+	stacey_excited = io_cd.AddPose(stacey, &stacey_excited_img, &stacey_excited_name_pal, &stacey_excited_text_pal);
+	stacey_sigh = io_cd.AddPose(stacey, &stacey_sigh_img, stacey_sigh_img.palette, stacey_sigh_img.palette);
 
 	// First scene
 	m_nextScene = CreateScene(Scenes::forestShed_runningThroughWoods);
@@ -38,7 +38,7 @@ void Script::Update
 	if (m_nextScene)
 	{
 		m_currentScene = std::move(m_nextScene);
-		m_currentSceneRoutine = m_currentScene->Run(io_game, io_vn);
+		m_currentSceneRoutine = m_currentScene->Run(io_game, io_vn, *this);
 	}
 	else if (m_currentSceneRoutine)
 	{

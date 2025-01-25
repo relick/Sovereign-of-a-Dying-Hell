@@ -11,7 +11,6 @@ namespace Game
 
 struct Pose
 {
-	char const* m_name{ nullptr };
 	Image const* m_image{ nullptr };
 	Palette const* m_namePal{ nullptr };
 	Palette const* m_textPal{ nullptr };
@@ -19,7 +18,6 @@ struct Pose
 
 struct Character
 {
-	char const* m_name{ nullptr };
 	char const* m_displayName{ nullptr };
 	bool m_showOnLeft{ false };
 	std::vector<Pose> m_poses;
@@ -31,13 +29,13 @@ class CharacterData
 	std::vector<Character> m_characters;
 
 public:
-	void AddCharacter(char const* i_name, char const* i_displayName, bool i_showOnLeft);
-	void AddPose(char const* i_charName, char const* i_poseName, Image const* i_image, Palette const* i_namePal, Palette const* i_textPal);
+	CharacterID AddCharacter(char const* i_displayName, bool i_showOnLeft);
+	PoseID AddPose(CharacterID i_charID, Image const* i_image, Palette const* i_namePal, Palette const* i_textPal);
 
 	void Clear();
 
-	Character const* FindCharacter(char const* i_charName);
-	std::pair<Character const*, Pose const*> FindPose(char const* i_charName, char const* i_poseName);
+	Character const* GetCharacter(CharacterID i_charID);
+	std::pair<Character const*, Pose const*> GetPose(CharacterID i_charID, PoseID i_poseID);
 };
 
 }

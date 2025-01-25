@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Declare.hpp"
 #include "Script.hpp"
 #include "Scene.hpp"
 #include "BuryYourGays_Scenes.hpp"
@@ -22,7 +23,13 @@ class Script
 	std::unique_ptr<Game::Scene> m_nextScene;
 
 public:
+	// Fast character lookup indices for the CharacterData manager
+	Game::CharacterID beans;
+	Game::CharacterID stacey;
 	
+	Game::PoseID stacey_annoyed;
+	Game::PoseID stacey_excited;
+	Game::PoseID stacey_sigh;
 };
 
 }
