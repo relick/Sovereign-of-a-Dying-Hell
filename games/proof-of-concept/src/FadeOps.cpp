@@ -55,26 +55,25 @@ FadeOp CreateFade
 	return newFade;
 }
 
-bool DoFadeStep
+bool FadeOp::DoFadeStep
 (
-	FadeOp& io_fadeOp
 )
 {
 	// not yet done ?
-	if (io_fadeOp.m_counter > 0)
+	if (m_counter > 0)
 	{
 		// then prepare fade palette for next frame
-		s16* palR = io_fadeOp.m_palR.data();
-		s16* palG = io_fadeOp.m_palG.data();
-		s16* palB = io_fadeOp.m_palB.data();
+		s16* palR = m_palR.data();
+		s16* palG = m_palG.data();
+		s16* palB = m_palB.data();
 
-		s16* stepR = io_fadeOp.m_stepR.data();
-		s16* stepG = io_fadeOp.m_stepG.data();
-		s16* stepB = io_fadeOp.m_stepB.data();
-		u16* dst = io_fadeOp.m_dstPal;
+		s16* stepR = m_stepR.data();
+		s16* stepG = m_stepG.data();
+		s16* stepB = m_stepB.data();
+		u16* dst = m_dstPal;
 
 		// compute the next fade palette
-		u16 i = io_fadeOp.m_size;
+		u16 i = m_size;
 		while (i--)
 		{
 			u16 col;
@@ -96,7 +95,7 @@ bool DoFadeStep
 
 
 		// not yet done
-		--io_fadeOp.m_counter;
+		--m_counter;
 		return true;
 	}
 	else

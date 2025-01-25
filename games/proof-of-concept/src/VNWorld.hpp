@@ -29,9 +29,9 @@ class VNWorld
 
 	u16 const* m_bgSrcPal{ nullptr };
 	u16 const* m_charaSrcPal{ nullptr };
-	std::array<u16, 32> m_mainPals;
-	std::array<u16, 32> m_namePals;
-	std::array<u16, 32> m_textPals;
+	std::array<u16, 32> m_mainPals{};
+	std::array<u16, 32> m_namePals{};
+	std::array<u16, 32> m_textPals{};
 
 	WorldRoutine Init(Game &io_game) override;
 	WorldRoutine Shutdown(Game &io_game) override;

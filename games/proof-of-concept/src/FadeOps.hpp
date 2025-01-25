@@ -21,12 +21,13 @@ struct FadeOp
 	std::array<s16, 32> m_stepR{};
 	std::array<s16, 32> m_stepG{};
 	std::array<s16, 32> m_stepB{};
+
+	explicit operator bool() const { return m_counter > 0; }
+	bool DoFadeStep();
 };
 
 // io_startDstPal should hold the starting palette, and will also be used as the target for fading
 // i_size max is 32
 FadeOp CreateFade(u16* io_startDstPal, u16 const* i_endPal, u16 i_size, u16 i_numFrame);
-
-bool DoFadeStep(FadeOp& io_fadeOp);
 
 }

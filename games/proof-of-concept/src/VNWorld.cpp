@@ -3,6 +3,7 @@
 #include "Version.hpp"
 #include "PaletteOps.hpp"
 #include "Script.hpp"
+#include "FadeOps.hpp"
 
 #include <genesis.h>
 #include "res_fonts.h"
@@ -337,8 +338,15 @@ WorldRoutine VNWorld::Init
 	VDP_setHilightShadow(1);
 
 	// Show palette-based text frame
+	s_bgNormalPal = m_mainPals.data();
+	s_bgNamePal = m_namePals.data();
+	s_bgTextPal = m_textPals.data();
+	s_charaNormalPal = m_mainPals.data() + 16;
+	s_charaNamePal = m_namePals.data() + 16;
+	s_charaTextPal = m_textPals.data() + 16;
 	HInt_TextArea_SetName();
 	VDP_setHIntCounter(1);
+	VDP_setHInterrupt(true);
 
 	m_printer.Init(io_game, vn_font, name_font);
 
@@ -356,8 +364,6 @@ WorldRoutine VNWorld::Init
 	}
 
 	m_script->Init(io_game, *this, m_characters);
-
-	VDP_setHInterrupt(true);
 
 	co_return;
 }
@@ -454,37 +460,46 @@ void VNWorld::SetBG
 {
 	m_nextBG = &i_bg;
 	io_game.QueueLambdaTask([this] -> Task {
-		VDP_setHInterrupt(false);
-
-		PAL_fadeOutPalette(PAL0, FramesPerSecond() >> 1, true);
-		while (PAL_isDoingFade())
 		{
-			co_yield{};
+			System::FadeOp fadeOp1 = System::CreateFade(m_mainPals.data(), palette_black, 16, FramesPerSecond() >> 1);
+			System::FadeOp fadeOp2 = System::CreateFade(m_namePals.data(), palette_black, 16, FramesPerSecond() >> 1);
+			System::FadeOp fadeOp3 = System::CreateFade(m_textPals.data(), palette_black, 16, FramesPerSecond() >> 1);
+
+			while (fadeOp1)
+			{
+				fadeOp1.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
 		}
-
-		m_bgSrcPal = m_nextBG->palette->data;
-
-		std::memcpy(m_mainPals.data(), m_bgSrcPal, sizeof(u16) * 16);
-		Halve(m_namePals.data(), m_mainPals.data());
-		MinusOne(m_textPals.data(), m_namePals.data());
-
-		s_bgNormalPal = m_mainPals.data();
-		s_bgNamePal = m_namePals.data();
-		s_bgTextPal = m_textPals.data();
 
 		co_return;
 	});
 	io_game.QueueFunctionTask(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
 	io_game.QueueFunctionTask(SetTileMap_Full(VDP_BG_B, m_nextBG->tilemap->tilemap, m_nextBG->tilemap->w, m_nextBG->tilemap->h, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
 	io_game.QueueLambdaTask([this]() -> Task {
-		PAL_fadeInPalette(PAL0, m_nextBG->palette->data, FramesPerSecond() >> 1, true);
+		m_bgSrcPal = m_nextBG->palette->data;
 
-		while (PAL_isDoingFade())
 		{
-			co_yield{};
+			std::array<u16, 16> namePal;
+			std::array<u16, 16> textPal;
+
+			Halve(namePal.data(), m_bgSrcPal);
+			MinusOne(textPal.data(), namePal.data());
+
+			System::FadeOp fadeOp1 = System::CreateFade(m_mainPals.data(), m_bgSrcPal, 16, FramesPerSecond() >> 1);
+			System::FadeOp fadeOp2 = System::CreateFade(m_namePals.data(), namePal.data(), 16, FramesPerSecond() >> 1);
+			System::FadeOp fadeOp3 = System::CreateFade(m_textPals.data(), textPal.data(), 16, FramesPerSecond() >> 1);
+
+			while (fadeOp1)
+			{
+				fadeOp1.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
 		}
-		HInt_TextArea_SetName();
-		VDP_setHInterrupt(true);
 
 		m_nextBG = nullptr;
 		co_return;
@@ -497,24 +512,21 @@ void VNWorld::BlackBG
 	Game& io_game
 )
 {
-	io_game.QueueFunctionTask([] -> Task {
-		VDP_setHInterrupt(false);
+	io_game.QueueLambdaTask([this] -> Task {
+		System::FadeOp fadeOp1 = System::CreateFade(m_mainPals.data(), palette_black, 16, FramesPerSecond() >> 2);
+		System::FadeOp fadeOp2 = System::CreateFade(m_namePals.data(), palette_black, 16, FramesPerSecond() >> 2);
+		System::FadeOp fadeOp3 = System::CreateFade(m_textPals.data(), palette_black, 16, FramesPerSecond() >> 2);
 
-		PAL_fadeOutPalette(PAL0, FramesPerSecond() >> 2, true);
-		while (PAL_isDoingFade())
+		while (fadeOp1)
 		{
+			fadeOp1.DoFadeStep();
+			fadeOp2.DoFadeStep();
+			fadeOp3.DoFadeStep();
 			co_yield{};
 		}
 
-		s_bgNormalPal = palette_black;
-		s_bgNamePal = palette_black;
-		s_bgTextPal = palette_black;
-
-		HInt_TextArea_SetName();
-		VDP_setHInterrupt(true);
-
 		co_return;
-	}());
+	});
 }
 
 //------------------------------------------------------------------------------
@@ -531,17 +543,13 @@ void VNWorld::SetCharacter
 	{
 		HideCharacter(io_game, false);
 		m_nextPose = pose;
-		
+
 		io_game.QueueLambdaTask([this] -> Task {
 			m_charaSrcPal = m_nextPose->m_image->palette->data;
 
 			std::memcpy(m_mainPals.data() + 16, m_charaSrcPal, sizeof(u16) * 16);
 			Halve(m_namePals.data() + 16, m_mainPals.data() + 16);
 			MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
-
-			s_charaNormalPal = m_mainPals.data() + 16;
-			s_charaNamePal = m_namePals.data() + 16;
-			s_charaTextPal = m_textPals.data() + 16;
 
 			co_return;
 		});
