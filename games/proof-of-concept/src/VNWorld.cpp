@@ -19,37 +19,31 @@ consteval std::array<u16, 64*32> FillHilightPlaneA()
 	return arr;
 }
 
-std::array<u16, 16> MinusOne(u16 const* i_pal)
+void MinusOne(u16* i_dstPal, u16 const* i_srcPal)
 {
-	std::array<u16, 16> newPal;
 	for (u8 i = 0; i < 16; ++i)
 	{
-		u8 const r = (i_pal[i] & VDPPALETTE_REDMASK) >> VDPPALETTE_REDSFT;
-		u8 const g = (i_pal[i] & VDPPALETTE_GREENMASK) >> VDPPALETTE_GREENSFT;
-		u8 const b = (i_pal[i] & VDPPALETTE_BLUEMASK) >> VDPPALETTE_BLUESFT;
-		newPal[i] = RGB3_3_3_TO_VDPCOLOR(
+		u8 const r = (i_srcPal[i] & VDPPALETTE_REDMASK) >> VDPPALETTE_REDSFT;
+		u8 const g = (i_srcPal[i] & VDPPALETTE_GREENMASK) >> VDPPALETTE_GREENSFT;
+		u8 const b = (i_srcPal[i] & VDPPALETTE_BLUEMASK) >> VDPPALETTE_BLUESFT;
+		i_dstPal[i] = RGB3_3_3_TO_VDPCOLOR(
 			(r > 0) ? r - 1 : 0,
 			(g > 0) ? g - 1 : 0,
 			(b > 0) ? b - 1 : 0
 		);
 	}
-
-	return newPal;
 }
 
-std::array<u16, 16> Halve(u16 const* i_pal)
+void Halve(u16* i_dstPal, u16 const* i_srcPal)
 {
-	std::array<u16, 16> newPal;
 	for(u8 i = 0; i < 16; ++i)
 	{
-		newPal[i] = RGB3_3_3_TO_VDPCOLOR(
-			(i_pal[i] & VDPPALETTE_REDMASK) >> (VDPPALETTE_REDSFT + 1),
-			(i_pal[i] & VDPPALETTE_GREENMASK) >> (VDPPALETTE_GREENSFT + 1),
-			(i_pal[i] & VDPPALETTE_BLUEMASK) >> (VDPPALETTE_BLUESFT + 1)
+		i_dstPal[i] = RGB3_3_3_TO_VDPCOLOR(
+			(i_srcPal[i] & VDPPALETTE_REDMASK) >> (VDPPALETTE_REDSFT + 1),
+			(i_srcPal[i] & VDPPALETTE_GREENMASK) >> (VDPPALETTE_GREENSFT + 1),
+			(i_srcPal[i] & VDPPALETTE_BLUEMASK) >> (VDPPALETTE_BLUESFT + 1)
 		);
 	}
-
-	return newPal;
 }
 
 constexpr std::array<u16, 64 * 32> c_hilightEmptyPlaneA = FillHilightPlaneA();
@@ -468,13 +462,15 @@ void VNWorld::SetBG
 			co_yield{};
 		}
 
-		s_bgNormalPal = m_nextBG->palette->data;
+		m_bgSrcPal = m_nextBG->palette->data;
 
-		m_bgNameCalcPal = Halve(s_bgNormalPal);
-		s_bgNamePal = m_bgNameCalcPal.data();
+		std::memcpy(m_mainPals.data(), m_bgSrcPal, sizeof(u16) * 16);
+		Halve(m_namePals.data(), m_mainPals.data());
+		MinusOne(m_textPals.data(), m_namePals.data());
 
-		m_bgTextCalcPal = MinusOne(s_bgNamePal);
-		s_bgTextPal = m_bgTextCalcPal.data();
+		s_bgNormalPal = m_mainPals.data();
+		s_bgNamePal = m_namePals.data();
+		s_bgTextPal = m_textPals.data();
 
 		co_return;
 	});
@@ -538,13 +534,17 @@ void VNWorld::SetCharacter
 		//VDP_setHInterrupt(false);
 		//PAL_fadeOutPalette(PAL1, FramesPerSecond() / 4, true);
 		io_game.QueueLambdaTask([this] -> Task {
-			s_charaNormalPal = m_nextPose->m_image->palette->data;
 
-			m_charaNameCalcPal = Halve(s_charaNormalPal);
-			s_charaNamePal = m_charaNameCalcPal.data();
 
-			m_charaTextCalcPal = MinusOne(s_charaNamePal);
-			s_charaTextPal = m_charaTextCalcPal.data();
+			m_charaSrcPal = m_nextPose->m_image->palette->data;
+
+			std::memcpy(m_mainPals.data() + 16, m_charaSrcPal, sizeof(u16) * 16);
+			Halve(m_namePals.data() + 16, m_mainPals.data() + 16);
+			MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
+
+			s_charaNormalPal = m_mainPals.data() + 16;
+			s_charaNamePal = m_namePals.data() + 16;
+			s_charaTextPal = m_textPals.data() + 16;
 
 			co_return;
 		});

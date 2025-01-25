@@ -27,11 +27,11 @@ class VNWorld
 	Image const* m_nextBG{ nullptr };
 	Pose const* m_nextPose{ nullptr };
 
-	std::array<u16, 16> m_bgNameCalcPal;
-	std::array<u16, 16> m_bgTextCalcPal;
-
-	std::array<u16, 16> m_charaNameCalcPal;
-	std::array<u16, 16> m_charaTextCalcPal;
+	u16 const* m_bgSrcPal{ nullptr };
+	u16 const* m_charaSrcPal{ nullptr };
+	std::array<u16, 32> m_mainPals;
+	std::array<u16, 32> m_namePals;
+	std::array<u16, 32> m_textPals;
 
 	WorldRoutine Init(Game &io_game) override;
 	WorldRoutine Shutdown(Game &io_game) override;
