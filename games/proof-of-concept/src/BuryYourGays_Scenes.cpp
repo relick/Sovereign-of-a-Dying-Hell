@@ -53,6 +53,44 @@ SCENE_RUN(forestShed_runningThroughWoods)
     think("I can barely see where I'm putting my feet!");
     hide_portrait();
 
+    static const std::array tripChoices = {
+        "Trip over a tree root!",
+        "Fall over a log!",
+        "Avoid the obstacles!",
+        "Stumble on a fallen branch!",
+    };
+    std::optional<u16> const tripResult = timed_choice(3.0, tripChoices);
+
+#define trip(object) portrait(beans, shout); vpunch(); say(beans, "OOF-"); think("That " object " came out of nowhere!"); hide_portrait()
+
+    if (tripResult)
+    {
+        switch (*tripResult)
+        {
+        case 0: trip("tree root"); break;
+        case 1: trip("log"); break;
+        case 2:
+        {
+            portrait(beans, kewl);
+            think("Sure footed as a mountain goat!");
+            portrait(beans, shout);
+            vpunch();
+            say(beans, "OOF-");
+            say(beans, "Ohh...");
+            say(beans, "I was so busy avoiding the branches I just ran face first into that tree.");
+            hide_portrait();
+            break;
+        }
+        case 3: trip("branch"); break;
+        }
+    }
+    else
+    {
+        trip("tree root");
+    }
+
+#undef trip
+
     io_game.RequestNextWorld(std::make_unique<Game::IntroWorld>());
 
     end;

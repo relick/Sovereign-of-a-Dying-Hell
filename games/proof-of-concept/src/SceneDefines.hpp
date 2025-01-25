@@ -24,3 +24,8 @@
 #define think(text) io_vn.SetCharName(-1); io_vn.SetText("(" text ")"); wait
 
 #define say(chara, text) io_vn.SetCharName(script.chara); io_vn.SetText(text); wait
+
+#define choice(choiceArr) {}
+#define timed_choice(timeInSeconds, choiceArr) {}
+
+#define vpunch()
