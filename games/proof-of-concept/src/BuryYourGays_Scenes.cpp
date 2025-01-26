@@ -53,7 +53,7 @@ SCENE_RUN(forestShed_runningThroughWoods)
     think("I can barely see where I'm putting my feet!");
     hide_portrait();
 
-    static const std::array tripChoices = {
+    static constexpr std::array tripChoices = {
         "Trip over a tree root!",
         "Fall over a log!",
         "Avoid the obstacles!",
