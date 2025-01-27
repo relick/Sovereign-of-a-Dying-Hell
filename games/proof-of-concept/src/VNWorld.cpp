@@ -8,6 +8,7 @@
 #include <genesis.h>
 #include "res_fonts.h"
 
+#include <algorithm>
 #include <cstring>
 
 namespace Game
@@ -124,7 +125,6 @@ Task SetTileMap_Full(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 baseti
 	u16 const bufInc = (planeWidth - w);
 
 	u16 const quarterWidth = w >> 2;
-	u16 const doubleWidth = w << 1;
 
 	while (i--)
 	{
@@ -150,7 +150,7 @@ Task SetTileMap_Full(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 baseti
 		}
 		else
 		{
-			std::memcpy(buf, src, doubleWidth);
+			std::copy(src, src + w, buf);
 			src += w;
 			buf += planeWidth;
 		}
@@ -179,7 +179,6 @@ Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 baseti
 	//SYS_disableInts();
 
 	u16 const quarterWidth = w >> 2;
-	u16 const doubleWidth = w << 1;
 
 	u16 rowsDone = 0;
 
@@ -217,7 +216,7 @@ Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 baseti
 			}
 			else
 			{
-				std::memcpy(buf, src, doubleWidth);
+				std::copy(src, src + w, buf);
 				src += w;
 			}
 
@@ -270,7 +269,7 @@ Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 baseti
 			}
 			else
 			{
-				std::memcpy(buf, src, doubleWidth);
+				std::copy(src, src + w, buf);
 				src -= w;
 			}
 
@@ -350,9 +349,9 @@ WorldRoutine VNWorld::Init
 
 	m_printer.Init(io_game, vn_font, name_font);
 
-	u16 blackWithTextPal[64] = { 0 };
-	std::memcpy(blackWithTextPal + 48, text_font_pal.data, 16 * sizeof(u16));
-	PAL_setColors(0, blackWithTextPal, 64, DMA_QUEUE_COPY);
+	std::array<u16, 64> blackWithTextPal = { 0 };
+	std::copy(text_font_pal.data, text_font_pal.data + 16, blackWithTextPal.begin() + 48);
+	PAL_setColors(0, blackWithTextPal.data(), 64, DMA_QUEUE_COPY);
 
 	HideCharacter(io_game, true);
 
@@ -547,7 +546,7 @@ void VNWorld::SetCharacter
 		io_game.QueueLambdaTask([this] -> Task {
 			m_charaSrcPal = m_nextPose->m_image->palette->data;
 
-			std::memcpy(m_mainPals.data() + 16, m_charaSrcPal, sizeof(u16) * 16);
+			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
 			Halve(m_namePals.data() + 16, m_mainPals.data() + 16);
 			MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
 
