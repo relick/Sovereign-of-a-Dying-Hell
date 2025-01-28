@@ -92,6 +92,10 @@ public:
 	// Action from player to skip or progress
 	void Next();
 
+	// Hide/reveal all sprites, to effectively enable/disable the printer
+	void HideAll();
+	void RevealAll();
+
 private:
 	void SetupSprites();
 

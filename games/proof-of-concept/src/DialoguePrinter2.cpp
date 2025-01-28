@@ -286,15 +286,9 @@ void DialoguePrinter2::SetText
 //------------------------------------------------------------------------------
 void DialoguePrinter2::Update()
 {
-	if (!m_curText || m_curTextIndex >= m_curTextLen)
-	{
-		m_doneAllText = true;
-		return;
-	}
-
 	// TODO: properly controllable timer
 	static u16 time = 0;
-	if(time == 3)
+	if (time == 3)
 	{
 		time = 0;
 	}
@@ -304,9 +298,19 @@ void DialoguePrinter2::Update()
 		return;
 	}
 
-	bool const moreToDisplay = DrawChar();
+	bool showArrow = true;
+	if (m_curText && m_curTextIndex < m_curTextLen)
+	{
+		bool const moreToDisplay = DrawChar();
+		showArrow = !moreToDisplay; // && m_curTextIndex != m_curTextLen; // Always display the arrow when at the end now
+		m_doneAllText = !moreToDisplay && m_curTextIndex == m_curTextLen;
+	}
+	else
+	{
+		m_doneAllText = true;
+	}
 
-	if (!moreToDisplay && m_curTextIndex != m_curTextLen)
+	if (showArrow)
 	{
 		++m_arrowTimer;
 		if (m_arrowTimer >= c_arrowSpeed)
@@ -317,7 +321,6 @@ void DialoguePrinter2::Update()
 		}
 	}
 
-	m_doneAllText = !moreToDisplay && m_curTextIndex == m_curTextLen;
 }
 
 //------------------------------------------------------------------------------
@@ -362,6 +365,45 @@ void DialoguePrinter2::Next()
 		{
 		}
 	}
+}
+
+//------------------------------------------------------------------------------
+void DialoguePrinter2::HideAll()
+{
+	for (SpriteID sprID : m_nameSprites)
+	{
+		EditableSpriteData spr = m_game->Sprites().EditSpriteData(sprID);
+		spr.SetVisible(false);
+	}
+
+	for (SpriteID sprID : m_textSprites)
+	{
+		EditableSpriteData spr = m_game->Sprites().EditSpriteData(sprID);
+		spr.SetVisible(false);
+	}
+
+	{
+		EditableSpriteData arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
+		arrowSpr.SetVisible(false);
+	}
+}
+
+//------------------------------------------------------------------------------
+void DialoguePrinter2::RevealAll()
+{
+	for (SpriteID sprID : m_nameSprites)
+	{
+		EditableSpriteData spr = m_game->Sprites().EditSpriteData(sprID);
+		spr.SetVisible(true);
+	}
+
+	for (SpriteID sprID : m_textSprites)
+	{
+		EditableSpriteData spr = m_game->Sprites().EditSpriteData(sprID);
+		spr.SetVisible(true);
+	}
+
+	// Arrow sprite left up to Update to reveal
 }
 
 //------------------------------------------------------------------------------
