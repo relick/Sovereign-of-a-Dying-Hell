@@ -31,9 +31,48 @@ namespace Palettes
 {
 
 //------------------------------------------------------------------------------
+// Mini-helper for 3-bit RGB values, split into separate 1-byte components for manipulation (but still ultimately 3-bit colour)
+//------------------------------------------------------------------------------
+struct RGB3Colour
+{
+	u8 r; u8 g; u8 b;
+
+	constexpr RGB3Colour(u8 i_r, u8 i_g, u8 i_b)
+		: r{ i_r }, g{ i_g }, b{ i_b }
+	{}
+	constexpr RGB3Colour(u16 i_vdpColour)
+		: r{ static_cast<u8>((i_vdpColour & VDPPALETTE_REDMASK) >> VDPPALETTE_REDSFT) }
+		, g{ static_cast<u8>((i_vdpColour & VDPPALETTE_GREENMASK) >> VDPPALETTE_GREENSFT) }
+		, b{ static_cast<u8>((i_vdpColour & VDPPALETTE_BLUEMASK) >> VDPPALETTE_BLUESFT) }
+	{}
+	constexpr RGB3Colour(u32 i_24bit)
+		: RGB3Colour{ static_cast<u16>(RGB24_TO_VDPCOLOR(i_24bit)) }
+	{}
+	constexpr u16 ToVDPColour() const
+	{
+		return RGB3_3_3_TO_VDPCOLOR(r, g, b);
+	}
+	constexpr RGB3Colour& operator+=(RGB3Colour const& i_o)
+	{
+		r += i_o.r; g += i_o.g; b += i_o.b; return *this;
+	}
+	constexpr RGB3Colour& operator-=(RGB3Colour const& i_o)
+	{
+		r = (r > i_o.r) ? (r - i_o.r) : 0;
+		g = (g > i_o.g) ? (g - i_o.g) : 0;
+		b = (b > i_o.b) ? (b - i_o.b) : 0;
+		return *this;
+	}
+	constexpr RGB3Colour& operator>>=(u8 i_shift)
+	{
+		r >>= i_shift; g >>= i_shift; b >>= i_shift; return *this;
+	}
+};
+
+//------------------------------------------------------------------------------
 template<u8 t_PalLen = 16> inline void MinusOne(u16* i_dstPal, u16 const* i_srcPal);
 template<u8 t_PalLen = 16> inline void Halve(u16* i_dstPal, u16 const* i_srcPal);
-template<u8 t_PalLen = 16> inline void Tint(u16* i_dstPal, u16 const* i_srcPal, u8 i_r, u8 i_g, u8 i_b);
+template<u8 t_PalLen = 16> inline void Tint(u16* i_dstPal, u16 const* i_srcPal, RGB3Colour i_col);
 
 //------------------------------------------------------------------------------
 // All code here works on the basis BG text frame is using PAL0

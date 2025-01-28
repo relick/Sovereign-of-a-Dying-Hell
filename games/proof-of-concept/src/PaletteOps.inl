@@ -239,16 +239,11 @@ void MinusOne
 	u16 const* i_srcPal
 )
 {
+	constexpr RGB3Colour c_one(1, 1, 1);
+
 	for (u8 i = 0; i < t_PalLen; ++i)
 	{
-		u8 const r = (i_srcPal[i] & VDPPALETTE_REDMASK) >> VDPPALETTE_REDSFT;
-		u8 const g = (i_srcPal[i] & VDPPALETTE_GREENMASK) >> VDPPALETTE_GREENSFT;
-		u8 const b = (i_srcPal[i] & VDPPALETTE_BLUEMASK) >> VDPPALETTE_BLUESFT;
-		i_dstPal[i] = RGB3_3_3_TO_VDPCOLOR(
-			(r > 0) ? r - 1 : 0,
-			(g > 0) ? g - 1 : 0,
-			(b > 0) ? b - 1 : 0
-		);
+		i_dstPal[i] = (RGB3Colour(i_srcPal[i]) -= c_one).ToVDPColour();
 	}
 }
 
@@ -262,11 +257,7 @@ void Halve
 {
 	for (u8 i = 0; i < t_PalLen; ++i)
 	{
-		i_dstPal[i] = RGB3_3_3_TO_VDPCOLOR(
-			(i_srcPal[i] & VDPPALETTE_REDMASK) >> (VDPPALETTE_REDSFT + 1),
-			(i_srcPal[i] & VDPPALETTE_GREENMASK) >> (VDPPALETTE_GREENSFT + 1),
-			(i_srcPal[i] & VDPPALETTE_BLUEMASK) >> (VDPPALETTE_BLUESFT + 1)
-		);
+		i_dstPal[i] = (RGB3Colour(i_srcPal[i]) >>= 1).ToVDPColour();
 	}
 }
 
@@ -276,18 +267,12 @@ void Tint
 (
 	u16* i_dstPal,
 	u16 const* i_srcPal,
-	u8 i_r,
-	u8 i_g,
-	u8 i_b
+	RGB3Colour i_col
 )
 {
 	for (u8 i = 0; i < t_PalLen; ++i)
 	{
-		i_dstPal[i] = RGB3_3_3_TO_VDPCOLOR(
-			((i_srcPal[i] & VDPPALETTE_REDMASK) + i_r) >> (VDPPALETTE_REDSFT + 1),
-			((i_srcPal[i] & VDPPALETTE_GREENMASK) + i_g) >> (VDPPALETTE_GREENSFT + 1),
-			((i_srcPal[i] & VDPPALETTE_BLUEMASK) + i_b) >> (VDPPALETTE_BLUESFT + 1)
-		);
+		i_dstPal[i] = ((RGB3Colour(i_srcPal[i]) += i_col) >>= 1).ToVDPColour();
 	}
 }
 

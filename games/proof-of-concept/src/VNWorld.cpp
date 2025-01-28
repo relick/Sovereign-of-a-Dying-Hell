@@ -15,14 +15,15 @@
 namespace Game
 {
 
-consteval std::array<u16, 64*32> FillHilightPlaneA()
+consteval std::array<u16, 64*32> FillHighlightPlaneA()
 {
 	std::array<u16, 64 * 32> arr;
 	arr.fill(TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 2047));
 	return arr;
 }
 
-constexpr std::array<u16, 64 * 32> c_hilightEmptyPlaneA = FillHilightPlaneA();
+constexpr std::array<u16, 64 * 32> c_highlightEmptyPlaneA = FillHighlightPlaneA();
+constexpr Palettes::RGB3Colour c_tintColour{ 0, 4, 7 }; // TODO: customisable by player/scene?
 
 static u16 const* s_bgNormalPal{ palette_black };
 static u16 const* s_bgNamePal{ palette_black };
@@ -223,7 +224,10 @@ void VNWorld::SetBG
 
 		co_return;
 	});
-	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
+		m_nextBG,
+		TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)
+	));
 	io_game.QueueFunctionTask(Tiles::SetMap_Full(
 		VDP_BG_B,
 		m_nextBG->tilemap->tilemap,
@@ -238,7 +242,7 @@ void VNWorld::SetBG
 			std::array<u16, 16> namePal;
 			std::array<u16, 16> textPal;
 
-			Palettes::Halve(namePal.data(), m_bgSrcPal);
+			Palettes::Tint(namePal.data(), m_bgSrcPal, c_tintColour);
 			Palettes::MinusOne(textPal.data(), namePal.data());
 
 			Palettes::FadeOp fadeOp1 = Palettes::CreateFade(m_mainPals.data(), m_bgSrcPal, 16, FramesPerSecond() >> 1);
@@ -301,13 +305,22 @@ void VNWorld::SetCharacter
 			m_charaSrcPal = m_nextPose->m_image->palette->data;
 
 			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
-			Palettes::Halve(m_namePals.data() + 16, m_mainPals.data() + 16);
+			Palettes::Tint(m_namePals.data() + 16, m_mainPals.data() + 16, c_tintColour);
 			Palettes::MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
 
 			co_return;
 		});
-		io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
-		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(VDP_BG_A, m_nextPose->m_image->tilemap->tilemap, m_nextPose->m_image->tilemap->w, m_nextPose->m_image->tilemap->h, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
+		io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
+			m_nextPose->m_image,
+			TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)
+		));
+		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
+			VDP_BG_A,
+			m_nextPose->m_image->tilemap->tilemap,
+			m_nextPose->m_image->tilemap->w,
+			m_nextPose->m_image->tilemap->h,
+			TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)
+		));
 		io_game.QueueLambdaTask([this] -> Task {
 			m_nextPose = nullptr;
 			co_return;
@@ -327,7 +340,7 @@ void VNWorld::HideCharacter
 	{
 		io_game.QueueFunctionTask([] -> Task {
 			//AutoProfileScope profile("VNWorld::HideCharacter: %lu");
-			while (!DMA_transfer(DMA_QUEUE, DMA_VRAM, (void*)c_hilightEmptyPlaneA.data(), VDP_BG_A, c_hilightEmptyPlaneA.size(), 2))
+			while (!DMA_transfer(DMA_QUEUE, DMA_VRAM, (void*)c_highlightEmptyPlaneA.data(), VDP_BG_A, c_highlightEmptyPlaneA.size(), 2))
 			{
 				co_yield {};
 			}
@@ -337,7 +350,13 @@ void VNWorld::HideCharacter
 	}
 	else
 	{
-		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Down>(VDP_BG_A, c_hilightEmptyPlaneA.data(), 40, 28, 0));
+		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Down>(
+			VDP_BG_A,
+			c_highlightEmptyPlaneA.data(),
+			40,
+			28,
+			0
+		));
 	}
 }
 
