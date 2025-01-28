@@ -20,9 +20,9 @@ void Script::Init
 	stacey = io_cd.AddCharacter("STACEY", true);
 
 	// Set up poses
-	stacey_annoyed = io_cd.AddPose(stacey, &stacey_annoyed_img, &stacey_annoyed_name_pal, &stacey_annoyed_text_pal);
-	stacey_excited = io_cd.AddPose(stacey, &stacey_excited_img, &stacey_excited_name_pal, &stacey_excited_text_pal);
-	stacey_sigh = io_cd.AddPose(stacey, &stacey_sigh_img, stacey_sigh_img.palette, stacey_sigh_img.palette);
+	stacey_annoyed = io_cd.AddPose(stacey, &stacey_annoyed_img);
+	stacey_excited = io_cd.AddPose(stacey, &stacey_excited_img);
+	stacey_sigh = io_cd.AddPose(stacey, &stacey_sigh_img);
 
 	// First scene
 	m_nextScene = CreateScene(Scenes::forestShed_runningThroughWoods);

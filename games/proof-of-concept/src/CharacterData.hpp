@@ -12,8 +12,6 @@ namespace Game
 struct Pose
 {
 	Image const* m_image{ nullptr };
-	Palette const* m_namePal{ nullptr };
-	Palette const* m_textPal{ nullptr };
 };
 
 struct Character
@@ -30,7 +28,7 @@ class CharacterData
 
 public:
 	CharacterID AddCharacter(char const* i_displayName, bool i_showOnLeft);
-	PoseID AddPose(CharacterID i_charID, Image const* i_image, Palette const* i_namePal, Palette const* i_textPal);
+	PoseID AddPose(CharacterID i_charID, Image const* i_image);
 
 	void Clear();
 

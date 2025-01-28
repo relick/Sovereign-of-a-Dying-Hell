@@ -21,12 +21,10 @@ CharacterID CharacterData::AddCharacter
 PoseID CharacterData::AddPose
 (
 	CharacterID i_charID,
-	Image const* i_image,
-	Palette const* i_namePal,
-	Palette const* i_textPal
+	Image const* i_image
 )
 {
-	m_characters[i_charID].m_poses.push_back({ i_image, i_namePal, i_textPal });
+	m_characters[i_charID].m_poses.push_back({ i_image });
 	return static_cast<u8>(m_characters[i_charID].m_poses.size() - 1);
 }
 
