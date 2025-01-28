@@ -22,7 +22,6 @@ class VNWorld
 	DialoguePrinter2 m_printer;
 
 	std::unique_ptr<Script> m_script;
-	bool m_readyForNext{false};
 
 	Image const* m_nextBG{ nullptr };
 	Pose const* m_nextPose{ nullptr };
@@ -33,6 +32,30 @@ class VNWorld
 	std::array<u16, 32> m_namePals{};
 	std::array<u16, 32> m_textPals{};
 
+	u8 m_waitingForTasksStack{ 0 };
+
+	// Mostly changes which subsystem is active/allows transitions - should be mutually exclusive
+	enum class SceneMode
+	{
+		None,
+		Dialogue,
+		Choice,
+		Settings,
+	};
+	SceneMode m_sceneMode{ SceneMode::Dialogue };
+
+	// Determines how the scene routine is progressed
+	enum class ProgressMode
+	{
+		Always, // Reset to this after progress made via any way. In particular used by wait_for_tasks()
+		Dialogue, // Waits for dialogue printer to indicate progress can happen, and player to progress
+		Choice, // Waits for choice subsystem to return a choice
+	};
+	ProgressMode m_progressMode{ ProgressMode::Always };
+
+	// Buttons
+	bool m_ABCpressed{ false };
+
 	WorldRoutine Init(Game &io_game) override;
 	WorldRoutine Shutdown(Game &io_game) override;
 	void Run(Game &io_game) override;
@@ -40,6 +63,7 @@ class VNWorld
 public:
 	VNWorld(std::unique_ptr<Script>&& i_script);
 
+	void WaitForTasks(Game& io_game);
 	void StartMusic(u8 const* i_bgm, u16 i_fadeInFrames, bool i_loop);
 	void StopMusic(u16 i_fadeOutFrames);
 	void SetBG(Game& io_game, Image const& i_bg);

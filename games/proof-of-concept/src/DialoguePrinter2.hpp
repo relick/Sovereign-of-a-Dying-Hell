@@ -75,6 +75,8 @@ class DialoguePrinter2
 	u16 m_lineTileRefreshStart{UINT16_MAX};
 	u16 m_lineTileRefreshEnd{0};
 
+	bool m_doneAllText{false};
+
 public:
 	// Sets up tiles and tilemap
 	void Init(Game& io_game, TileSet const& i_textFont, TileSet const& i_nameFont);
@@ -84,7 +86,8 @@ public:
 	void SetText(char const *i_text);
 
 	// Advances render and queues DMA
-	bool Update();
+	void Update();
+	bool Done() const;
 
 	// Action from player to skip or progress
 	void Next();

@@ -137,45 +137,96 @@ void VNWorld::Run
 	Game& io_game
 )
 {
-	u16 const buttons = JOY_readJoypad(JOY_1);
-
-	static bool pressed = false;
-	if ((buttons & (BUTTON_A | BUTTON_B | BUTTON_C)) != 0)
+	if (m_waitingForTasksStack > 0)
 	{
-		if (!pressed)
-		{
-			if (m_readyForNext)
-			{
-				//AutoProfileScope profile("BuryYourGays_Script::Update: %lu");
+		return;
+	}
 
-				m_script->Update(io_game, *this);
-				m_readyForNext = false;
+	u16 const buttons = JOY_readJoypad(JOY_1);
+	bool const ABCpressedThisFrame = [this, buttons]{
+		if ((buttons & (BUTTON_A | BUTTON_B | BUTTON_C)) != 0)
+		{
+			if (!m_ABCpressed)
+			{
+				m_ABCpressed = true;
+				return true;
 			}
-			else
+		}
+		else
+		{
+			m_ABCpressed = false;
+		}
+		return false;
+	}();
+
+	switch (m_sceneMode)
+	{
+		case SceneMode::None:
+		{
+			break;
+		}
+		case SceneMode::Dialogue:
+		{
+			if (ABCpressedThisFrame)
 			{
 				m_printer.Next();
 			}
+			else
+			{
+				m_printer.Update();
+			}
+			break;
 		}
-		pressed = true;
-	}
-	else
-	{
-		pressed = false;
+		case SceneMode::Choice:
+		{
+			// nyi
+			break;
+		}
+		case SceneMode::Settings:
+		{
+			// nyi
+			break;
+		}
 	}
 
-	static u16 time = 0;
-	if(time == 3)
 	{
-		if (m_printer.Update())
+		//AutoProfileScope profile("BuryYourGays_Script::Update: %lu");
+		switch (m_progressMode)
 		{
-			m_readyForNext = true;
+			case ProgressMode::Always:
+			{
+				m_script->Update(io_game, *this);
+				break;
+			}
+			case ProgressMode::Dialogue:
+			{
+				if (ABCpressedThisFrame && m_printer.Done())
+				{
+					m_script->Update(io_game, *this);
+					//m_progressMode = ProgressMode::Always;
+				}
+				break;
+			}
+			case ProgressMode::Choice:
+			{
+				// nyi
+				break;
+			}
 		}
-		time = 0;
 	}
-	else
-	{
-		++time;
-	}
+}
+
+//------------------------------------------------------------------------------
+void VNWorld::WaitForTasks
+(
+	Game& io_game
+)
+{
+	++m_waitingForTasksStack;
+	io_game.QueueLambdaTask([this] -> Task {
+		--m_waitingForTasksStack;
+		co_return;
+	});
 }
 
 //------------------------------------------------------------------------------
@@ -383,6 +434,7 @@ void VNWorld::SetText
 	char const* i_text
 )
 {
+	m_progressMode = ProgressMode::Dialogue;
 	m_printer.SetText(i_text);
 }
 

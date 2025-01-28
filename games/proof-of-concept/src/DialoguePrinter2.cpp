@@ -274,6 +274,7 @@ void DialoguePrinter2::SetText
 	char const* i_text
 )
 {
+	m_doneAllText = false;
 	m_curText = i_text;
 	m_curTextLen = std::strlen(i_text);
 	m_curTextIndex = 0;
@@ -283,26 +284,46 @@ void DialoguePrinter2::SetText
 }
 
 //------------------------------------------------------------------------------
-bool DialoguePrinter2::Update()
+void DialoguePrinter2::Update()
 {
-	if (m_curText && m_curTextIndex < m_curTextLen)
+	if (!m_curText || m_curTextIndex >= m_curTextLen)
 	{
-		bool const moreToDisplay = DrawChar();
-
-		if (!moreToDisplay && m_curTextIndex != m_curTextLen)
-		{
-			++m_arrowTimer;
-			if (m_arrowTimer >= c_arrowSpeed)
-			{
-				EditableSpriteData arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
-				arrowSpr.SetVisible(!arrowSpr.IsVisible());
-				m_arrowTimer = 0;
-			}
-		}
-
-		return !moreToDisplay && m_curTextIndex == m_curTextLen;
+		m_doneAllText = true;
+		return;
 	}
-	return true;
+
+	// TODO: properly controllable timer
+	static u16 time = 0;
+	if(time == 3)
+	{
+		time = 0;
+	}
+	else
+	{
+		++time;
+		return;
+	}
+
+	bool const moreToDisplay = DrawChar();
+
+	if (!moreToDisplay && m_curTextIndex != m_curTextLen)
+	{
+		++m_arrowTimer;
+		if (m_arrowTimer >= c_arrowSpeed)
+		{
+			EditableSpriteData arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
+			arrowSpr.SetVisible(!arrowSpr.IsVisible());
+			m_arrowTimer = 0;
+		}
+	}
+
+	m_doneAllText = !moreToDisplay && m_curTextIndex == m_curTextLen;
+}
+
+//------------------------------------------------------------------------------
+bool DialoguePrinter2::Done() const
+{
+	return m_doneAllText;
 }
 
 //------------------------------------------------------------------------------
