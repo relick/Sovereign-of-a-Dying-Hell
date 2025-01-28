@@ -202,8 +202,8 @@ void VNWorld::Run
 			{
 				if (ABCpressedThisFrame && m_printer.Done())
 				{
+					m_progressMode = ProgressMode::Always;
 					m_script->Update(io_game, *this);
-					//m_progressMode = ProgressMode::Always;
 				}
 				break;
 			}
