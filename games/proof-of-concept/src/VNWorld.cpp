@@ -23,7 +23,7 @@ consteval std::array<u16, 64*32> FillHighlightPlaneA()
 }
 
 constexpr std::array<u16, 64 * 32> c_highlightEmptyPlaneA = FillHighlightPlaneA();
-constexpr Palettes::RGB3Colour c_tintColour{ 0, 4, 7 }; // TODO: customisable by player/scene?
+constexpr Palettes::RGB3Colour c_tintColour{ 0, 2, 4 }; // TODO: customisable by player/scene?
 
 static u16 const* s_bgNormalPal{ palette_black };
 static u16 const* s_bgNamePal{ palette_black };
