@@ -5,9 +5,10 @@
 #define PALETTEFADE_FRACBITS    8
 #define PALETTEFADE_ROUND_VAL   ((1 << (PALETTEFADE_FRACBITS - 1)) - 1)
 
-namespace System
+namespace Palettes
 {
 
+//------------------------------------------------------------------------------
 FadeOp CreateFade
 (
 	u16* io_startDstPal,
@@ -55,6 +56,7 @@ FadeOp CreateFade
 	return newFade;
 }
 
+//------------------------------------------------------------------------------
 bool FadeOp::DoFadeStep
 (
 )

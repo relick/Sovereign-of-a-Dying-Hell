@@ -1,9 +1,10 @@
 #include "VNWorld.hpp"
 #include "Game.hpp"
-#include "Version.hpp"
-#include "PaletteOps.hpp"
 #include "Script.hpp"
+#include "Version.hpp"
 #include "FadeOps.hpp"
+#include "PaletteOps.hpp"
+#include "TileOps.hpp"
 
 #include <genesis.h>
 #include "res_fonts.h"
@@ -19,33 +20,6 @@ consteval std::array<u16, 64*32> FillHilightPlaneA()
 	std::array<u16, 64 * 32> arr;
 	arr.fill(TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 2047));
 	return arr;
-}
-
-void MinusOne(u16* i_dstPal, u16 const* i_srcPal)
-{
-	for (u8 i = 0; i < 16; ++i)
-	{
-		u8 const r = (i_srcPal[i] & VDPPALETTE_REDMASK) >> VDPPALETTE_REDSFT;
-		u8 const g = (i_srcPal[i] & VDPPALETTE_GREENMASK) >> VDPPALETTE_GREENSFT;
-		u8 const b = (i_srcPal[i] & VDPPALETTE_BLUEMASK) >> VDPPALETTE_BLUESFT;
-		i_dstPal[i] = RGB3_3_3_TO_VDPCOLOR(
-			(r > 0) ? r - 1 : 0,
-			(g > 0) ? g - 1 : 0,
-			(b > 0) ? b - 1 : 0
-		);
-	}
-}
-
-void Halve(u16* i_dstPal, u16 const* i_srcPal)
-{
-	for(u8 i = 0; i < 16; ++i)
-	{
-		i_dstPal[i] = RGB3_3_3_TO_VDPCOLOR(
-			(i_srcPal[i] & VDPPALETTE_REDMASK) >> (VDPPALETTE_REDSFT + 1),
-			(i_srcPal[i] & VDPPALETTE_GREENMASK) >> (VDPPALETTE_GREENSFT + 1),
-			(i_srcPal[i] & VDPPALETTE_BLUEMASK) >> (VDPPALETTE_BLUESFT + 1)
-		);
-	}
 }
 
 constexpr std::array<u16, 64 * 32> c_hilightEmptyPlaneA = FillHilightPlaneA();
@@ -65,25 +39,25 @@ void HInt_TextArea_Reset();
 
 void HInt_TextArea_SetName()
 {
-	SetBGTextFramePalette(s_bgNamePal);
-	SetCharTextFramePalette(s_charaNamePal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, false, c_textFramePos * 8 - 21, &HInt_TextArea_SetText>);
+	Palettes::SetBGTextFramePalette(s_bgNamePal);
+	Palettes::SetCharTextFramePalette(s_charaNamePal);
+	SYS_setHIntCallback(&Palettes::HInt_TextFrameDMA2<PAL0, PAL1, false, c_textFramePos * 8 - 21, &HInt_TextArea_SetText>);
 }
 
 void HInt_TextArea_SetText()
 {
-	SetBGTextFramePalette(s_bgTextPal);
-	SetCharTextFramePalette(s_charaTextPal);
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 - 1, &HInt_TextArea_Reset>);
+	Palettes::SetBGTextFramePalette(s_bgTextPal);
+	Palettes::SetCharTextFramePalette(s_charaTextPal);
+	SYS_setHIntCallback(&Palettes::HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 - 1, &HInt_TextArea_Reset>);
 }
 
 void HInt_TextArea_Reset()
 {
-	SetBGTextFramePalette(s_bgNormalPal);
-	SetCharTextFramePalette(s_charaNormalPal);
+	Palettes::SetBGTextFramePalette(s_bgNormalPal);
+	Palettes::SetCharTextFramePalette(s_charaNormalPal);
 
 	// TODO: fix this more robustly. If the Hint at the end is interrupted by Vint, the game basically falls over because of all the DMA going on
-	SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8 + 1, &HInt_TextArea_SetName>);
+	SYS_setHIntCallback(&Palettes::HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8 + 1, &HInt_TextArea_SetName>);
 	//SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 8, &HInt_TextArea_SetName>);
 }
 
@@ -95,232 +69,6 @@ VNWorld::VNWorld
 	: m_script{ std::move(i_script) }
 {
 	if (!m_script) { Error("Must provide a script to VNWorld"); }
-}
-
-// Based on VDP_setTileMapEx
-Task SetTileMap_Full(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
-{
-	//AutoProfileScope profile("SetTileMap_Full: %lu");
-
-	u16 const* src = (u16 const*)FAR_SAFE(tilemap, mulu(w, h) * 2);
-
-	// we can increment both index and palette
-	u16 const baseinc = basetile & (TILE_INDEX_MASK | TILE_ATTR_PALETTE_MASK);
-	// we can only do logical OR on priority and HV flip
-	u16 const baseor = basetile & (TILE_ATTR_PRIORITY_MASK | TILE_ATTR_VFLIP_MASK | TILE_ATTR_HFLIP_MASK);
-
-	u16 i = h;
-
-	// get temp buffer and schedule DMA
-	u16 const bufSize = mulu(planeWidth, h);
-
-	u16* buf = nullptr;
-	while (!(buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, planeAddr, bufSize, 2))))
-	{
-		co_yield{};
-	}
-
-	// Disable ints whilst we fill the DMA buffer
-	//SYS_disableInts();
-	u16 const bufInc = (planeWidth - w);
-
-	u16 const quarterWidth = w >> 2;
-
-	while (i--)
-	{
-		if (basetile != 0)
-		{
-			// then prepare data in buffer that will be transferred by DMA
-			u16 r = quarterWidth;
-
-			// prepare map data for row update
-			while (r--)
-			{
-				*buf++ = baseor | (*src++ + baseinc);
-				*buf++ = baseor | (*src++ + baseinc);
-				*buf++ = baseor | (*src++ + baseinc);
-				*buf++ = baseor | (*src++ + baseinc);
-			}
-
-			r = w & 3;
-			// prepare map data for row update
-			while (r--) *buf++ = baseor | (*src++ + baseinc);
-
-			buf += bufInc;
-		}
-		else
-		{
-			std::copy(src, src + w, buf);
-			src += w;
-			buf += planeWidth;
-		}
-	}
-
-	//SYS_enableInts();
-
-	co_return;
-}
-
-template<bool t_Down, u16 t_Speed = 4>
-Task SetTileMap_Wipe(u16 planeAddr, u16 const* tilemap, u16 w, u16 h, u16 basetile)
-{
-	//AutoProfileScope profile("SetTileMap_WipeDown: %lu");
-
-	u16 const* src = (u16 const*)FAR_SAFE(tilemap, mulu(w, h) * 2);
-
-	// we can increment both index and palette
-	u16 const baseinc = basetile & (TILE_INDEX_MASK | TILE_ATTR_PALETTE_MASK);
-	// we can only do logical OR on priority and HV flip
-	u16 const baseor = basetile & (TILE_ATTR_PRIORITY_MASK | TILE_ATTR_VFLIP_MASK | TILE_ATTR_HFLIP_MASK);
-
-	u16 i = h;
-
-	// Disable ints whilst we fill the DMA buffer
-	//SYS_disableInts();
-
-	u16 const quarterWidth = w >> 2;
-
-	u16 rowsDone = 0;
-
-	if constexpr (t_Down)
-	{
-		u16 addr = planeAddr;
-		u16 const addrInc = planeWidth * 2;
-
-		while (i--)
-		{
-			// get temp buffer and schedule DMA
-			u16* buf = nullptr;
-			while (!(buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, addr, w, 2))))
-			{
-				co_yield{};
-			}
-
-			if (basetile != 0)
-			{
-				// then prepare data in buffer that will be transferred by DMA
-				u16 r = quarterWidth;
-
-				// prepare map data for row update
-				while (r--)
-				{
-					*buf++ = baseor | (*src++ + baseinc);
-					*buf++ = baseor | (*src++ + baseinc);
-					*buf++ = baseor | (*src++ + baseinc);
-					*buf++ = baseor | (*src++ + baseinc);
-				}
-
-				r = w & 3;
-				// prepare map data for row update
-				while (r--) *buf++ = baseor | (*src++ + baseinc);
-			}
-			else
-			{
-				std::copy(src, src + w, buf);
-				src += w;
-			}
-
-			addr += addrInc;
-
-			++rowsDone;
-			if (rowsDone >= t_Speed)
-			{
-				rowsDone = 0;
-				co_yield{};
-			}
-		}
-	}
-	else
-	{
-		u16 addr = planeAddr + (planeWidth * (h - 1) * 2);
-		u16 const addrDec = planeWidth * 2;
-
-		src += mulu(w, h - 1);
-		u16 const srcDec = w * 2;
-
-		while (i--)
-		{
-			// get temp buffer and schedule DMA
-			u16* buf = nullptr;
-			while (!(buf = static_cast<u16*>(DMA_allocateAndQueueDma(DMA_VRAM, addr, w, 2))))
-			{
-				co_yield{};
-			}
-
-			if (basetile != 0)
-			{
-				// then prepare data in buffer that will be transferred by DMA
-				u16 r = quarterWidth;
-
-				// prepare map data for row update
-				while (r--)
-				{
-					*buf++ = baseor | (*src++ + baseinc);
-					*buf++ = baseor | (*src++ + baseinc);
-					*buf++ = baseor | (*src++ + baseinc);
-					*buf++ = baseor | (*src++ + baseinc);
-				}
-
-				r = w & 3;
-				// prepare map data for row update
-				while (r--) *buf++ = baseor | (*src++ + baseinc);
-
-				src -= srcDec;
-			}
-			else
-			{
-				std::copy(src, src + w, buf);
-				src -= w;
-			}
-
-			addr -= addrDec;
-
-			++rowsDone;
-			if (rowsDone >= t_Speed)
-			{
-				rowsDone = 0;
-				co_yield{};
-			}
-		}
-	}
-
-	//SYS_enableInts();
-
-	co_return;
-}
-
-// Based on VDP_drawImageEx in part
-Task FastTilesLoad(const Image* image, u16 basetile)
-{
-	//AutoProfileScope profile("FastTilesLoad: %lu");
-	u16 constexpr chunkShift = 5;
-	u16 constexpr chunkSize = 1 << chunkShift;
-
-	u16 const tileChunks = image->tileset->numTile >> chunkShift;
-	u16 const baseTileIndex = basetile & TILE_INDEX_MASK;
-	u16 tileIndex = baseTileIndex << 5;
-	u16 tileInc = 1 << (chunkShift + 5);
-	u32 const* srcTiles = image->tileset->tiles;
-	u16 srcTilesInc = 1 << (chunkShift + 3);
-	for(u16 i = 0; i < tileChunks; ++i)
-	{
-		while (!DMA_queueDma(DMA_VRAM, (void*)srcTiles, tileIndex, chunkSize * 16, 2))
-		{
-			co_yield {};
-		}
-		srcTiles += srcTilesInc;
-		tileIndex += tileInc;
-	}
-	u16 const remainder = image->tileset->numTile - (tileChunks << chunkShift);
-	if (remainder > 0)
-	{
-		while (!DMA_queueDma(DMA_VRAM, (void*)srcTiles, tileIndex, remainder * 16, 2))
-		{
-			co_yield {};
-		}
-	}
-
-	co_return;
 }
 
 //------------------------------------------------------------------------------
@@ -460,9 +208,9 @@ void VNWorld::SetBG
 	m_nextBG = &i_bg;
 	io_game.QueueLambdaTask([this] -> Task {
 		{
-			System::FadeOp fadeOp1 = System::CreateFade(m_mainPals.data(), palette_black, 16, FramesPerSecond() >> 1);
-			System::FadeOp fadeOp2 = System::CreateFade(m_namePals.data(), palette_black, 16, FramesPerSecond() >> 1);
-			System::FadeOp fadeOp3 = System::CreateFade(m_textPals.data(), palette_black, 16, FramesPerSecond() >> 1);
+			Palettes::FadeOp fadeOp1 = Palettes::CreateFade(m_mainPals.data(), palette_black, 16, FramesPerSecond() >> 1);
+			Palettes::FadeOp fadeOp2 = Palettes::CreateFade(m_namePals.data(), palette_black, 16, FramesPerSecond() >> 1);
+			Palettes::FadeOp fadeOp3 = Palettes::CreateFade(m_textPals.data(), palette_black, 16, FramesPerSecond() >> 1);
 
 			while (fadeOp1)
 			{
@@ -475,8 +223,14 @@ void VNWorld::SetBG
 
 		co_return;
 	});
-	io_game.QueueFunctionTask(FastTilesLoad(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
-	io_game.QueueFunctionTask(SetTileMap_Full(VDP_BG_B, m_nextBG->tilemap->tilemap, m_nextBG->tilemap->w, m_nextBG->tilemap->h, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(m_nextBG, TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)));
+	io_game.QueueFunctionTask(Tiles::SetMap_Full(
+		VDP_BG_B,
+		m_nextBG->tilemap->tilemap,
+		m_nextBG->tilemap->w,
+		m_nextBG->tilemap->h,
+		TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)
+	));
 	io_game.QueueLambdaTask([this]() -> Task {
 		m_bgSrcPal = m_nextBG->palette->data;
 
@@ -484,12 +238,12 @@ void VNWorld::SetBG
 			std::array<u16, 16> namePal;
 			std::array<u16, 16> textPal;
 
-			Halve(namePal.data(), m_bgSrcPal);
-			MinusOne(textPal.data(), namePal.data());
+			Palettes::Halve(namePal.data(), m_bgSrcPal);
+			Palettes::MinusOne(textPal.data(), namePal.data());
 
-			System::FadeOp fadeOp1 = System::CreateFade(m_mainPals.data(), m_bgSrcPal, 16, FramesPerSecond() >> 1);
-			System::FadeOp fadeOp2 = System::CreateFade(m_namePals.data(), namePal.data(), 16, FramesPerSecond() >> 1);
-			System::FadeOp fadeOp3 = System::CreateFade(m_textPals.data(), textPal.data(), 16, FramesPerSecond() >> 1);
+			Palettes::FadeOp fadeOp1 = Palettes::CreateFade(m_mainPals.data(), m_bgSrcPal, 16, FramesPerSecond() >> 1);
+			Palettes::FadeOp fadeOp2 = Palettes::CreateFade(m_namePals.data(), namePal.data(), 16, FramesPerSecond() >> 1);
+			Palettes::FadeOp fadeOp3 = Palettes::CreateFade(m_textPals.data(), textPal.data(), 16, FramesPerSecond() >> 1);
 
 			while (fadeOp1)
 			{
@@ -512,9 +266,9 @@ void VNWorld::BlackBG
 )
 {
 	io_game.QueueLambdaTask([this] -> Task {
-		System::FadeOp fadeOp1 = System::CreateFade(m_mainPals.data(), palette_black, 16, FramesPerSecond() >> 2);
-		System::FadeOp fadeOp2 = System::CreateFade(m_namePals.data(), palette_black, 16, FramesPerSecond() >> 2);
-		System::FadeOp fadeOp3 = System::CreateFade(m_textPals.data(), palette_black, 16, FramesPerSecond() >> 2);
+		Palettes::FadeOp fadeOp1 = Palettes::CreateFade(m_mainPals.data(), palette_black, 16, FramesPerSecond() >> 2);
+		Palettes::FadeOp fadeOp2 = Palettes::CreateFade(m_namePals.data(), palette_black, 16, FramesPerSecond() >> 2);
+		Palettes::FadeOp fadeOp3 = Palettes::CreateFade(m_textPals.data(), palette_black, 16, FramesPerSecond() >> 2);
 
 		while (fadeOp1)
 		{
@@ -547,13 +301,13 @@ void VNWorld::SetCharacter
 			m_charaSrcPal = m_nextPose->m_image->palette->data;
 
 			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
-			Halve(m_namePals.data() + 16, m_mainPals.data() + 16);
-			MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
+			Palettes::Halve(m_namePals.data() + 16, m_mainPals.data() + 16);
+			Palettes::MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
 
 			co_return;
 		});
-		io_game.QueueFunctionTask(FastTilesLoad(m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
-		io_game.QueueFunctionTask(SetTileMap_Wipe<false>(VDP_BG_A, m_nextPose->m_image->tilemap->tilemap, m_nextPose->m_image->tilemap->w, m_nextPose->m_image->tilemap->h, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
+		io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(m_nextPose->m_image, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
+		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(VDP_BG_A, m_nextPose->m_image->tilemap->tilemap, m_nextPose->m_image->tilemap->w, m_nextPose->m_image->tilemap->h, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)));
 		io_game.QueueLambdaTask([this] -> Task {
 			m_nextPose = nullptr;
 			co_return;
@@ -583,7 +337,7 @@ void VNWorld::HideCharacter
 	}
 	else
 	{
-		io_game.QueueFunctionTask(SetTileMap_Wipe<true>(VDP_BG_A, c_hilightEmptyPlaneA.data(), 40, 28, 0));
+		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Down>(VDP_BG_A, c_hilightEmptyPlaneA.data(), 40, 28, 0));
 	}
 }
 

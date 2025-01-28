@@ -5,7 +5,7 @@
 #include <array>
 #include <optional>
 
-namespace System
+namespace Palettes
 {
 
 struct FadeOp
