@@ -276,8 +276,8 @@ void VNWorld::SetBG
 		co_return;
 	});
 	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
-		m_nextBG,
-		TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)
+		m_nextBG->tileset,
+		0
 	));
 	io_game.QueueFunctionTask(Tiles::SetMap_Full(
 		VDP_BG_B,
@@ -361,16 +361,17 @@ void VNWorld::SetCharacter
 
 			co_return;
 		});
+		u16 const tileIndex = 1536 - m_nextPose->m_image->tileset->numTile;
 		io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
-			m_nextPose->m_image,
-			TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)
+			m_nextPose->m_image->tileset,
+			tileIndex
 		));
 		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
 			VDP_BG_A,
 			m_nextPose->m_image->tilemap->tilemap,
 			m_nextPose->m_image->tilemap->w,
 			m_nextPose->m_image->tilemap->h,
-			TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 1536 - m_nextPose->m_image->tileset->numTile)
+			TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex)
 		));
 		io_game.QueueLambdaTask([this] -> Task {
 			m_nextPose = nullptr;

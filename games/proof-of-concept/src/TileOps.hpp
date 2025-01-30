@@ -181,16 +181,20 @@ Game::Task SetMap_Wipe
 // Based on VDP_drawImageEx in part
 //------------------------------------------------------------------------------
 template<u16 t_ChunkShift = 5> // shift 5 => 32 tile chunks
-Game::Task LoadTiles_Chunked(const Image* image, u16 basetile)
+Game::Task LoadTiles_Chunked
+(
+	TileSet const* i_tileset,
+	u16 i_tileIndex
+)
 {
 	//AutoProfileScope profile("LoadTiles_Chunked: %lu");
 	u16 constexpr chunkSize = 1 << t_ChunkShift;
 
-	u16 const tileChunks = image->tileset->numTile >> t_ChunkShift;
-	u16 const baseTileIndex = basetile & TILE_INDEX_MASK;
+	u16 const tileChunks = i_tileset->numTile >> t_ChunkShift;
+	u16 const baseTileIndex = i_tileIndex & TILE_INDEX_MASK;
 	u16 tileIndex = baseTileIndex << 5;
 	u16 tileInc = 1 << (t_ChunkShift + 5);
-	u32 const* srcTiles = image->tileset->tiles;
+	u32 const* srcTiles = i_tileset->tiles;
 	u16 srcTilesInc = 1 << (t_ChunkShift + 3);
 	for(u16 i = 0; i < tileChunks; ++i)
 	{
@@ -201,7 +205,7 @@ Game::Task LoadTiles_Chunked(const Image* image, u16 basetile)
 		srcTiles += srcTilesInc;
 		tileIndex += tileInc;
 	}
-	u16 const remainder = image->tileset->numTile - (tileChunks << t_ChunkShift);
+	u16 const remainder = i_tileset->numTile - (tileChunks << t_ChunkShift);
 	if (remainder > 0)
 	{
 		while (!DMA_queueDma(DMA_VRAM, (void*)srcTiles, tileIndex, remainder * 16, 2))
