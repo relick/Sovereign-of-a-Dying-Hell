@@ -79,8 +79,8 @@ class DialoguePrinter2
 
 public:
 	// Sets up tiles and tilemap
-	void Init(Game& io_game, TileSet const& i_textFont, TileSet const& i_nameFont);
-	void Shutdown();
+	DialoguePrinter2(Game& io_game, TileSet const& i_textFont, TileSet const& i_nameFont);
+	~DialoguePrinter2();
 
 	void SetName(char const* i_name, bool i_left);
 	void SetText(char const *i_text);

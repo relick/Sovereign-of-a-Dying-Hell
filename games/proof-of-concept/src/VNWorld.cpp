@@ -96,8 +96,6 @@ WorldRoutine VNWorld::Init
 	VDP_setHIntCounter(1);
 	VDP_setHInterrupt(true);
 
-	m_printer.Init(io_game, vn_font, name_font);
-
 	std::array<u16, 64> blackWithTextPal = { 0 };
 	std::copy(text_font_pal.data, text_font_pal.data + 16, blackWithTextPal.begin() + 48);
 	PAL_setColors(0, blackWithTextPal.data(), 64, DMA_QUEUE_COPY);
@@ -126,8 +124,7 @@ WorldRoutine VNWorld::Shutdown
 
 	SYS_setHIntCallback(nullptr);
 	VDP_setHInterrupt(false);
-	m_printer.Shutdown();
-
+	
 	co_return;
 }
 
@@ -159,7 +156,7 @@ void VNWorld::Run
 		return false;
 	}();
 
-	switch (m_sceneMode)
+	switch (static_cast<SceneMode>(m_sceneMode.index()))
 	{
 		case SceneMode::None:
 		{
@@ -169,11 +166,11 @@ void VNWorld::Run
 		{
 			if (ABCpressedThisFrame)
 			{
-				m_printer.Next();
+				Get<SceneMode::Dialogue>().Next();
 			}
 			else
 			{
-				m_printer.Update();
+				Get<SceneMode::Dialogue>().Update();
 			}
 			break;
 		}
@@ -200,7 +197,7 @@ void VNWorld::Run
 			}
 			case ProgressMode::Dialogue:
 			{
-				if (ABCpressedThisFrame && m_printer.Done())
+				if (ABCpressedThisFrame && Get<SceneMode::Dialogue>().Done())
 				{
 					m_progressMode = ProgressMode::Always;
 					m_script->Update(io_game, *this);
@@ -413,30 +410,64 @@ void VNWorld::HideCharacter
 }
 
 //------------------------------------------------------------------------------
-void VNWorld::SetCharName
-(
-	CharacterID i_charID
-)
-{
-	auto const chara = m_characters.GetCharacter(i_charID);
-	if (chara)
-	{
-		m_printer.SetName(chara->m_displayName, chara->m_showOnLeft);
-	}
-	else
-	{
-		m_printer.SetName(nullptr, true);
-	}
-}
-
-//------------------------------------------------------------------------------
 void VNWorld::SetText
 (
+	Game& io_game,
+	CharacterID i_charID,
 	char const* i_text
 )
 {
+	TransitionTo(io_game, SceneMode::Dialogue);
 	m_progressMode = ProgressMode::Dialogue;
-	m_printer.SetText(i_text);
+	
+	auto const chara = m_characters.GetCharacter(i_charID);
+	if (chara)
+	{
+		Get<SceneMode::Dialogue>().SetName(chara->m_displayName, chara->m_showOnLeft);
+	}
+	else
+	{
+		Get<SceneMode::Dialogue>().SetName(nullptr, true);
+	}
+
+	Get<SceneMode::Dialogue>().SetText(i_text);
+}
+
+//------------------------------------------------------------------------------
+void VNWorld::TransitionTo
+(
+	Game& io_game,
+	SceneMode i_sceneMode
+)
+{
+	if (static_cast<u8>(i_sceneMode) == m_sceneMode.index())
+	{
+		return;
+	}
+
+	switch (i_sceneMode)
+	{
+		case SceneMode::None:
+		{
+			m_sceneMode.emplace<static_cast<u8>(SceneMode::None)>();
+			break;
+		}
+		case SceneMode::Dialogue:
+		{
+			m_sceneMode.emplace<static_cast<u8>(SceneMode::Dialogue)>(io_game, vn_font, name_font);
+			break;
+		}
+		case SceneMode::Choice:
+		{
+			m_sceneMode.emplace<static_cast<u8>(SceneMode::Choice)>();
+			break;
+		}
+		case SceneMode::Settings:
+		{
+			m_sceneMode.emplace<static_cast<u8>(SceneMode::Settings)>();
+			break;
+		}
+	}
 }
 
 }

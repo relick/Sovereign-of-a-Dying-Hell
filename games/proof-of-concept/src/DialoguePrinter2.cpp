@@ -36,7 +36,7 @@ inline constexpr u16 c_lineIndent = 1;
 inline constexpr u8 c_arrowSpeed = 2; // Number of updates between arrow flashes i.e. higher number = longer.
 
 //------------------------------------------------------------------------------
-void DialoguePrinter2::Init
+DialoguePrinter2::DialoguePrinter2
 (
 	Game& io_game,
 	TileSet const &i_textFont,
@@ -112,7 +112,7 @@ void DialoguePrinter2::Init
 }
 
 //------------------------------------------------------------------------------
-void DialoguePrinter2::Shutdown
+DialoguePrinter2::~DialoguePrinter2
 (
 )
 {

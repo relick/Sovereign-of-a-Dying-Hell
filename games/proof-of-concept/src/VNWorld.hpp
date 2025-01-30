@@ -11,6 +11,7 @@
 
 #include <array>
 #include <memory>
+#include <variant>
 
 namespace Game
 {
@@ -19,7 +20,6 @@ class VNWorld
 	: public World
 {
 	CharacterData m_characters;
-	DialoguePrinter2 m_printer;
 
 	std::unique_ptr<Script> m_script;
 
@@ -35,17 +35,23 @@ class VNWorld
 	u8 m_waitingForTasksStack{ 0 };
 
 	// Mostly changes which subsystem is active/allows transitions - should be mutually exclusive
-	enum class SceneMode
+	enum class SceneMode : u8
 	{
 		None,
 		Dialogue,
 		Choice,
 		Settings,
 	};
-	SceneMode m_sceneMode{ SceneMode::Dialogue };
+	using SceneModeVar = std::variant<
+		std::monostate,
+		DialoguePrinter2,
+		std::monostate,
+		std::monostate
+	>;
+	SceneModeVar m_sceneMode;
 
 	// Determines how the scene routine is progressed
-	enum class ProgressMode
+	enum class ProgressMode : u8
 	{
 		Always, // Reset to this after progress made via any way. In particular used by wait_for_tasks()
 		Dialogue, // Waits for dialogue printer to indicate progress can happen, and player to progress
@@ -70,8 +76,15 @@ public:
 	void BlackBG(Game& io_game);
 	void SetCharacter(Game& io_game, CharacterID i_charID, PoseID i_poseID);
 	void HideCharacter(Game& io_game, bool i_fast);
-	void SetCharName(CharacterID i_charID);
-	void SetText(char const* i_text);
+	void SetText(Game& io_game, CharacterID i_charID, char const* i_text);
+
+	void TransitionTo(Game& io_game, SceneMode i_sceneMode);
+
+	template<SceneMode t_SceneMode>
+	auto Get() -> decltype(std::get<static_cast<u8>(t_SceneMode)>(m_sceneMode))
+	{
+		return std::get<static_cast<u8>(t_SceneMode)>(m_sceneMode);
+	}
 };
 
 }
