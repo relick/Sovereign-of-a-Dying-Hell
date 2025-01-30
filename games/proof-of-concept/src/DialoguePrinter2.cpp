@@ -46,9 +46,11 @@ DialoguePrinter2::DialoguePrinter2
 	m_game = &io_game;
 
 	// Queue cleared tiles
+	// TODO: does this need chunking?
 	VDP_fillTileData(0, c_textTilesIndex, m_tiles.size(), true);
 
 	// Parse font for widths up front
+	// TODO: this could be done externally from this constructor, under some sort of universal font manager
 	m_textFont = &i_textFont;
 	u16 srcIndex = 0;
 	for(u16 i = 0; i < m_textFontData.size(); ++i)
