@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Declare.hpp"
-#include "Constants.hpp"
-#include "Worlds.hpp"
-#include "DialoguePrinter2.hpp"
 #include "CharacterData.hpp"
+#include "Constants.hpp"
 #include "Debug.hpp"
+#include "DialoguePrinter2.hpp"
+#include "FontData.hpp"
+#include "Worlds.hpp"
 
 #include <genesis.h>
 
@@ -20,6 +21,7 @@ class VNWorld
 	: public World
 {
 	CharacterData m_characters;
+	FontData m_fonts;
 
 	std::unique_ptr<Script> m_script;
 

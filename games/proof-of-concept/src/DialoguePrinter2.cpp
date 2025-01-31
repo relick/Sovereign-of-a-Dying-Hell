@@ -1,8 +1,10 @@
 #include "DialoguePrinter2.hpp"
+
 #include "Constants.hpp"
+#include "Debug.hpp"
+#include "FontData.hpp"
 #include "Game.hpp"
 #include "SpriteManager.hpp"
-#include "Debug.hpp"
 
 #include <genesis.h>
 #include "res_spr.h"
@@ -24,7 +26,6 @@ inline constexpr u16 c_textTilesIndex = c_textTilesAddress / 32;
 inline constexpr u16 c_nameTilesIndex = c_textTilesIndex + c_textTileCount;
 inline constexpr u16 c_nameTilesAddress = c_nameTilesIndex * 32;
 
-inline constexpr u16 c_nameFontOffset = 26 * 8;
 inline constexpr u16 c_namePosSide = 10;
 inline constexpr s16 c_namePosDown = -10;
 
@@ -39,45 +40,14 @@ inline constexpr u8 c_arrowSpeed = 2; // Number of updates between arrow flashes
 DialoguePrinter2::DialoguePrinter2
 (
 	Game& io_game,
-	TileSet const &i_textFont,
-	TileSet const &i_nameFont
+	FontData const& i_fonts
 )
+	: m_game{ &io_game }
+	, m_fonts{ &i_fonts }
 {
-	m_game = &io_game;
-
 	// Queue cleared tiles
 	// TODO: does this need chunking?
 	VDP_fillTileData(0, c_textTilesIndex, m_tiles.size(), true);
-
-	// Parse font for widths up front
-	// TODO: this could be done externally from this constructor, under some sort of universal font manager
-	m_textFont = &i_textFont;
-	u16 srcIndex = 0;
-	for(u16 i = 0; i < m_textFontData.size(); ++i)
-	{
-		m_textFontData[i].m_srcIndex = srcIndex;
-		m_textFontData[i].m_charWidth = 0;
-		for (u16 t = 0; t < 8; ++t, ++srcIndex)
-		{
-			u32 row = m_textFont->tiles[srcIndex];
-			s8 width = 8;
-			while((row & 0xF) == 0 && width > 0)
-			{
-				--width;
-				row >>= 4;
-			}
-			if (m_textFontData[i].m_charWidth < width)
-			{
-				m_textFontData[i].m_charWidth = width;
-			}
-		}
-	}
-
-	m_nameFont = &i_nameFont;
-	for(u16 i = 0; i < m_nameFontData.size(); ++i)
-	{
-		m_nameFontData[i] = i * 8;
-	}
 
 	SetupSprites();
 
@@ -89,7 +59,7 @@ DialoguePrinter2::DialoguePrinter2
 					DMA_VRAM,
 					m_tiles.data() + c_textTileCount,
 					c_nameTilesAddress,
-					c_nameTileCount * (sizeof(Tile) >> 1),
+					c_nameTileCount * (sizeof(Tiles::Tile) >> 1),
 					2
 				);
 
@@ -101,8 +71,8 @@ DialoguePrinter2::DialoguePrinter2
 				DMA_doDmaFast(
 					DMA_VRAM,
 					m_tiles.data() + m_lineTileRefreshStart,
-					c_textTilesAddress + (sizeof(Tile) * m_lineTileRefreshStart),
-					(1 + m_lineTileRefreshEnd - m_lineTileRefreshStart) * (sizeof(Tile) >> 1),
+					c_textTilesAddress + (sizeof(Tiles::Tile) * m_lineTileRefreshStart),
+					(1 + m_lineTileRefreshEnd - m_lineTileRefreshStart) * (sizeof(Tiles::Tile) >> 1),
 					2
 				);
 
@@ -222,7 +192,7 @@ void DialoguePrinter2::SetName
 	m_curName = i_name;
 
 	// Clear current name
-	std::fill(m_tiles.begin() + c_textTileCount, m_tiles.end(), Tile{});
+	std::fill(m_tiles.begin() + c_textTileCount, m_tiles.end(), Tiles::Tile{});
 
 	QueueNameDMA();
 
@@ -243,10 +213,10 @@ void DialoguePrinter2::SetName
 
 		if (curChar >= 'A' && curChar <= 'Z')
 		{
-			u16 const srcIndexUpper = m_nameFontData[curChar - 'A'];
-			u16 const srcIndexLower = srcIndexUpper + c_nameFontOffset;
-			std::memcpy(&(m_tiles[c_textTileCount + (limit++)]), m_nameFont->tiles + srcIndexUpper, sizeof(Tile));
-			std::memcpy(&(m_tiles[c_textTileCount + limit]), m_nameFont->tiles + srcIndexLower, sizeof(Tile));
+			auto const [upperTile, lowerTile] = m_fonts->GetVNNameFontTiles(curChar);
+
+			m_tiles[c_textTileCount + (limit++)] = *upperTile;
+			m_tiles[c_textTileCount + limit] = *lowerTile;
 		}
 
 		++i_name;
@@ -353,7 +323,7 @@ void DialoguePrinter2::Next()
 		}
 
 		// Can't print any more already, so move to next
-		std::fill(m_tiles.begin(), m_tiles.begin() + c_textTileCount, Tile{});
+		std::fill(m_tiles.begin(), m_tiles.begin() + c_textTileCount, Tiles::Tile{});
 		m_lineTileRefreshStart = 0;
 		m_lineTileRefreshEnd = c_textTileCount;
 		m_x = 0;
@@ -421,7 +391,7 @@ bool DialoguePrinter2::DrawChar
 	// Main logic for stepping through and deciding how our display progresses
 	if (m_curTextIndex == 0)
 	{
-		std::fill(m_tiles.begin(), m_tiles.begin() + c_textTileCount, Tile{});
+		std::fill(m_tiles.begin(), m_tiles.begin() + c_textTileCount, Tiles::Tile{});
 		m_lineTileRefreshStart = 0;
 		m_lineTileRefreshEnd = c_textTileCount;
 	}
@@ -433,8 +403,7 @@ bool DialoguePrinter2::DrawChar
 		u16 wordLen = 0;
 		while (*word != ' ' && *word != '\n' && *word != '\0')
 		{
-			wordLen += m_textFontData[*word - 32].m_charWidth;
-			++word;
+			wordLen += m_fonts->GetVNTextFontCharWidth(*word++);
 		}
 
 		if(m_x + wordLen >= c_lineWidth * c_pixelsPerTile)
@@ -470,14 +439,15 @@ bool DialoguePrinter2::DrawChar
 		return m_y < c_lineCount;
 	}
 
-	u8 charFontDataI = curChar - 32;
+	u32 const* curCharTileRows = m_fonts->GetVNTextFontTile(curChar)->AsRawRows();
+	u8 const curCharWidth = m_fonts->GetVNTextFontCharWidth(curChar);
 
 	// Blit!
 	if (curChar != ' ')
 	{
 		// Whilst we have 8 pixel tall text that aligns with the tiles, a character spans 2 tiles generally. So we'll do left tile, then right tile
 		u16 const tileInd = (m_y * c_lineWidth) + (m_x >> 3);
-		u32 *const leftTile = (u32 *)&(m_tiles[tileInd].m_pixels);
+		u32* const leftTile = m_tiles[tileInd].AsRawRows();
 
 
 		// So for the left tile, we need to just shift the font data to the right by the amount of pixels m_x is in to the tile
@@ -485,23 +455,23 @@ bool DialoguePrinter2::DrawChar
 		u16 const shift = leftTilePixels << 2;
 		for (u8 i = 0; i < 8; ++i)
 		{
-			leftTile[i] |= m_textFont->tiles[m_textFontData[charFontDataI].m_srcIndex + i] >> shift;
+			leftTile[i] |= curCharTileRows[i] >> shift;
 		}
 		QueueCharacterDMA(tileInd);
 
 		u16 const used = c_pixelsPerTile - leftTilePixels;
-		if (used < m_textFontData[charFontDataI].m_charWidth)
+		if (used < curCharWidth)
 		{
-			u32 *const rightTile = (u32 *)&(m_tiles[tileInd + 1].m_pixels);
+			u32* const rightTile = m_tiles[tileInd + 1].AsRawRows();
 			u16 antiShift = used << 2;
 			for(u8 i = 0; i < 8; ++i)
 			{
-				rightTile[i] |= m_textFont->tiles[m_textFontData[charFontDataI].m_srcIndex + i] << antiShift;
+				rightTile[i] |= curCharTileRows[i] << antiShift;
 			}
 			QueueCharacterDMA(tileInd + 1);
 		}
 
-		m_x += m_textFontData[charFontDataI].m_charWidth;
+		m_x += curCharWidth;
 	}
 	else if (m_x > 0)
 	{

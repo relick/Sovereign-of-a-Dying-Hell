@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 #include "GameRoutines.hpp"
+#include "TileData.hpp"
 
 #include <genesis.h>
 
@@ -193,9 +194,9 @@ Game::Task LoadTiles_Chunked
 	u16 const tileChunks = i_tileset->numTile >> t_ChunkShift;
 	u16 const baseTileIndex = i_tileIndex & TILE_INDEX_MASK;
 	u16 tileIndex = baseTileIndex << 5;
-	u16 tileInc = 1 << (t_ChunkShift + 5);
-	u32 const* srcTiles = i_tileset->tiles;
-	u16 srcTilesInc = 1 << (t_ChunkShift + 3);
+	u16 const tileInc = 1 << (t_ChunkShift + 5);
+	Tile const* srcTiles = AsTiles(i_tileset->tiles);
+	u16 const srcTilesInc = chunkSize;
 	for(u16 i = 0; i < tileChunks; ++i)
 	{
 		while (!DMA_queueDma(DMA_VRAM, (void*)srcTiles, tileIndex, chunkSize * 16, 2))

@@ -67,7 +67,8 @@ VNWorld::VNWorld
 (
 	std::unique_ptr<Script>&& i_script
 )
-	: m_script{ std::move(i_script) }
+	: m_fonts{ vn_font, name_font }
+	, m_script{ std::move(i_script) }
 {
 	if (!m_script) { Error("Must provide a script to VNWorld"); }
 }
@@ -454,7 +455,7 @@ void VNWorld::TransitionTo
 		}
 		case SceneMode::Dialogue:
 		{
-			m_sceneMode.emplace<static_cast<u8>(SceneMode::Dialogue)>(io_game, vn_font, name_font);
+			m_sceneMode.emplace<static_cast<u8>(SceneMode::Dialogue)>(io_game, m_fonts);
 			break;
 		}
 		case SceneMode::Choice:

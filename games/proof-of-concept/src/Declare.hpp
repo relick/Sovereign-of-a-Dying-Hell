@@ -14,13 +14,16 @@ namespace Game
 
 class Game;
 class World;
-class DialoguePrinter2;
 
 using CharacterID = u8;
 using PoseID = u8;
 struct Pose;
 struct Character;
 class CharacterData;
+
+class FontData;
+
+class DialoguePrinter2;
 
 class VNWorld;
 class Script;
