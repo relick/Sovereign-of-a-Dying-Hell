@@ -20,7 +20,7 @@ SCENE_RUN(forestShed_runningThroughWoods)
 
     scene(forest);
 
-    play_music(hallowbean_nature, 2.0, true);
+    //play_music(hallowbean_nature, 2.0, true);
 
     wait_for_tasks();
 
