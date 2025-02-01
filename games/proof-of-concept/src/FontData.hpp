@@ -29,8 +29,8 @@ class FontData
 	TileSet const* m_vnNameFont{nullptr};
 
 public:
-	// Sets up tiles and tilemap
-	FontData(
+	// Processes fonts
+	void Init(
 		TileSet const& i_vnTextFont,
 		TileSet const& i_vnNameFont
 	);

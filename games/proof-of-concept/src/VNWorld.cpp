@@ -67,8 +67,7 @@ VNWorld::VNWorld
 (
 	std::unique_ptr<Script>&& i_script
 )
-	: m_fonts{ vn_font, name_font }
-	, m_script{ std::move(i_script) }
+	: m_script{ std::move(i_script) }
 {
 	if (!m_script) { Error("Must provide a script to VNWorld"); }
 }
@@ -85,6 +84,8 @@ WorldRoutine VNWorld::Init
 
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
+
+	m_fonts.Init(vn_font, name_font);
 
 	// Show palette-based text frame
 	s_bgNormalPal = m_mainPals.data();

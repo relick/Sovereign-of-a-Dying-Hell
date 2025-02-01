@@ -4,14 +4,15 @@ namespace Game
 {
 
 //------------------------------------------------------------------------------
-FontData::FontData
+void FontData::Init
 (
 	TileSet const& i_vnTextFont,
 	TileSet const& i_vnNameFont
 )
-	: m_vnTextFont{ &i_vnTextFont }
-	, m_vnNameFont{ &i_vnNameFont }
 {
+	m_vnTextFont = &i_vnTextFont;
+	m_vnNameFont = &i_vnNameFont;
+
 	// Parse vn text font for characters widths
 	Tiles::Tile const* vnTextTile = Tiles::AsTiles(m_vnTextFont->tiles);
 	for(VariableWidthCharData& charData : m_vnTextFontAuxData)
