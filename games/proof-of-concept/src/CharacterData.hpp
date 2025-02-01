@@ -4,31 +4,46 @@
 
 #include <genesis.h>
 
+#include <array>
+#include <span>
 #include <vector>
 
 namespace Game
 {
 
+struct AnimFrame
+{
+	TileMap const* m_tilemap{ nullptr };
+	u16 m_frameDuration{ 0 }; // 0 => stay on this frame forever
+};
+
+template<size_t t_FrameCount>
+using Animation = std::array<AnimFrame, t_FrameCount>;
+
 struct Pose
 {
-	Image const* m_image{ nullptr };
+	TileSet const* m_tileset{ nullptr };
+	Palette const* m_palette{ nullptr };
+	std::span<AnimFrame const> m_animation;
 };
+
+template<size_t t_PoseCount>
+using Poses = std::array<Pose, t_PoseCount>;
 
 struct Character
 {
 	char const* m_displayName{ nullptr };
 	bool m_showOnLeft{ false };
-	std::vector<Pose> m_poses;
+	std::span<Pose const> m_poses;
 };
 
 // Simple data manager for scripts to dump into and the VN world to process
 class CharacterData
 {
-	std::vector<Character> m_characters;
+	std::vector<Character const*> m_characters;
 
 public:
-	CharacterID AddCharacter(char const* i_displayName, bool i_showOnLeft);
-	PoseID AddPose(CharacterID i_charID, Image const* i_image);
+	CharacterID AddCharacter(Character const* i_character);
 
 	void Clear();
 

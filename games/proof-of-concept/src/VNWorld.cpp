@@ -352,7 +352,7 @@ void VNWorld::SetCharacter
 		m_nextPose = pose;
 
 		io_game.QueueLambdaTask([this] -> Task {
-			m_charaSrcPal = m_nextPose->m_image->palette->data;
+			m_charaSrcPal = m_nextPose->m_palette->data;
 
 			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
 			Palettes::Tint(m_namePals.data() + 16, m_mainPals.data() + 16, c_tintColour);
@@ -360,16 +360,16 @@ void VNWorld::SetCharacter
 
 			co_return;
 		});
-		u16 const tileIndex = 1536 - m_nextPose->m_image->tileset->numTile;
+		u16 const tileIndex = 1536 - m_nextPose->m_tileset->numTile;
 		io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
-			m_nextPose->m_image->tileset,
+			m_nextPose->m_tileset,
 			tileIndex
 		));
 		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
 			VDP_BG_A,
-			m_nextPose->m_image->tilemap->tilemap,
-			m_nextPose->m_image->tilemap->w,
-			m_nextPose->m_image->tilemap->h,
+			m_nextPose->m_animation[0].m_tilemap->tilemap,
+			m_nextPose->m_animation[0].m_tilemap->w,
+			m_nextPose->m_animation[0].m_tilemap->h,
 			TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex)
 		));
 		io_game.QueueLambdaTask([this] -> Task {
