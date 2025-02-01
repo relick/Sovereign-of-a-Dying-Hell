@@ -159,57 +159,57 @@ void VNWorld::Run
 
 	switch (static_cast<SceneMode>(m_sceneMode.index()))
 	{
-		case SceneMode::None:
+	case SceneMode::None:
+	{
+		break;
+	}
+	case SceneMode::Dialogue:
+	{
+		if (ABCpressedThisFrame)
 		{
-			break;
+			Get<SceneMode::Dialogue>().Next();
 		}
-		case SceneMode::Dialogue:
+		else
 		{
-			if (ABCpressedThisFrame)
-			{
-				Get<SceneMode::Dialogue>().Next();
-			}
-			else
-			{
-				Get<SceneMode::Dialogue>().Update();
-			}
-			break;
+			Get<SceneMode::Dialogue>().Update();
 		}
-		case SceneMode::Choice:
-		{
-			// nyi
-			break;
-		}
-		case SceneMode::Settings:
-		{
-			// nyi
-			break;
-		}
+		break;
+	}
+	case SceneMode::Choice:
+	{
+		// nyi
+		break;
+	}
+	case SceneMode::Settings:
+	{
+		// nyi
+		break;
+	}
 	}
 
 	{
 		//AutoProfileScope profile("BuryYourGays_Script::Update: %lu");
 		switch (m_progressMode)
 		{
-			case ProgressMode::Always:
+		case ProgressMode::Always:
+		{
+			m_script->Update(io_game, *this);
+			break;
+		}
+		case ProgressMode::Dialogue:
+		{
+			if (ABCpressedThisFrame && Get<SceneMode::Dialogue>().Done())
 			{
+				m_progressMode = ProgressMode::Always;
 				m_script->Update(io_game, *this);
-				break;
 			}
-			case ProgressMode::Dialogue:
-			{
-				if (ABCpressedThisFrame && Get<SceneMode::Dialogue>().Done())
-				{
-					m_progressMode = ProgressMode::Always;
-					m_script->Update(io_game, *this);
-				}
-				break;
-			}
-			case ProgressMode::Choice:
-			{
-				// nyi
-				break;
-			}
+			break;
+		}
+		case ProgressMode::Choice:
+		{
+			// nyi
+			break;
+		}
 		}
 	}
 }
@@ -448,26 +448,26 @@ void VNWorld::TransitionTo
 
 	switch (i_sceneMode)
 	{
-		case SceneMode::None:
-		{
-			m_sceneMode.emplace<static_cast<u8>(SceneMode::None)>();
-			break;
-		}
-		case SceneMode::Dialogue:
-		{
-			m_sceneMode.emplace<static_cast<u8>(SceneMode::Dialogue)>(io_game, m_fonts);
-			break;
-		}
-		case SceneMode::Choice:
-		{
-			m_sceneMode.emplace<static_cast<u8>(SceneMode::Choice)>();
-			break;
-		}
-		case SceneMode::Settings:
-		{
-			m_sceneMode.emplace<static_cast<u8>(SceneMode::Settings)>();
-			break;
-		}
+	case SceneMode::None:
+	{
+		m_sceneMode.emplace<static_cast<u8>(SceneMode::None)>();
+		break;
+	}
+	case SceneMode::Dialogue:
+	{
+		m_sceneMode.emplace<static_cast<u8>(SceneMode::Dialogue)>(io_game, m_fonts);
+		break;
+	}
+	case SceneMode::Choice:
+	{
+		m_sceneMode.emplace<static_cast<u8>(SceneMode::Choice)>();
+		break;
+	}
+	case SceneMode::Settings:
+	{
+		m_sceneMode.emplace<static_cast<u8>(SceneMode::Settings)>();
+		break;
+	}
 	}
 }
 
