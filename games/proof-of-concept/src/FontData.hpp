@@ -11,7 +11,7 @@
 namespace Game
 {
 
-inline constexpr u16 c_vnNameFontOffset = 26 * 8;
+inline constexpr u16 c_vnNameFontLowerTileOffset = 26;
 
 //------------------------------------------------------------------------------
 /// Preprocesses and stores data about fonts for use by text rendering systems
@@ -41,7 +41,7 @@ public:
 	// Returns upper and lower tile
 	std::pair<Tiles::Tile const*, Tiles::Tile const*> GetVNNameFontTiles(char i_asciiChar) const {
 		Tiles::Tile const* upper = Tiles::AsTiles(m_vnNameFont->tiles) + (i_asciiChar - 'A');
-		return { upper, upper + c_vnNameFontOffset, };
+		return { upper, upper + c_vnNameFontLowerTileOffset, };
 	}
 };
 
