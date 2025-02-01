@@ -19,6 +19,9 @@ class DialoguePrinter2
 	Game* m_game{nullptr};
 	FontData const* m_fonts{nullptr};
 
+	bool m_vramInitialised{ false };
+	bool m_spritesInitialised{ false };
+
 	VBlankCallbackID m_dmaCallbackID{};
 
 	char const* m_curText{nullptr};

@@ -45,14 +45,23 @@ DialoguePrinter2::DialoguePrinter2
 	: m_game{ &io_game }
 	, m_fonts{ &i_fonts }
 {
-	// Queue cleared tiles
-	// TODO: does this need chunking?
-	VDP_fillTileData(0, c_textTilesIndex, m_tiles.size(), true);
-
-	SetupSprites();
-
 	m_dmaCallbackID = m_game->AddVBlankCallback(
-		[this]{
+		[this] {
+			// Wait for next frame if there are any tasks queued, to avoid piling too much DMA
+			// Text can be quite heavy!
+			if (m_game->TasksInProgress())
+			{
+				return;
+			}
+
+			// Must clear VRAM by DMA fill in the VBlank, otherwise it swallows up the whole frame
+			if (!m_vramInitialised)
+			{
+				VDP_fillTileData(0, c_textTilesIndex, m_tiles.size(), true);
+				m_vramInitialised = true;
+				return;
+			}
+
 			if(m_nameTileRefresh)
 			{
 				DMA_doDmaFast(
@@ -91,16 +100,19 @@ DialoguePrinter2::~DialoguePrinter2
 	// Remove vblank and sprites
 	m_game->RemoveVBlankCallback(m_dmaCallbackID);
 
-	// Should clean up even if the world will do it, in case we spawn and kill multiple DialoguePrinters!
-	for(SpriteID id : m_nameSprites)
+	if (m_spritesInitialised)
 	{
-		m_game->Sprites().RemoveSprite(id);
+		// Should clean up even if the world will do it, in case we spawn and kill multiple DialoguePrinters!
+		for(SpriteID id : m_nameSprites)
+		{
+			m_game->Sprites().RemoveSprite(id);
+		}
+		for(SpriteID id : m_textSprites)
+		{
+			m_game->Sprites().RemoveSprite(id);
+		}
+		m_game->Sprites().RemoveSprite(m_nextArrow);
 	}
-	for(SpriteID id : m_textSprites)
-	{
-		m_game->Sprites().RemoveSprite(id);
-	}
-	m_game->Sprites().RemoveSprite(m_nextArrow);
 }
 
 //------------------------------------------------------------------------------
@@ -258,6 +270,15 @@ void DialoguePrinter2::SetText
 //------------------------------------------------------------------------------
 void DialoguePrinter2::Update()
 {
+	if (!m_spritesInitialised)
+	{
+		if (m_vramInitialised)
+		{
+			SetupSprites();
+			m_spritesInitialised = true;
+		}
+	}
+
 	// TODO: properly controllable timer
 	static u16 time = 0;
 	if (time == 3)
