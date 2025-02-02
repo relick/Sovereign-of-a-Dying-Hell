@@ -23,7 +23,7 @@ SCENE_RUN(forestShed_runningThroughWoods)
 
     wait_for_tasks();
 
-    /*portrait(beans, tired);
+    portrait(beans, tired);
     think("I'm so tired... and my feet hurt...");
     think("It's getting dark so fast...");
     portrait(beans, shout);
@@ -46,7 +46,7 @@ SCENE_RUN(forestShed_runningThroughWoods)
     think("How am I meant to keep up with a champion cheerleader?");
     hide();
 
-    wait_for_tasks();*/
+    wait_for_tasks();
 
     portrait(beans, tired);
     think("I can barely see where I'm putting my feet!");
@@ -58,8 +58,8 @@ SCENE_RUN(forestShed_runningThroughWoods)
         "Avoid the obstacles!",
         "Stumble on a fallen branch!",
     };
-    std::optional<u16> const tripResult;
     timed_choice(3.0, tripChoices);
+    std::optional<u8> const tripResult = get_timed_choice_result();
 
 #define trip(object) portrait(beans, shout); vpunch(); say(beans, "OOF-"); think("That " object " came out of nowhere!"); hide_portrait()
 
