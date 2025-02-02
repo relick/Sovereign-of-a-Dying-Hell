@@ -9,7 +9,7 @@ namespace TestZanmu
 {
 
 inline constexpr Game::AnimFrames<5> c_zanmu_blink_anim = { {
-	{ &zanmu_blink_1, 287, },
+	{ &zanmu_blink_1, 47, },
 	{ &zanmu_blink_2, 4, },
 	{ &zanmu_blink_3, 3, },
 	{ &zanmu_blink_4, 2, },
