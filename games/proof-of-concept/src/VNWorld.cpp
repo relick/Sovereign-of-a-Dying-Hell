@@ -182,7 +182,8 @@ void VNWorld::Run
 	}
 	case SceneMode::Choice:
 	{
-		// nyi
+		// TODO: respond to choice
+		Get<SceneMode::Choice>().Update();
 		break;
 	}
 	case SceneMode::Settings:
