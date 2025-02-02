@@ -16,8 +16,9 @@ class CharacterAnimator
 		u16 m_baseTile{ 0 };
 		u16 m_currentFrameIndex{ 0 };
 		u16 m_ticks{ 0 };
+		u16 m_currentFrameTicks{ 0 };
 
-		AnimContext(Pose const* i_pose, u16 i_baseTile) : m_pose{ i_pose }, m_baseTile{ i_baseTile } {}
+		AnimContext(Pose const* i_pose, u16 i_baseTile);
 	};
 
 	std::optional<AnimContext> m_context;

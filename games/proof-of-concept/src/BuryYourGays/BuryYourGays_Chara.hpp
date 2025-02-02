@@ -9,15 +9,15 @@ namespace BuryYourGays
 {
 
 inline constexpr Game::AnimFrames<1> c_stacey_annoyed_anim = { {
-	{ &stacey_annoyed_tilemap, 0, },
+	{ &stacey_annoyed_tilemap, Game::AnimFrameDuration::Infinite(), },
 } };
 
 inline constexpr Game::AnimFrames<1> c_stacey_excited_anim = { {
-	{ &stacey_excited_tilemap, 0, },
+	{ &stacey_excited_tilemap, Game::AnimFrameDuration::Infinite(), },
 } };
 
 inline constexpr Game::AnimFrames<1> c_stacey_sigh_anim = { {
-	{ &stacey_sigh_tilemap, 0, },
+	{ &stacey_sigh_tilemap, Game::AnimFrameDuration::Infinite(), },
 } };
 
 inline constexpr Game::Pose c_stacey_annoyed_pose = {

@@ -9,11 +9,11 @@ namespace TestZanmu
 {
 
 inline constexpr Game::AnimFrames<5> c_zanmu_blink_anim = { {
-	{ &zanmu_blink_1, 47, },
-	{ &zanmu_blink_2, 4, },
-	{ &zanmu_blink_3, 3, },
-	{ &zanmu_blink_4, 2, },
-	{ &zanmu_blink_5, 4, },
+	{ &zanmu_blink_1, Game::AnimFrameDuration::Variable(60, 300), },
+	{ &zanmu_blink_2, Game::AnimFrameDuration::Fixed(4), },
+	{ &zanmu_blink_3, Game::AnimFrameDuration::Fixed(3), },
+	{ &zanmu_blink_4, Game::AnimFrameDuration::Fixed(2), },
+	{ &zanmu_blink_5, Game::AnimFrameDuration::Fixed(4), },
 } };
 
 inline constexpr Game::Pose c_zanmu_blink_pose = {

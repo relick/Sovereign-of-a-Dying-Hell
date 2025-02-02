@@ -19,7 +19,7 @@ SCENE_RUN(BlinkingInHell)
 
     scene(beach2);
 
-    play_music(spacey, 2.0, true);
+    //play_music(spacey, 2.0, true);
 
     wait_for_tasks();
 
