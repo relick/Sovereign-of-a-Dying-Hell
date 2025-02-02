@@ -27,6 +27,8 @@
 #define say(CHARA, TEXT) io_vn.SetText(io_game, &c_ ## CHARA, TEXT); wait
 
 #define choice(choiceArr) io_vn.Choice(io_game, choiceArr); wait
+#define get_choice_result() *(io_vn.GetChoiceResult())
 #define timed_choice(timeInSeconds, choiceArr) io_vn.Choice(io_game, choiceArr); wait
+#define get_timed_choice_result() io_vn.GetChoiceResult()
 
 #define vpunch()

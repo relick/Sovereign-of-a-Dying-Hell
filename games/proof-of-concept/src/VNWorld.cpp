@@ -182,8 +182,7 @@ void VNWorld::Run
 	}
 	case SceneMode::Choice:
 	{
-		// TODO: respond to choice
-		Get<SceneMode::Choice>().Update();
+		m_choiceMade = Get<SceneMode::Choice>().Update();
 		break;
 	}
 	case SceneMode::Settings:
@@ -213,7 +212,13 @@ void VNWorld::Run
 		}
 		case ProgressMode::Choice:
 		{
-			// nyi
+			if (m_choiceMade)
+			{
+				// We have MADE OUR CHOICE!
+				m_progressMode = ProgressMode::Always;
+				m_script->Update(io_game, *this);
+				m_choiceMade = std::nullopt;
+			}
 			break;
 		}
 		}
