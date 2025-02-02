@@ -27,12 +27,12 @@ public:
 
 	constexpr static AnimFrameDuration Fixed(u16 i_duration)
 	{
-		return { i_duration, i_duration };
+		return { std::max<u16>(i_duration, 1), std::max<u16>(i_duration, 1) };
 	}
 
 	constexpr static AnimFrameDuration Variable(u16 i_minDuration, u16 i_maxDuration)
 	{
-		return { i_minDuration, std::max(i_maxDuration, i_minDuration) };
+		return { std::max<u16>(i_minDuration, 1), std::max<u16>(i_maxDuration, std::max<u16>(i_minDuration, 1)) };
 	}
 
 	constexpr u16 Get() const
@@ -45,7 +45,7 @@ public:
 		// TODO: don't use rand(), and definitely not like this!
 		f16 const r = rand() & FIX16_FRAC_MASK;
 		f16 const mul = fix16Mul(r, intToFix16(m_maxDuration - m_minDuration));
-		return fix16ToInt(mul) + m_minDuration;
+		return std::max<u16>(fix16ToInt(mul) + m_minDuration, 1);
 	}
 };
 
