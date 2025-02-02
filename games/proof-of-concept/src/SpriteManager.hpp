@@ -34,8 +34,8 @@ class SpriteManager
     friend EditableSpriteData;
 
     std::vector<Sprite> m_sprites;
-    std::vector<VRAMSprite> m_vramSprites;
-    
+    std::vector<VRAMSprite> m_vramSprites; // TODO: in-place vector
+
     SpriteID m_nextSpriteID{0};
 
     u16 m_miscSpriteTilesIndex{0};

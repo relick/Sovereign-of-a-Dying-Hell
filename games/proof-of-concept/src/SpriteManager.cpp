@@ -110,6 +110,11 @@ std::pair<SpriteID, EditableSpriteData> SpriteManager::AddSprite
     u16 i_tileAttr
 )
 {
+    if (m_sprites.size() >= 80)
+    {
+        Error("Too many sprites"); // TODO: actually handle properly?
+    }
+
     Sprite& spr = m_sprites.emplace_back();
     VRAMSprite& vSpr = m_vramSprites.emplace_back();
     spr.m_id = m_nextSpriteID++;
