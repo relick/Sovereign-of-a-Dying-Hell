@@ -11,6 +11,7 @@ enum class TaskPriority : u8
 	Low,
 	Normal,
 	High,
+	Animations,
 	Sprites,
 };
 

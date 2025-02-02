@@ -48,7 +48,7 @@ void CharacterAnimator::Update
 				m_context->m_pose->m_animation[m_context->m_currentFrameIndex].m_tilemap->w,
 				m_context->m_pose->m_animation[m_context->m_currentFrameIndex].m_tilemap->h,
 				m_context->m_baseTile
-			));
+			), TaskPriority::Animations);
 		}
 	}
 }
