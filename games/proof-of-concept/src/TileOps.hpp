@@ -10,7 +10,7 @@ namespace Tiles
 //------------------------------------------------------------------------------
 // Based on VDP_setTileMapEx
 //------------------------------------------------------------------------------
-Game::Task SetMap_Full
+inline Game::Task SetMap_Full
 (
 	u16 i_planeAddr,
 	u16 const* i_tilemap,
@@ -90,7 +90,7 @@ enum class WipeDir
 
 //------------------------------------------------------------------------------
 template<WipeDir t_Dir, u16 t_Speed = 4>
-Game::Task SetMap_Wipe
+inline Game::Task SetMap_Wipe
 (
 	u16 i_planeAddr,
 	u16 const* i_tilemap,
@@ -180,7 +180,7 @@ Game::Task SetMap_Wipe
 // Based on VDP_drawImageEx in part
 //------------------------------------------------------------------------------
 template<u16 t_ChunkShift = 5> // shift 5 => 32 tile chunks
-Game::Task LoadTiles_Chunked
+inline Game::Task LoadTiles_Chunked
 (
 	TileSet const* i_tileset,
 	u16 i_tileIndex
