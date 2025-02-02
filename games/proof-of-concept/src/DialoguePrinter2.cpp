@@ -360,45 +360,6 @@ void DialoguePrinter2::Next()
 }
 
 //------------------------------------------------------------------------------
-void DialoguePrinter2::HideAll()
-{
-	for (SpriteID sprID : m_nameSprites)
-	{
-		EditableSpriteData spr = m_game->Sprites().EditSpriteData(sprID);
-		spr.SetVisible(false);
-	}
-
-	for (SpriteID sprID : m_textSprites)
-	{
-		EditableSpriteData spr = m_game->Sprites().EditSpriteData(sprID);
-		spr.SetVisible(false);
-	}
-
-	{
-		EditableSpriteData arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);
-		arrowSpr.SetVisible(false);
-	}
-}
-
-//------------------------------------------------------------------------------
-void DialoguePrinter2::RevealAll()
-{
-	for (SpriteID sprID : m_nameSprites)
-	{
-		EditableSpriteData spr = m_game->Sprites().EditSpriteData(sprID);
-		spr.SetVisible(true);
-	}
-
-	for (SpriteID sprID : m_textSprites)
-	{
-		EditableSpriteData spr = m_game->Sprites().EditSpriteData(sprID);
-		spr.SetVisible(true);
-	}
-
-	// Arrow sprite left up to Update to reveal
-}
-
-//------------------------------------------------------------------------------
 bool DialoguePrinter2::DrawChar
 (
 )
@@ -477,7 +438,7 @@ bool DialoguePrinter2::DrawChar
 		{
 			leftTile[i] |= curCharTileRows[i] >> shift;
 		}
-		QueueCharacterDMA(tileInd);
+		QueueTextDMA(tileInd);
 
 		u16 const used = c_pixelsPerTile - leftTilePixels;
 		if (used < curCharWidth)
@@ -488,7 +449,7 @@ bool DialoguePrinter2::DrawChar
 			{
 				rightTile[i] |= curCharTileRows[i] << antiShift;
 			}
-			QueueCharacterDMA(tileInd + 1);
+			QueueTextDMA(tileInd + 1);
 		}
 
 		m_x += curCharWidth;
@@ -522,13 +483,13 @@ void DialoguePrinter2::QueueNameDMA()
 }
 
 //------------------------------------------------------------------------------
-void DialoguePrinter2::QueueCharacterDMA
+void DialoguePrinter2::QueueTextDMA
 (
-	u16 i_charIndex
+	u16 i_tileIndex
 )
 {
-	m_lineTileRefreshStart = std::min(i_charIndex, m_lineTileRefreshStart);
-	m_lineTileRefreshEnd = std::max(i_charIndex, m_lineTileRefreshEnd);
+	m_lineTileRefreshStart = std::min(i_tileIndex, m_lineTileRefreshStart);
+	m_lineTileRefreshEnd = std::max(i_tileIndex, m_lineTileRefreshEnd);
 }
 
 }

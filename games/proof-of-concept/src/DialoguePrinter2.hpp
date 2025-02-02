@@ -61,10 +61,6 @@ public:
 	// Action from player to skip or progress
 	void Next();
 
-	// Hide/reveal all sprites, to effectively enable/disable the printer
-	void HideAll();
-	void RevealAll();
-
 private:
 	void SetupSprites();
 
@@ -72,7 +68,7 @@ private:
 	bool DrawChar();
 
 	void QueueNameDMA();
-	void QueueCharacterDMA(u16 i_charIndex);
+	void QueueTextDMA(u16 i_tileIndex);
 };
 
 }
