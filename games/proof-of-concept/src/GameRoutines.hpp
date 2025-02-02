@@ -6,7 +6,7 @@ namespace Game
 {
 
 using Task = Coroutine<struct TaskTag, std::suspend_always>;
-enum class TaskPriority
+enum class TaskPriority : u8
 {
 	Low,
 	Normal,

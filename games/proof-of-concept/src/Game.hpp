@@ -5,7 +5,6 @@
 #include "GameRoutines.hpp"
 
 #include <algorithm>
-#include <deque>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -43,14 +42,17 @@ class Game
 	{
 		Task m_routine;
 		std::unique_ptr<Erasure> m_lambda;
-		TaskPriority m_priority;
+		TaskPriority m_priority{};
+		u16 m_monotonic{};
 
 		bool operator<(TaskData const& i_o) const
 		{
-			return m_priority < i_o.m_priority;
+			// monotonic number is > as later tasks should be 'less' than earlier tasks
+			return m_priority < i_o.m_priority || (m_priority == i_o.m_priority && m_monotonic > i_o.m_monotonic);
 		}
 	};
-	std::deque<TaskData> m_tasks;
+	std::vector<TaskData> m_tasks;
+	static inline u16 s_taskMonotonic = 0;
 
 	static inline VBlankCallbackID s_callbackID = 0;
 	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
@@ -132,6 +134,7 @@ void Game::QueueLambdaTask
 		holder->m_lambda(std::forward<T_Args>(i_args)...),
 		std::unique_ptr<Erasure>(holder),
 		i_priority,
+		s_taskMonotonic++,
 		});
 	std::push_heap(m_tasks.begin(), m_tasks.end());
 }

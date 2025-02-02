@@ -135,7 +135,7 @@ void Game::QueueFunctionTask
 	TaskPriority i_priority
 )
 {
-	m_tasks.push_back({ std::move(i_task), {}, i_priority, });
+	m_tasks.push_back({ std::move(i_task), {}, i_priority, s_taskMonotonic++, });
 	std::push_heap(m_tasks.begin(), m_tasks.end());
 }
 
