@@ -2,7 +2,7 @@ Main list of TODO:
 - Software text blitting // done!
 - Palette fading in RAM to allow for fading of text frame // done!
 - Script engine // in progress, still to do: choices
-- Character animation
+- Character animation // done
 - Text beeps
 - Intro world sounds
 - Save data (straightforward to do but just bear in mind while making script engine)
