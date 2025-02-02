@@ -118,7 +118,7 @@ public:
         return *this;
     }
 
-    explicit operator bool()
+    explicit operator bool() const
     {
         return !m_handle->done();
     }

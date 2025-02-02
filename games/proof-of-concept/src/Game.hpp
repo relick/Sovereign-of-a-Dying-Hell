@@ -4,6 +4,7 @@
 #include "SpriteManager.hpp"
 #include "GameRoutines.hpp"
 
+#include <algorithm>
 #include <deque>
 #include <functional>
 #include <memory>
@@ -38,7 +39,18 @@ class Game
 
 	SpriteManager m_sprites;
 
-	std::deque<std::pair<Task, std::unique_ptr<Erasure>>> m_tasks;
+	struct TaskData
+	{
+		Task m_routine;
+		std::unique_ptr<Erasure> m_lambda;
+		TaskPriority m_priority;
+
+		bool operator<(TaskData const& i_o) const
+		{
+			return m_priority < i_o.m_priority;
+		}
+	};
+	std::deque<TaskData> m_tasks;
 
 	static inline VBlankCallbackID s_callbackID = 0;
 	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
@@ -60,8 +72,11 @@ public:
 	SpriteManager& Sprites() { return m_sprites; }
 
 	void QueueFunctionTask(Task&& i_task);
+	void QueueFunctionTask(Task&& i_task, TaskPriority i_priority);
 	template<NotTaskCoroutine T_Lambda, typename... T_Args>
 	void QueueLambdaTask(T_Lambda&& i_lambda, T_Args&&... i_args);
+	template<NotTaskCoroutine T_Lambda, typename... T_Args>
+	void QueueLambdaTask(T_Lambda&& i_lambda, TaskPriority i_priority, T_Args&&... i_args);
 	bool TasksInProgress() const;
 
 private:
@@ -101,11 +116,24 @@ void Game::QueueLambdaTask
 	T_Args&&... i_args
 )
 {
+	QueueLambdaTask(std::forward<T_Lambda>(i_lambda), TaskPriority::Normal, std::forward<T_Args>(i_args)...);
+}
+
+template<NotTaskCoroutine T_Lambda, typename... T_Args>
+void Game::QueueLambdaTask
+(
+	T_Lambda&& i_lambda,
+	TaskPriority i_priority,
+	T_Args&&... i_args
+)
+{
 	LambdaHolder<T_Lambda>* holder = new LambdaHolder<T_Lambda>{ std::move(i_lambda) };
 	m_tasks.push_back({
 		holder->m_lambda(std::forward<T_Args>(i_args)...),
-		std::unique_ptr<Erasure>(holder)
-	});
+		std::unique_ptr<Erasure>(holder),
+		i_priority,
+		});
+	std::push_heap(m_tasks.begin(), m_tasks.end());
 }
 
 }

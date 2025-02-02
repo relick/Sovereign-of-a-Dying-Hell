@@ -5,7 +5,9 @@ Main list of TODO:
 - Character animation // done
 - Text beeps
 - Intro world sounds
+- Character animation layering
 - Save data (straightforward to do but just bear in mind while making script engine)
 - Title screen
 - Credits animation
 - Music room
+- Better font (thicker, for better visibility on composite signal?)

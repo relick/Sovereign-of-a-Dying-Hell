@@ -125,7 +125,18 @@ void Game::QueueFunctionTask
 	Task&& i_task
 )
 {
-	m_tasks.push_back({ std::move(i_task), {} });
+	QueueFunctionTask(std::move(i_task), TaskPriority::Normal);
+}
+
+//------------------------------------------------------------------------------
+void Game::QueueFunctionTask
+(
+	Task&& i_task,
+	TaskPriority i_priority
+)
+{
+	m_tasks.push_back({ std::move(i_task), {}, i_priority, });
+	std::push_heap(m_tasks.begin(), m_tasks.end());
 }
 
 //------------------------------------------------------------------------------
@@ -167,17 +178,15 @@ void Game::PostWorldFrame()
 	s_frameLogPoints[2] = GetVCount();
 #endif
 
+	while (!m_tasks.empty() && !m_tasks.front().m_routine)
+	{
+		std::pop_heap(m_tasks.begin(), m_tasks.end());
+		m_tasks.pop_back();
+	}
+
 	if (!m_tasks.empty())
 	{
-		while (!m_tasks.front().first)
-		{
-			m_tasks.pop_front();
-		}
-
-		if (!m_tasks.empty())
-		{
-			m_tasks.front().first();
-		}
+		m_tasks.front().m_routine();
 	}
 
 #if LOG_WHOLE_FRAME_TIMES

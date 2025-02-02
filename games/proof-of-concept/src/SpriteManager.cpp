@@ -81,7 +81,7 @@ void SpriteManager::Update
                     co_yield{};
                 }
                 co_return;
-            });
+            }, TaskPriority::Sprites);
         }
         else
         {
@@ -92,7 +92,7 @@ void SpriteManager::Update
                     co_yield{};
                 }
                 co_return;
-            }());
+            }(), TaskPriority::Sprites);
         }
     }
 
