@@ -235,8 +235,8 @@ namespace Palettes
 template<u8 t_PalLen>
 void MinusOne
 (
-	u16* i_dstPal,
-	u16 const* i_srcPal
+	u16 const* i_srcPal,
+	u16* i_dstPal
 )
 {
 	constexpr RGB3Colour c_one(1, 1, 1);
@@ -251,8 +251,8 @@ void MinusOne
 template<u8 t_PalLen>
 void Halve
 (
-	u16* i_dstPal,
-	u16 const* i_srcPal
+	u16 const* i_srcPal,
+	u16* i_dstPal
 )
 {
 	for (u8 i = 0; i < t_PalLen; ++i)
@@ -265,8 +265,8 @@ void Halve
 template<u8 t_PalLen>
 void Tint
 (
-	u16* i_dstPal,
 	u16 const* i_srcPal,
+	u16* i_dstPal,
 	RGB3Colour i_col
 )
 {

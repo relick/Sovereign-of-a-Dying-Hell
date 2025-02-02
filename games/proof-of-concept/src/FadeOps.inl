@@ -1,3 +1,5 @@
+#pragma once
+
 #include "FadeOps.hpp"
 
 #define PALETTEFADE_FRACBITS    8
@@ -7,17 +9,16 @@ namespace Palettes
 {
 
 //------------------------------------------------------------------------------
-FadeOp CreateFade
+template<u16 t_PalSize>
+FadeOp<t_PalSize> CreateFade
 (
 	u16* io_startDstPal,
 	u16 const* i_endPal,
-	u16 i_size,
 	u16 i_numFrame
 )
 {
-	FadeOp newFade;
+	FadeOp<t_PalSize> newFade;
 
-	newFade.m_size = i_size;
 	newFade.m_counter = i_numFrame;
 	newFade.m_dstPal = io_startDstPal;
 
@@ -29,7 +30,7 @@ FadeOp CreateFade
 	s16* stepG = newFade.m_stepG.data();
 	s16* stepB = newFade.m_stepB.data();
 
-	u16 len = newFade.m_size;
+	u16 len = t_PalSize;
 	while (len--)
 	{
 		u16 const s = *io_startDstPal++;
@@ -55,7 +56,8 @@ FadeOp CreateFade
 }
 
 //------------------------------------------------------------------------------
-bool FadeOp::DoFadeStep
+template<u16 t_PalSize>
+bool FadeOp<t_PalSize>::DoFadeStep
 (
 )
 {
@@ -73,7 +75,7 @@ bool FadeOp::DoFadeStep
 		u16* dst = m_dstPal;
 
 		// compute the next fade palette
-		u16 i = m_size;
+		u16 i = t_PalSize;
 		while (i--)
 		{
 			u16 col;

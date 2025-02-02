@@ -68,9 +68,9 @@ struct RGB3Colour
 };
 
 //------------------------------------------------------------------------------
-template<u8 t_PalLen = 16> inline void MinusOne(u16* i_dstPal, u16 const* i_srcPal);
-template<u8 t_PalLen = 16> inline void Halve(u16* i_dstPal, u16 const* i_srcPal);
-template<u8 t_PalLen = 16> inline void Tint(u16* i_dstPal, u16 const* i_srcPal, RGB3Colour i_col);
+template<u8 t_PalLen = 16> inline void MinusOne(u16 const* i_srcPal, u16* i_dstPal);
+template<u8 t_PalLen = 16> inline void Halve(u16 const* i_srcPal, u16* i_dstPal);
+template<u8 t_PalLen = 16> inline void Tint(u16 const* i_srcPal, u16* i_dstPal, RGB3Colour i_col);
 
 //------------------------------------------------------------------------------
 // All code here works on the basis BG text frame is using PAL0

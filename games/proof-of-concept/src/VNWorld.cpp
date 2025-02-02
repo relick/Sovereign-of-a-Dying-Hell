@@ -162,7 +162,7 @@ void VNWorld::Run
 		return false;
 	}();
 
-	switch (static_cast<SceneMode>(m_sceneMode.index()))
+	switch (CurrentMode())
 	{
 	case SceneMode::None:
 	{
@@ -263,9 +263,9 @@ void VNWorld::SetBG
 	m_nextBG = &i_bg;
 	io_game.QueueLambdaTask([this] -> Task {
 		{
-			Palettes::FadeOp fadeOp1 = Palettes::CreateFade(m_mainPals.data(), palette_black, 16, FramesPerSecond() >> 1);
-			Palettes::FadeOp fadeOp2 = Palettes::CreateFade(m_namePals.data(), palette_black, 16, FramesPerSecond() >> 1);
-			Palettes::FadeOp fadeOp3 = Palettes::CreateFade(m_textPals.data(), palette_black, 16, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), palette_black, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), palette_black, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), palette_black, FramesPerSecond() >> 1);
 
 			while (fadeOp1)
 			{
@@ -292,16 +292,48 @@ void VNWorld::SetBG
 	io_game.QueueLambdaTask([this]() -> Task {
 		m_bgSrcPal = m_nextBG->palette->data;
 
+		if (CurrentMode() == SceneMode::Dialogue)
 		{
 			std::array<u16, 16> namePal;
 			std::array<u16, 16> textPal;
 
-			Palettes::Tint(namePal.data(), m_bgSrcPal, c_tintColour);
-			Palettes::MinusOne(textPal.data(), namePal.data());
+			Palettes::Tint(m_bgSrcPal, namePal.data(), c_tintColour);
+			Palettes::MinusOne(namePal.data(), textPal.data());
 
-			Palettes::FadeOp fadeOp1 = Palettes::CreateFade(m_mainPals.data(), m_bgSrcPal, 16, FramesPerSecond() >> 1);
-			Palettes::FadeOp fadeOp2 = Palettes::CreateFade(m_namePals.data(), namePal.data(), 16, FramesPerSecond() >> 1);
-			Palettes::FadeOp fadeOp3 = Palettes::CreateFade(m_textPals.data(), textPal.data(), 16, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), namePal.data(), FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), textPal.data(), FramesPerSecond() >> 1);
+
+			while (fadeOp1)
+			{
+				fadeOp1.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
+		}
+		else if (CurrentMode() == SceneMode::Choice)
+		{
+			std::array<u16, 16> darkPal;
+			Palettes::Tint(m_bgSrcPal, darkPal.data(), c_tintColour);
+
+			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), darkPal.data(), FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), darkPal.data(), FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), darkPal.data(), FramesPerSecond() >> 1);
+
+			while (fadeOp1)
+			{
+				fadeOp1.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
+		}
+		else
+		{
+			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
 
 			while (fadeOp1)
 			{
@@ -324,9 +356,9 @@ void VNWorld::BlackBG
 )
 {
 	io_game.QueueLambdaTask([this] -> Task {
-		Palettes::FadeOp fadeOp1 = Palettes::CreateFade(m_mainPals.data(), palette_black, 16, FramesPerSecond() >> 2);
-		Palettes::FadeOp fadeOp2 = Palettes::CreateFade(m_namePals.data(), palette_black, 16, FramesPerSecond() >> 2);
-		Palettes::FadeOp fadeOp3 = Palettes::CreateFade(m_textPals.data(), palette_black, 16, FramesPerSecond() >> 2);
+		Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), palette_black, FramesPerSecond() >> 2);
+		Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), palette_black, FramesPerSecond() >> 2);
+		Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), palette_black, FramesPerSecond() >> 2);
 
 		while (fadeOp1)
 		{
@@ -353,9 +385,24 @@ void VNWorld::SetCharacterVisual
 	io_game.QueueLambdaTask([this] -> Task {
 		m_charaSrcPal = m_nextPose->m_palette->data;
 
-		std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
-		Palettes::Tint(m_namePals.data() + 16, m_mainPals.data() + 16, c_tintColour);
-		Palettes::MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
+		if (CurrentMode() == SceneMode::Dialogue)
+		{
+			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
+			Palettes::Tint(m_mainPals.data() + 16, m_namePals.data() + 16, c_tintColour);
+			Palettes::MinusOne(m_namePals.data() + 16, m_textPals.data() + 16);
+		}
+		else if (CurrentMode() == SceneMode::Choice)
+		{
+			Palettes::Tint(m_charaSrcPal, m_mainPals.data() + 16, c_tintColour);
+			std::copy(m_mainPals.begin() + 16, m_mainPals.begin() + 32, m_namePals.begin() + 16);
+			std::copy(m_mainPals.begin() + 16, m_mainPals.begin() + 32, m_textPals.begin() + 16);
+		}
+		else
+		{
+			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
+			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_namePals.begin() + 16);
+			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_textPals.begin() + 16);
+		}
 
 		co_return;
 	});
@@ -456,7 +503,7 @@ void VNWorld::TransitionTo
 	SceneMode i_sceneMode
 )
 {
-	if (static_cast<u8>(i_sceneMode) == m_sceneMode.index())
+	if (i_sceneMode == CurrentMode())
 	{
 		return;
 	}
@@ -465,16 +512,79 @@ void VNWorld::TransitionTo
 	{
 	case SceneMode::None:
 	{
+		io_game.QueueLambdaTask([this] -> Task {
+			Palettes::FadeOp<16> fadeOp1a = Palettes::CreateFade<16>(m_mainPals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp1b = Palettes::CreateFade<16>(m_mainPals.data() + 16, m_charaSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp2a = Palettes::CreateFade<16>(m_namePals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp2b = Palettes::CreateFade<16>(m_namePals.data() + 16, m_charaSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp3a = Palettes::CreateFade<16>(m_textPals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp3b = Palettes::CreateFade<16>(m_textPals.data() + 16, m_charaSrcPal, FramesPerSecond() >> 1);
+
+			while (fadeOp1a)
+			{
+				fadeOp1a.DoFadeStep();
+				fadeOp1b.DoFadeStep();
+				fadeOp2a.DoFadeStep();
+				fadeOp2b.DoFadeStep();
+				fadeOp3a.DoFadeStep();
+				fadeOp3b.DoFadeStep();
+				co_yield{};
+			}
+		});
+
 		m_sceneMode.emplace<static_cast<u8>(SceneMode::None)>();
 		break;
 	}
 	case SceneMode::Dialogue:
 	{
+		io_game.QueueLambdaTask([this] -> Task {
+			std::array<u16, 32> namePal;
+			std::array<u16, 32> textPal;
+
+			Palettes::Tint<16>(m_bgSrcPal, namePal.data(), c_tintColour);
+			Palettes::Tint<16>(m_charaSrcPal, namePal.data() + 16, c_tintColour);
+			Palettes::MinusOne<16>(namePal.data(), textPal.data());
+			Palettes::MinusOne<16>(namePal.data() + 16, textPal.data() + 16);
+
+			Palettes::FadeOp<16> fadeOp1a = Palettes::CreateFade<16>(m_mainPals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp1b = Palettes::CreateFade<16>(m_mainPals.data() + 16, m_charaSrcPal, FramesPerSecond() >> 1);
+			Palettes::FadeOp<32> fadeOp2 = Palettes::CreateFade<32>(m_namePals.data(), namePal.data(), FramesPerSecond() >> 1);
+			Palettes::FadeOp<32> fadeOp3 = Palettes::CreateFade<32>(m_textPals.data(), textPal.data(), FramesPerSecond() >> 1);
+
+			while (fadeOp1a)
+			{
+				fadeOp1a.DoFadeStep();
+				fadeOp1b.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
+		});
+
 		m_sceneMode.emplace<static_cast<u8>(SceneMode::Dialogue)>(io_game, m_fonts);
 		break;
 	}
 	case SceneMode::Choice:
 	{
+		io_game.QueueLambdaTask([this] -> Task {
+			std::array<u16, 32> darkPal;
+
+			Palettes::Tint<16>(m_bgSrcPal, darkPal.data(), c_tintColour);
+			Palettes::Tint<16>(m_charaSrcPal, darkPal.data() + 16, c_tintColour);
+
+			Palettes::FadeOp<32> fadeOp1 = Palettes::CreateFade<32>(m_mainPals.data(), darkPal.data(), FramesPerSecond() >> 1);
+			Palettes::FadeOp<32> fadeOp2 = Palettes::CreateFade<32>(m_namePals.data(), darkPal.data(), FramesPerSecond() >> 1);
+			Palettes::FadeOp<32> fadeOp3 = Palettes::CreateFade<32>(m_textPals.data(), darkPal.data(), FramesPerSecond() >> 1);
+
+			while (fadeOp1)
+			{
+				fadeOp1.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
+		});
+
 		m_sceneMode.emplace<static_cast<u8>(SceneMode::Choice)>(io_game, m_fonts);
 		break;
 	}

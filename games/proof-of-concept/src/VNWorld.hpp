@@ -25,8 +25,8 @@ class VNWorld
 	Image const* m_nextBG{ nullptr };
 	Pose const* m_nextPose{ nullptr };
 
-	u16 const* m_bgSrcPal{ nullptr };
-	u16 const* m_charaSrcPal{ nullptr };
+	u16 const* m_bgSrcPal{ palette_black };
+	u16 const* m_charaSrcPal{ palette_black };
 	std::array<u16, 32> m_mainPals{};
 	std::array<u16, 32> m_namePals{};
 	std::array<u16, 32> m_textPals{};
@@ -78,6 +78,7 @@ public:
 	void SetText(Game& io_game, Character const* i_char, char const* i_text); // null char = hide name
 	void Choice(Game& io_game, std::span<char const* const> i_choices);
 
+	SceneMode CurrentMode() const { return static_cast<SceneMode>(m_sceneMode.index()); }
 	void TransitionTo(Game& io_game, SceneMode i_sceneMode);
 
 	template<SceneMode t_SceneMode>
