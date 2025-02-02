@@ -437,6 +437,19 @@ void VNWorld::SetText
 }
 
 //------------------------------------------------------------------------------
+void VNWorld::Choice
+(
+	Game& io_game,
+	std::span<char const* const> i_choices
+)
+{
+	TransitionTo(io_game, SceneMode::Choice);
+	m_progressMode = ProgressMode::Choice;
+
+	Get<SceneMode::Choice>().SetChoices(i_choices);
+}
+
+//------------------------------------------------------------------------------
 void VNWorld::TransitionTo
 (
 	Game& io_game,
@@ -462,7 +475,7 @@ void VNWorld::TransitionTo
 	}
 	case SceneMode::Choice:
 	{
-		m_sceneMode.emplace<static_cast<u8>(SceneMode::Choice)>();
+		m_sceneMode.emplace<static_cast<u8>(SceneMode::Choice)>(io_game, m_fonts);
 		break;
 	}
 	case SceneMode::Settings:

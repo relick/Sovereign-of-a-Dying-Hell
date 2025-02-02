@@ -87,7 +87,7 @@ void SpriteManager::Update
         {
             io_game.QueueFunctionTask([] -> Task {
                 
-                while (!DMA_copyAndQueueDma(DMA_VRAM, (void*)&c_noSprites, VDP_getSpriteListAddress(), (sizeof(VRAMSprite) >> 1), 2))
+                while (!DMA_queueDmaFast(DMA_VRAM, (void*)&c_noSprites, VDP_getSpriteListAddress(), (sizeof(VRAMSprite) >> 1), 2))
                 {
                     co_yield{};
                 }
@@ -164,6 +164,7 @@ void SpriteManager::RemoveSprite
 
     if(sprI != m_sprites.end())
     {
+        m_vramSprites.erase(m_vramSprites.begin() + std::distance(m_sprites.begin(), sprI));
         m_sprites.erase(sprI);
         m_spritesRemoved = true;
     }

@@ -71,6 +71,9 @@ class FontData;
 // DialoguePrinter2
 class DialoguePrinter2;
 
+// ChoiceSystem
+class ChoiceSystem;
+
 // VNWorld
 class VNWorld;
 class Script;

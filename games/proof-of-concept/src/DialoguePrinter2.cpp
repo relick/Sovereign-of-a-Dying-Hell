@@ -420,12 +420,12 @@ bool DialoguePrinter2::DrawChar
 		return m_y < c_lineCount;
 	}
 
-	u32 const* curCharTileRows = m_fonts->GetVNTextFontTile(curChar)->AsRawRows();
-	u8 const curCharWidth = m_fonts->GetVNTextFontCharWidth(curChar);
-
 	// Blit!
 	if (curChar != ' ')
 	{
+		u32 const* curCharTileRows = m_fonts->GetVNTextFontTile(curChar)->AsRawRows();
+		u8 const curCharWidth = m_fonts->GetVNTextFontCharWidth(curChar);
+
 		// Whilst we have 8 pixel tall text that aligns with the tiles, a character spans 2 tiles generally. So we'll do left tile, then right tile
 		u16 const tileInd = (m_y * c_lineWidth) + (m_x >> 3);
 		u32* const leftTile = m_tiles[tileInd].AsRawRows();

@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 #include "CharacterAnimator.hpp"
+#include "ChoiceSystem.hpp"
 #include "DialoguePrinter2.hpp"
 #include "FontData.hpp"
 #include "Worlds.hpp"
@@ -43,7 +44,7 @@ class VNWorld
 	using SceneModeVar = std::variant<
 		std::monostate,
 		DialoguePrinter2,
-		std::monostate,
+		ChoiceSystem,
 		std::monostate
 	>;
 	SceneModeVar m_sceneMode;
@@ -75,6 +76,7 @@ public:
 	void SetCharacterVisual(Game& io_game, Pose const& i_pose);
 	void HideCharacterVisual(Game& io_game, bool i_fast);
 	void SetText(Game& io_game, Character const* i_char, char const* i_text); // null char = hide name
+	void Choice(Game& io_game, std::span<char const* const> i_choices);
 
 	void TransitionTo(Game& io_game, SceneMode i_sceneMode);
 
