@@ -1,14 +1,10 @@
 #pragma once
 
 #include "Declare.hpp"
-#include "CharacterData.hpp" // Required to avoid linker errors???? TODO: find out why and fix
 #include "Constants.hpp"
-#include "Debug.hpp"
 #include "DialoguePrinter2.hpp"
 #include "FontData.hpp"
 #include "Worlds.hpp"
-
-#include <genesis.h>
 
 #include <array>
 #include <memory>

@@ -2,7 +2,6 @@
 
 #include "Worlds.hpp"
 
-#include <genesis.h>
 #include <array>
 
 namespace Game

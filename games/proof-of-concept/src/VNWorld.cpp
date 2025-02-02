@@ -1,6 +1,7 @@
 #include "VNWorld.hpp"
 
 #include "CharacterData.hpp"
+#include "Debug.hpp"
 #include "FadeOps.hpp"
 #include "Game.hpp"
 #include "PaletteOps.hpp"
@@ -8,7 +9,6 @@
 #include "TileOps.hpp"
 #include "Version.hpp"
 
-#include <genesis.h>
 #include "res_fonts.h"
 
 #include <algorithm>

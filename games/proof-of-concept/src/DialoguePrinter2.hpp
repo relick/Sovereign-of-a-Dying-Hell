@@ -3,10 +3,7 @@
 #include "Declare.hpp"
 #include "TileData.hpp"
 
-#include <genesis.h>
-
 #include <array>
-#include <string>
 
 namespace Game
 {

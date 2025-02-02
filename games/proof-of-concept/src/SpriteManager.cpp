@@ -1,8 +1,7 @@
 #include "SpriteManager.hpp"
+
 #include "Debug.hpp"
 #include "Game.hpp"
-
-#include <genesis.h>
 
 #include <algorithm>
 #include <ranges>

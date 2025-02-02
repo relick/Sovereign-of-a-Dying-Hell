@@ -2,8 +2,6 @@
 
 #include "Declare.hpp"
 
-#include <genesis.h>
-
 #include <span>
 
 namespace Game

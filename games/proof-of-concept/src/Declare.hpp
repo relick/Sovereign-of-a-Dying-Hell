@@ -1,6 +1,7 @@
 #pragma once
 
-#include <types.h>
+#include <genesis.h>
+#include "Constants.hpp"
 
 #include <array>
 

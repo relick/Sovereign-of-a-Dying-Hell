@@ -1,7 +1,6 @@
 #pragma once
 
-#include <types.h>
-#include <maths.h>
+#include "Declare.hpp"
 
 // Useful variables for handling region differences
 namespace System

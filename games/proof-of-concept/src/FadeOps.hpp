@@ -3,7 +3,6 @@
 #include "Declare.hpp"
 
 #include <array>
-#include <optional>
 
 namespace Palettes
 {

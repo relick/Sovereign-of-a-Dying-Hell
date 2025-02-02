@@ -1,6 +1,6 @@
 #pragma once
 
-#include <types.h>
+#include "Declare.hpp"
 
 // Sys constants
 inline constexpr u16 c_screenWidthTiles = 40;

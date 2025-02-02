@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Declare.hpp"
 #include "Game.hpp"
 #include "VNWorld.hpp"
 #include "Version.hpp"

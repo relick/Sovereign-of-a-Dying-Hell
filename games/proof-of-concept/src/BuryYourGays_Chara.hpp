@@ -3,7 +3,6 @@
 #include "Declare.hpp"
 #include "CharacterData.hpp"
 
-#include <genesis.h>
 #include "res_chara.h"
 
 namespace BuryYourGays

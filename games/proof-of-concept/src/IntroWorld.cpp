@@ -1,11 +1,10 @@
 #include "Worlds.hpp"
+
 #include "Game.hpp"
 #include "Version.hpp"
-
 #include "VNWorld.hpp"
-#include "BuryYourGays_Script.hpp"
 
-#include <genesis.h>
+#include "BuryYourGays_Script.hpp"
 #include "res_bg.h"
 
 namespace Game

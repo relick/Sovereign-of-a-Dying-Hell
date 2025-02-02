@@ -4,8 +4,6 @@
 #include "GameRoutines.hpp"
 #include "TileData.hpp"
 
-#include <genesis.h>
-
 namespace Tiles
 {
 

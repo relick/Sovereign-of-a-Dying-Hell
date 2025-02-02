@@ -1,11 +1,9 @@
 #include "BuryYourGays_Scenes.hpp"
 #include "BuryYourGays_Script.hpp"
 #include "BuryYourGays_Chara.hpp"
-#include "Worlds.hpp"
 
 #include "SceneDefines.hpp"
 
-#include <genesis.h>
 #include "res_music.h"
 #include "res_bg.h"
 

@@ -1,7 +1,5 @@
 #include "FadeOps.hpp"
 
-#include <genesis.h>
-
 #define PALETTEFADE_FRACBITS    8
 #define PALETTEFADE_ROUND_VAL   ((1 << (PALETTEFADE_FRACBITS - 1)) - 1)
 

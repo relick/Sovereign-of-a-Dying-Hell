@@ -2,9 +2,6 @@
 
 #include "Declare.hpp"
 
-#include <genesis.h>
-
-#include <array>
 #include <vector>
 
 namespace Game

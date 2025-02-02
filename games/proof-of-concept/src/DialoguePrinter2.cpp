@@ -6,7 +6,6 @@
 #include "Game.hpp"
 #include "SpriteManager.hpp"
 
-#include <genesis.h>
 #include "res_spr.h"
 
 #include <cstring>
