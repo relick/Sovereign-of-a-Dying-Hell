@@ -143,6 +143,8 @@ void VNWorld::Run
 		return;
 	}
 
+	m_animator.Update(io_game);
+
 	u16 const buttons = JOY_readJoypad(JOY_1);
 	bool const ABCpressedThisFrame = [this, buttons]{
 		if ((buttons & (BUTTON_A | BUTTON_B | BUTTON_C)) != 0)
@@ -358,6 +360,7 @@ void VNWorld::SetCharacterVisual
 		co_return;
 	});
 	u16 const tileIndex = 1536 - m_nextPose->m_tileset->numTile;
+	u16 const baseTile = TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex);
 	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
 		m_nextPose->m_tileset,
 		tileIndex
@@ -367,9 +370,10 @@ void VNWorld::SetCharacterVisual
 		m_nextPose->m_animation[0].m_tilemap->tilemap,
 		m_nextPose->m_animation[0].m_tilemap->w,
 		m_nextPose->m_animation[0].m_tilemap->h,
-		TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex)
+		baseTile
 	));
-	io_game.QueueLambdaTask([this] -> Task {
+	io_game.QueueLambdaTask([this, baseTile] -> Task {
+		m_animator.StartAnimation(m_nextPose, baseTile);
 		m_nextPose = nullptr;
 		co_return;
 	});
@@ -382,6 +386,8 @@ void VNWorld::HideCharacterVisual
 	bool i_fast
 )
 {
+	m_animator.StopAnimation();
+
 	// Fill with reserved but highlighted empty tile
 	if (i_fast)
 	{

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Declare.hpp"
-#include "Constants.hpp"
+#include "CharacterAnimator.hpp"
 #include "DialoguePrinter2.hpp"
 #include "FontData.hpp"
 #include "Worlds.hpp"
@@ -17,6 +17,7 @@ class VNWorld
 	: public World
 {
 	FontData m_fonts;
+	CharacterAnimator m_animator;
 
 	std::unique_ptr<Script> m_script;
 
