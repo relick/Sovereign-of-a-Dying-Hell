@@ -2,6 +2,8 @@
 
 #include <types.h>
 
+#include <array>
+
 // Specify which section of frame some code is running in for template differences
 enum class During
 {
@@ -12,25 +14,13 @@ enum class During
 namespace Game
 {
 
+// Game
 class Game;
 class World;
 
-using CharacterID = u8;
-using PoseID = u8;
-struct Pose;
-struct Character;
-class CharacterData;
-
-class FontData;
-
-class DialoguePrinter2;
-
-class VNWorld;
-class Script;
-class Scene;
-
 using VBlankCallbackID = u8;
 
+// SpriteManager
 using SpriteID = u16;
 class SpriteData;
 class SpriteManager;
@@ -64,5 +54,25 @@ enum class SpritePalette : u8
     Pal2 = 2,
     Pal3 = 3,
 };
+
+// CharacterData
+struct AnimFrame;
+template<u16 t_FrameCount>
+using AnimFrames = std::array<AnimFrame, t_FrameCount>;
+struct Pose;
+template<u16 t_PoseCount>
+using Poses = std::array<Pose, t_PoseCount>;
+struct Character;
+
+// FontData
+class FontData;
+
+// DialoguePrinter2
+class DialoguePrinter2;
+
+// VNWorld
+class VNWorld;
+class Script;
+class Scene;
 
 }

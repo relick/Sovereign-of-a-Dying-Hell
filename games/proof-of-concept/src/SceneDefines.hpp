@@ -9,21 +9,21 @@
 #define wait co_yield {}
 #define end co_return
 
-#define scene(bg) io_vn.SetBG(io_game, bg)
+#define scene(BG) io_vn.SetBG(io_game, BG)
 
-#define play_music(music, fadeInSeconds, loop) io_vn.StartMusic(music, fix16ToInt(fix16Mul(FIX16(fadeInSeconds), FramesPerSecond())), loop)
+#define play_music(MUSIC, FADE_IN_SECONDS, LOOP) io_vn.StartMusic(MUSIC, fix16ToInt(fix16Mul(FIX16(FADE_IN_SECONDS), FramesPerSecond())), LOOP)
 
 #define wait_for_tasks() io_vn.WaitForTasks(io_game); wait
 
-#define portrait(chara, pose)
+#define portrait(CHARA, POSE)
 #define hide_portrait()
 
-#define show(chara, pose) io_vn.SetCharacter(io_game, script.chara, script.chara ## _ ## pose)
-#define hide() io_vn.HideCharacter(io_game, false)
+#define show(CHARA, POSE) io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose)
+#define hide() io_vn.HideCharacterVisual(io_game, false)
 
-#define think(text) io_vn.SetText(io_game, -1, "(" text ")"); wait
+#define think(TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")"); wait
 
-#define say(chara, text) io_vn.SetText(io_game, script.chara, text); wait
+#define say(CHARA, TEXT) io_vn.SetText(io_game, &c_ ## CHARA, TEXT); wait
 
 #define choice(choiceArr) {}
 #define timed_choice(timeInSeconds, choiceArr) {}

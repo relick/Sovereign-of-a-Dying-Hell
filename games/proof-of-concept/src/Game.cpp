@@ -21,6 +21,8 @@ static std::array<u32, 6> s_frameLogPoints{};
 //------------------------------------------------------------------------------
 Game::Game()
 {
+	s_vBlankCallbacks.reserve(8);
+
 #if PROFILER
 	SYS_setVIntCallback(Game::VIntCallback);
 #endif

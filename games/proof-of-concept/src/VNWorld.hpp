@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Declare.hpp"
-#include "CharacterData.hpp"
+#include "CharacterData.hpp" // Required to avoid linker errors???? TODO: find out why and fix
 #include "Constants.hpp"
 #include "Debug.hpp"
 #include "DialoguePrinter2.hpp"
@@ -20,7 +20,6 @@ namespace Game
 class VNWorld
 	: public World
 {
-	CharacterData m_characters;
 	FontData m_fonts;
 
 	std::unique_ptr<Script> m_script;
@@ -76,9 +75,9 @@ public:
 	void StopMusic(u16 i_fadeOutFrames);
 	void SetBG(Game& io_game, Image const& i_bg);
 	void BlackBG(Game& io_game);
-	void SetCharacter(Game& io_game, CharacterID i_charID, PoseID i_poseID);
-	void HideCharacter(Game& io_game, bool i_fast);
-	void SetText(Game& io_game, CharacterID i_charID, char const* i_text);
+	void SetCharacterVisual(Game& io_game, Pose const& i_pose);
+	void HideCharacterVisual(Game& io_game, bool i_fast);
+	void SetText(Game& io_game, Character const* i_char, char const* i_text); // null char = hide name
 
 	void TransitionTo(Game& io_game, SceneMode i_sceneMode);
 

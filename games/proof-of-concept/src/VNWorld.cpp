@@ -1,10 +1,12 @@
 #include "VNWorld.hpp"
-#include "Game.hpp"
-#include "Script.hpp"
-#include "Version.hpp"
+
+#include "CharacterData.hpp"
 #include "FadeOps.hpp"
+#include "Game.hpp"
 #include "PaletteOps.hpp"
+#include "Script.hpp"
 #include "TileOps.hpp"
+#include "Version.hpp"
 
 #include <genesis.h>
 #include "res_fonts.h"
@@ -102,7 +104,7 @@ WorldRoutine VNWorld::Init
 	std::copy(text_font_pal.data, text_font_pal.data + 16, blackWithTextPal.begin() + 48);
 	PAL_setColors(0, blackWithTextPal.data(), 64, DMA_QUEUE_COPY);
 
-	HideCharacter(io_game, true);
+	HideCharacterVisual(io_game, true);
 
 	// Wait a frame for colours to swap and tilemap to fill
 	co_yield{};
@@ -111,7 +113,7 @@ WorldRoutine VNWorld::Init
 		co_yield{};
 	}
 
-	m_script->Init(io_game, *this, m_characters);
+	m_script->Init(io_game, *this);
 
 	co_return;
 }
@@ -337,50 +339,44 @@ void VNWorld::BlackBG
 }
 
 //------------------------------------------------------------------------------
-void VNWorld::SetCharacter
+void VNWorld::SetCharacterVisual
 (
 	Game& io_game,
-	CharacterID i_charID,
-	PoseID i_poseID
+	Pose const& i_pose
 )
 {
-	auto const [_, pose] = m_characters.GetPose(i_charID, i_poseID);
+	HideCharacterVisual(io_game, false);
+	m_nextPose = &i_pose;
 
-	if (pose)
-	{
-		HideCharacter(io_game, false);
-		m_nextPose = pose;
+	io_game.QueueLambdaTask([this] -> Task {
+		m_charaSrcPal = m_nextPose->m_palette->data;
 
-		io_game.QueueLambdaTask([this] -> Task {
-			m_charaSrcPal = m_nextPose->m_palette->data;
+		std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
+		Palettes::Tint(m_namePals.data() + 16, m_mainPals.data() + 16, c_tintColour);
+		Palettes::MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
 
-			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
-			Palettes::Tint(m_namePals.data() + 16, m_mainPals.data() + 16, c_tintColour);
-			Palettes::MinusOne(m_textPals.data() + 16, m_namePals.data() + 16);
-
-			co_return;
-		});
-		u16 const tileIndex = 1536 - m_nextPose->m_tileset->numTile;
-		io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
-			m_nextPose->m_tileset,
-			tileIndex
-		));
-		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
-			VDP_BG_A,
-			m_nextPose->m_animation[0].m_tilemap->tilemap,
-			m_nextPose->m_animation[0].m_tilemap->w,
-			m_nextPose->m_animation[0].m_tilemap->h,
-			TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex)
-		));
-		io_game.QueueLambdaTask([this] -> Task {
-			m_nextPose = nullptr;
-			co_return;
-		});
-	}
+		co_return;
+	});
+	u16 const tileIndex = 1536 - m_nextPose->m_tileset->numTile;
+	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
+		m_nextPose->m_tileset,
+		tileIndex
+	));
+	io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
+		VDP_BG_A,
+		m_nextPose->m_animation[0].m_tilemap->tilemap,
+		m_nextPose->m_animation[0].m_tilemap->w,
+		m_nextPose->m_animation[0].m_tilemap->h,
+		TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex)
+	));
+	io_game.QueueLambdaTask([this] -> Task {
+		m_nextPose = nullptr;
+		co_return;
+	});
 }
 
 //------------------------------------------------------------------------------
-void VNWorld::HideCharacter
+void VNWorld::HideCharacterVisual
 (
 	Game& io_game,
 	bool i_fast
@@ -415,17 +411,16 @@ void VNWorld::HideCharacter
 void VNWorld::SetText
 (
 	Game& io_game,
-	CharacterID i_charID,
+	Character const* i_char,
 	char const* i_text
 )
 {
 	TransitionTo(io_game, SceneMode::Dialogue);
 	m_progressMode = ProgressMode::Dialogue;
 	
-	auto const chara = m_characters.GetCharacter(i_charID);
-	if (chara)
+	if (i_char)
 	{
-		Get<SceneMode::Dialogue>().SetName(chara->m_displayName, chara->m_showOnLeft);
+		Get<SceneMode::Dialogue>().SetName(i_char->m_displayName, i_char->m_showOnLeft);
 	}
 	else
 	{
