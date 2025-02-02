@@ -4,7 +4,7 @@
 #include "Version.hpp"
 #include "VNWorld.hpp"
 
-#include "BuryYourGays_Script.hpp"
+#include "BuryYourGays/BuryYourGays_Script.hpp"
 #include "res_bg.h"
 
 namespace Game
