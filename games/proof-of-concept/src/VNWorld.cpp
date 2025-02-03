@@ -471,7 +471,7 @@ void VNWorld::SetText
 (
 	Game& io_game,
 	Character const* i_char,
-	char const* i_text
+	ConstantString i_text
 )
 {
 	TransitionTo(io_game, SceneMode::Dialogue);

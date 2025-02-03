@@ -5,6 +5,7 @@
 #include "ChoiceSystem.hpp"
 #include "DialoguePrinter2.hpp"
 #include "FontData.hpp"
+#include "StringLiteral.hpp"
 #include "Worlds.hpp"
 
 #include <array>
@@ -78,7 +79,7 @@ public:
 	void BlackBG(Game& io_game);
 	void SetCharacterVisual(Game& io_game, Pose const& i_pose);
 	void HideCharacterVisual(Game& io_game, bool i_fast);
-	void SetText(Game& io_game, Character const* i_char, char const* i_text); // null char = hide name
+	void SetText(Game& io_game, Character const* i_char, ConstantString i_text); // null char = hide name
 	void Choice(Game& io_game, std::span<char const* const> i_choices);
 	std::optional<u8> GetChoiceResult() const { return m_choiceMade; }
 

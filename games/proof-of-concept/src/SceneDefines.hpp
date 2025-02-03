@@ -4,6 +4,7 @@
 #include "Game.hpp"
 #include "VNWorld.hpp"
 #include "Version.hpp"
+#include "StringLiteral.hpp"
 
 // Make sure to include last, to avoid breaking other code
 
@@ -22,7 +23,7 @@
 #define show(CHARA, POSE) io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose)
 #define hide() io_vn.HideCharacterVisual(io_game, false)
 
-#define think(TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")"); wait
+#define think(TEXT) io_vn.SetText(io_game, nullptr, "("_sl + TEXT + ")"_sl); wait
 
 #define say(CHARA, TEXT) io_vn.SetText(io_game, &c_ ## CHARA, TEXT); wait
 

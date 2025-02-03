@@ -2,10 +2,10 @@
 #include "BuryYourGays_Script.hpp"
 #include "BuryYourGays_Chara.hpp"
 
-#include "SceneDefines.hpp"
-
 #include "res_music.h"
 #include "res_bg.h"
+
+#include "SceneDefines.hpp"
 
 #define SCENE_RUN(scene_name) Game::SceneRoutine scene_name::Run(Game::Game& io_game, Game::VNWorld& io_vn, Game::Script const& i_script)
 #define SCENE_SETUP() [[maybe_unused]] BuryYourGays::Script const& script = static_cast<BuryYourGays::Script const&>(i_script)
