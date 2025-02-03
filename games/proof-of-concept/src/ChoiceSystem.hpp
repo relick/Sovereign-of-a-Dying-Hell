@@ -5,6 +5,7 @@
 #include "TileData.hpp"
 
 #include <array>
+#include <expected>
 #include <optional>
 #include <span>
 #include <vector>
@@ -24,6 +25,7 @@ class ChoiceSystem
 	bool m_spritesInitialised{ false };
 
 	std::span<char const* const> m_choices;
+	std::optional<f16> m_timeLimit{ 0 };
 
 	VBlankCallbackID m_dmaCallbackID{};
 
@@ -42,10 +44,11 @@ public:
 	ChoiceSystem(Game& io_game, FontData const& i_fonts);
 	~ChoiceSystem();
 
-	void SetChoices(std::span<char const* const> i_choices);
+	void SetChoices(std::span<char const* const> i_choices, std::optional<f16> i_timeLimitInSeconds = std::nullopt);
 
-	// If returns a value, the value is the index of the choice made
-	std::optional<u8> Update();
+	// expected: index of choice made
+	enum class NoChoiceMade { Waiting, TimeLimitReached, };
+	std::expected<u8, NoChoiceMade> Update();
 
 private:
 	Task RenderText();

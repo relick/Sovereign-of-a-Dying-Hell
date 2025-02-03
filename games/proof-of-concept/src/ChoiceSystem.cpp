@@ -2,6 +2,7 @@
 
 #include "FontData.hpp"
 #include "Game.hpp"
+#include "Version.hpp"
 
 #include "res_spr.h"
 
@@ -45,11 +46,13 @@ ChoiceSystem::~ChoiceSystem()
 //------------------------------------------------------------------------------
 void ChoiceSystem::SetChoices
 (
-	std::span<char const* const> i_choices
+	std::span<char const* const> i_choices,
+	std::optional<f16> i_timeLimitInSeconds // = std::nullopt
 )
 {
 	m_choices = i_choices;
 	m_baseChoiceY = (c_screenHeightPx / 2) - ((m_choices.size() / 2) * c_choiceYSeparation);
+	m_timeLimit = i_timeLimitInSeconds;
 
 	// Text rendering
 	m_game->QueueFunctionTask(RenderText());
@@ -57,14 +60,22 @@ void ChoiceSystem::SetChoices
 }
 
 //------------------------------------------------------------------------------
-std::optional<u8> ChoiceSystem::Update()
+std::expected<u8, ChoiceSystem::NoChoiceMade> ChoiceSystem::Update()
 {
-	if (m_game->TasksInProgress())
+	if (m_timeLimit)
 	{
-		return std::nullopt;
+		*m_timeLimit -= FrameStep();
+		if (*m_timeLimit < 0)
+		{
+			return std::unexpected(NoChoiceMade::TimeLimitReached);
+		}
 	}
 
-	// TODO: read controller inputs, and return a choice value on selection
+	if (m_game->TasksInProgress())
+	{
+		return std::unexpected(NoChoiceMade::Waiting);
+	}
+
 	u16 const buttons = JOY_readJoypad(JOY_1);
 	static bool upPressedPrev = false;
 	static bool downPressedPrev = false;
@@ -144,7 +155,7 @@ std::optional<u8> ChoiceSystem::Update()
 
 	UpdateSprites();
 
-	return std::nullopt;
+	return std::unexpected(NoChoiceMade::Waiting);
 }
 
 //------------------------------------------------------------------------------

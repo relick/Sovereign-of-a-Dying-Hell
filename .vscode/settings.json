@@ -73,7 +73,8 @@
         "dma.h": "c",
         "vdp.h": "c",
         "*.txt": "cpp",
-        "coroutine": "cpp"
+        "coroutine": "cpp",
+        "expected": "cpp"
     },
     "files.exclude": {
         "**/*.rpyc": true,

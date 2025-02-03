@@ -162,6 +162,8 @@ void VNWorld::Run
 		return false;
 	}();
 
+	bool choiceOccurred = false;
+
 	switch (CurrentMode())
 	{
 	case SceneMode::None:
@@ -182,7 +184,18 @@ void VNWorld::Run
 	}
 	case SceneMode::Choice:
 	{
-		m_choiceMade = Get<SceneMode::Choice>().Update();
+		auto const updateResult = Get<SceneMode::Choice>().Update();
+		if (updateResult)
+		{
+			m_choiceMade = updateResult.value();
+			choiceOccurred = true;
+		}
+		else if (updateResult.error() == ChoiceSystem::NoChoiceMade::TimeLimitReached)
+		{
+			m_choiceMade = std::nullopt;
+			choiceOccurred = true;
+		}
+		// Otherwise, still waiting
 		break;
 	}
 	case SceneMode::Settings:
@@ -212,7 +225,7 @@ void VNWorld::Run
 		}
 		case ProgressMode::Choice:
 		{
-			if (m_choiceMade)
+			if (choiceOccurred)
 			{
 				// We have MADE OUR CHOICE!
 				m_progressMode = ProgressMode::Always;
@@ -500,6 +513,20 @@ void VNWorld::Choice
 	m_progressMode = ProgressMode::Choice;
 
 	Get<SceneMode::Choice>().SetChoices(i_choices);
+}
+
+//------------------------------------------------------------------------------
+void VNWorld::TimedChoice
+(
+	Game& io_game,
+	std::span<char const* const> i_choices,
+	f16 i_timeInSeconds
+)
+{
+	TransitionTo(io_game, SceneMode::Choice);
+	m_progressMode = ProgressMode::Choice;
+
+	Get<SceneMode::Choice>().SetChoices(i_choices, i_timeInSeconds);
 }
 
 //------------------------------------------------------------------------------
