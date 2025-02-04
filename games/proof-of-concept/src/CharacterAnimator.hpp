@@ -26,7 +26,7 @@ class CharacterAnimator
 public:
 	void Update(Game& io_game);
 
-	void StartAnimation(Pose const* i_pose, u16 i_baseTile) { m_context = AnimContext{ i_pose, i_baseTile }; }
+	void StartAnimation(Pose const& i_pose, u16 i_baseTile) { m_context = AnimContext{ &i_pose, i_baseTile }; }
 	void StopAnimation() { m_context = std::nullopt; }
 };
 

@@ -205,6 +205,17 @@ void VNWorld::Run
 	}
 	}
 
+	// TODO
+	// This is a bug fix but risks making UI unresponsive
+	// Essentially, prevent the script progressing until we're clear of tasks, in order to prevent
+	// bugs of transitioning scene mode before tasks are done.
+	// There will be many frames where we're not clear due to animations and sprite changes etc.
+	// So it may be necessary to do some input buffering to improve responsiveness
+	if (io_game.TasksInProgress())
+	{
+		return;
+	}
+
 	{
 		//AutoProfileScope profile("BuryYourGays_Script::Update: %lu");
 		switch (m_progressMode)
@@ -279,8 +290,7 @@ void VNWorld::SetBG
 	Image const& i_bg
 )
 {
-	m_nextBG = &i_bg;
-	io_game.QueueLambdaTask([this] -> Task {
+	io_game.QueueLambdaTask([this, &i_bg] -> Task {
 		{
 			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), palette_black, FramesPerSecond() >> 1);
 			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), palette_black, FramesPerSecond() >> 1);
@@ -298,18 +308,18 @@ void VNWorld::SetBG
 		co_return;
 	});
 	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
-		m_nextBG->tileset,
+		i_bg.tileset,
 		0
 	));
 	io_game.QueueFunctionTask(Tiles::SetMap_Full(
 		VDP_BG_B,
-		m_nextBG->tilemap->tilemap,
-		m_nextBG->tilemap->w,
-		m_nextBG->tilemap->h,
+		i_bg.tilemap->tilemap,
+		i_bg.tilemap->w,
+		i_bg.tilemap->h,
 		TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)
 	));
-	io_game.QueueLambdaTask([this]() -> Task {
-		m_bgSrcPal = m_nextBG->palette->data;
+	io_game.QueueLambdaTask([this, &i_bg]() -> Task {
+		m_bgSrcPal = i_bg.palette->data;
 
 		if (CurrentMode() == SceneMode::Dialogue)
 		{
@@ -363,7 +373,6 @@ void VNWorld::SetBG
 			}
 		}
 
-		m_nextBG = nullptr;
 		co_return;
 	});
 }
@@ -399,10 +408,8 @@ void VNWorld::SetCharacterVisual
 )
 {
 	HideCharacterVisual(io_game, false);
-	m_nextPose = &i_pose;
-
-	io_game.QueueLambdaTask([this] -> Task {
-		m_charaSrcPal = m_nextPose->m_palette->data;
+	io_game.QueueLambdaTask([this, &i_pose] -> Task {
+		m_charaSrcPal = i_pose.m_palette->data;
 
 		if (CurrentMode() == SceneMode::Dialogue)
 		{
@@ -425,22 +432,21 @@ void VNWorld::SetCharacterVisual
 
 		co_return;
 	});
-	u16 const tileIndex = 1536 - m_nextPose->m_tileset->numTile;
+	u16 const tileIndex = 1536 - i_pose.m_tileset->numTile;
 	u16 const baseTile = TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex);
 	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
-		m_nextPose->m_tileset,
+		i_pose.m_tileset,
 		tileIndex
 	));
 	io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
 		VDP_BG_A,
-		m_nextPose->m_animation[0].m_tilemap->tilemap,
-		m_nextPose->m_animation[0].m_tilemap->w,
-		m_nextPose->m_animation[0].m_tilemap->h,
+		i_pose.m_animation[0].m_tilemap->tilemap,
+		i_pose.m_animation[0].m_tilemap->w,
+		i_pose.m_animation[0].m_tilemap->h,
 		baseTile
 	));
-	io_game.QueueLambdaTask([this, baseTile] -> Task {
-		m_animator.StartAnimation(m_nextPose, baseTile);
-		m_nextPose = nullptr;
+	io_game.QueueLambdaTask([this, &i_pose, baseTile] -> Task {
+		m_animator.StartAnimation(i_pose, baseTile);
 		co_return;
 	});
 }
@@ -452,7 +458,10 @@ void VNWorld::HideCharacterVisual
 	bool i_fast
 )
 {
-	m_animator.StopAnimation();
+	io_game.QueueLambdaTask([this] -> Task {
+		m_animator.StopAnimation();
+		co_return;
+	});
 
 	// Fill with reserved but highlighted empty tile
 	if (i_fast)

@@ -22,9 +22,6 @@ class VNWorld
 
 	std::unique_ptr<Script> m_script;
 
-	Image const* m_nextBG{ nullptr };
-	Pose const* m_nextPose{ nullptr };
-
 	u16 const* m_bgSrcPal{ palette_black };
 	u16 const* m_charaSrcPal{ palette_black };
 	std::array<u16, 32> m_mainPals{};
