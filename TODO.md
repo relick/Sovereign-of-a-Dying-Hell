@@ -5,18 +5,22 @@ Main list of TODO:
 - Character animation // done!
 - Choices // done!
 - Timed choices // logic done, just need graphics
+
+Left before jam:
 - Text beeps
 - Triggered SFX
-- Intro world sounds
-- Character animation layering
 - Save data (straightforward to do but just bear in mind while making script engine)
 - Title screen
+- Character animation layering
+- CG mode
+
+Stretch:
+- vpunch/hpunch
+- Intro world sounds
 - Credits animation
 - Music room
 - Better font (thicker, for better visibility on composite signal?)
 - 2nd Character (portrait)
-- CG mode
-- vpunch/hpunch
 
 Known Bugs:
-None atm
+- Unresponsiveness when pressing buttons on 'blocked' frames where progression isn't allowed. Should be reasonable to just buffer the input for a few frames.
