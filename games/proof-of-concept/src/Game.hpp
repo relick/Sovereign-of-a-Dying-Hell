@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Declare.hpp"
+#include "SFXManager.hpp"
 #include "SpriteManager.hpp"
 #include "GameRoutines.hpp"
 
@@ -36,6 +37,7 @@ class Game
 	std::unique_ptr<World> m_nextWorld;
 	WorldRoutine m_currentWorldRoutine;
 
+	SFXManager m_sfx;
 	SpriteManager m_sprites;
 
 	struct TaskData
@@ -71,6 +73,7 @@ public:
 	VBlankCallbackID AddVBlankCallback(std::function<void()>&& i_callback);
 	void RemoveVBlankCallback(VBlankCallbackID i_callbackID);
 
+	SFXManager& SFX() { return m_sfx; }
 	SpriteManager& Sprites() { return m_sprites; }
 
 	void QueueFunctionTask(Task&& i_task);

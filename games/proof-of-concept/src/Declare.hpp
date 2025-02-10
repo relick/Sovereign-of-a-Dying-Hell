@@ -26,6 +26,10 @@ using SpriteID = u16;
 class SpriteData;
 class SpriteManager;
 
+// SFXManager
+using SFXID = u8;
+class SFXManager;
+
 //------------------------------------------------------------------------------
 enum class SpriteSize : u8
 {
