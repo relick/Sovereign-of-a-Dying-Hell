@@ -8,6 +8,7 @@ namespace Game
 {
 
 #define LOG_WHOLE_FRAME_TIMES (1 && PROFILER)
+#define LOG_MEMORY_USAGE (0)
 
 #if PROFILER
 static u32 volatile s_frameLineCount{};
@@ -207,6 +208,10 @@ void Game::PostWorldFrame()
 		static_cast<u16>(s_frameLogPoints[5] - s_frameLogPoints[4] + (s_frameLogPoints[4] <= s_frameLogPoints[5] ? 0 : 5))
 
 	);
+#endif
+
+#if LOG_MEMORY_USAGE
+	kprintf("Used: %u, Free: %u", MEM_getAllocated(), MEM_getFree());
 #endif
 }
 
