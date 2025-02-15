@@ -6,6 +6,7 @@
 #include "GameRoutines.hpp"
 
 #include <algorithm>
+#include <bit>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -59,6 +60,9 @@ class Game
 	static inline VBlankCallbackID s_callbackID = 0;
 	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
 
+	// TODO: improve beyond just being a set of numbers.
+	std::vector<u16> m_gameVariables;
+
 public:
 	Game();
 
@@ -83,6 +87,15 @@ public:
 	template<NotTaskCoroutine T_Lambda, typename... T_Args>
 	void QueueLambdaTask(T_Lambda&& i_lambda, TaskPriority i_priority, T_Args&&... i_args);
 	bool TasksInProgress() const;
+
+	void SetVariableCount(u16 i_count) { m_gameVariables.resize(i_count); }
+	template<typename T = u16>
+	void SetVar(u16 i_varIndex, T i_value) requires(sizeof(T) == sizeof(u16)) { m_gameVariables[i_varIndex] = std::bit_cast<u16>(i_value); }
+	template<typename T = u16>
+	T ReadVar(u16 i_varIndex) const requires(sizeof(T) == sizeof(u16)) { return std::bit_cast<T>(m_gameVariables[i_varIndex]); }
+
+	void SaveVariables();
+	bool LoadVariables();
 
 private:
 	static void VIntCallback();

@@ -147,6 +147,50 @@ bool Game::TasksInProgress() const
 }
 
 //------------------------------------------------------------------------------
+void Game::SaveVariables()
+{
+	SRAM_enable();
+
+	auto fnWriteWord = [offset = u32{ 0 }](u16 i_val) mutable
+		{
+			SRAM_writeWord(offset, i_val);
+			offset += 2;
+		};
+
+	fnWriteWord(m_gameVariables.size());
+	for (u16 var : m_gameVariables)
+	{
+		fnWriteWord(var);
+	}
+
+	SRAM_disable();
+}
+
+//------------------------------------------------------------------------------
+bool Game::LoadVariables()
+{
+	SRAM_enableRO();
+
+	auto fnReadWord = [offset = u32{ 0 }] mutable -> u16
+		{
+			u16 val = SRAM_readWord(offset);
+			offset += 2;
+			return val;
+		};
+
+	u16 const varCount = fnReadWord();
+	m_gameVariables.resize(varCount);
+	for (u16 i = 0; i < varCount; ++i)
+	{
+		m_gameVariables[i] = fnReadWord();
+	}
+
+	SRAM_disable();
+
+	return varCount > 0;
+}
+
+//------------------------------------------------------------------------------
 void Game::VIntCallback()
 {
 #if PROFILER
