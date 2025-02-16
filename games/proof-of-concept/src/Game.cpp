@@ -35,7 +35,7 @@ Game::Game()
 }
 
 //------------------------------------------------------------------------------
-void Game::RequestNextWorld(std::unique_ptr<World> &&i_nextWorld)
+void Game::RequestNextWorld(std::unique_ptr<World> i_nextWorld)
 {
 	m_nextWorld = std::move(i_nextWorld);
 }

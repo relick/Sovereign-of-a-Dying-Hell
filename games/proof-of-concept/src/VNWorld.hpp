@@ -61,12 +61,12 @@ class VNWorld
 	// Choice data
 	std::optional<u8> m_choiceMade;
 
+public:
+	VNWorld(std::unique_ptr<Script> i_script);
+
 	WorldRoutine Init(Game &io_game) override;
 	WorldRoutine Shutdown(Game &io_game) override;
 	void Run(Game &io_game) override;
-
-public:
-	VNWorld(std::unique_ptr<Script> i_script);
 
 	void WaitForTasks(Game& io_game);
 	void StartMusic(u8 const* i_bgm, u16 i_fadeInFrames, bool i_loop);

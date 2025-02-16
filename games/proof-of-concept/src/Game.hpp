@@ -67,7 +67,7 @@ class Game
 public:
 	Game();
 
-	void RequestNextWorld(std::unique_ptr<World> &&i_nextWorld);
+	void RequestNextWorld(std::unique_ptr<World> i_nextWorld);
 
 	void Run();
 
