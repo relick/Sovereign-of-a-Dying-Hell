@@ -262,7 +262,7 @@ void ChoiceSystem::SetupSprites
 	{
 		auto [id, spr] = m_game->Sprites().AddSprite(
 			SpriteSize::r1c1,
-			TILE_ATTR_FULL(PAL3, true, false, false, m_game->Sprites().InsertMiscTiles(misc_spr))
+			TILE_ATTR_FULL(PAL3, true, false, false, m_game->Sprites().InsertMiscTiles(misc_spr) + 1) // 1 is where the right-arrow is
 		);
 
 		spr.SetVisible(false);
