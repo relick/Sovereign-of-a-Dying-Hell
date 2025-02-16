@@ -21,6 +21,9 @@ class Script
 	std::unique_ptr<Game::Scene> m_currentScene;
 	Game::SceneRoutine m_currentSceneRoutine;
 	std::unique_ptr<Game::Scene> m_nextScene;
+
+public:
+	Game::NoSFX zanmu_beeps;
 };
 
 }

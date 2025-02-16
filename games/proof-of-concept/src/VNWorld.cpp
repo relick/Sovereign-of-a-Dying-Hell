@@ -480,7 +480,8 @@ void VNWorld::SetText
 (
 	Game& io_game,
 	Character const* i_char,
-	char const* i_text
+	char const* i_text,
+	std::optional<SFXID> i_beeps
 )
 {
 	TransitionTo(io_game, SceneMode::Dialogue);
@@ -495,7 +496,7 @@ void VNWorld::SetText
 		Get<SceneMode::Dialogue>().SetName(nullptr, true);
 	}
 
-	Get<SceneMode::Dialogue>().SetText(i_text);
+	Get<SceneMode::Dialogue>().SetText(i_text, i_beeps);
 }
 
 //------------------------------------------------------------------------------

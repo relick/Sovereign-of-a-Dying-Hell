@@ -10,6 +10,7 @@
 
 #include "res_bg.h"
 #include "res_spr.h"
+#include "res_sfx.h"
 
 namespace BuryYourGays
 {
@@ -113,6 +114,10 @@ void Script::InitVN
 	Game::VNWorld& io_vn
 )
 {
+	// Set up data
+	stacey_beeps = io_game.SFX().AddSFX(mid_beep, std::size(mid_beep), Game::Channel::TextBeeps);
+	beans_beeps = io_game.SFX().AddSFX(high_beep, std::size(high_beep), Game::Channel::TextBeeps);
+
 	// First scene
 	Scenes sceneToStart = Scenes::forestShed_runningThroughWoods;
 

@@ -22,9 +22,9 @@
 #define show(CHARA, POSE) io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose)
 #define hide() io_vn.HideCharacterVisual(io_game, false)
 
-#define think(TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")"); wait
+#define think(TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")", std::nullopt); wait
 
-#define say(CHARA, TEXT) io_vn.SetText(io_game, &c_ ## CHARA, TEXT); wait
+#define say(CHARA, TEXT) io_vn.SetText(io_game, &c_ ## CHARA, TEXT, script. CHARA ## _beeps); wait
 
 #define choice(CHOICE_SPAN) io_vn.Choice(io_game, CHOICE_SPAN); wait
 #define get_choice_result() *(io_vn.GetChoiceResult())

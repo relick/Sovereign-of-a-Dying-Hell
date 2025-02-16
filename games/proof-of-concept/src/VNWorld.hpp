@@ -75,7 +75,7 @@ public:
 	void BlackBG(Game& io_game);
 	void SetCharacterVisual(Game& io_game, Pose const& i_pose);
 	void HideCharacterVisual(Game& io_game, bool i_fast);
-	void SetText(Game& io_game, Character const* i_char, char const* i_text); // null char = hide name
+	void SetText(Game& io_game, Character const* i_char, char const* i_text, std::optional<SFXID> i_beeps); // null char = hide name
 	void Choice(Game& io_game, std::span<char const* const> i_choices);
 	void TimedChoice(Game& io_game, std::span<char const* const> i_choices, f16 i_timeInSeconds);
 	std::optional<u8> GetChoiceResult() const { return m_choiceMade; }

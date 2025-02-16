@@ -4,6 +4,7 @@
 #include "Debug.hpp"
 #include "FontData.hpp"
 #include "Game.hpp"
+#include "SFXManager.hpp"
 #include "SpriteManager.hpp"
 
 #include "res_spr.h"
@@ -254,9 +255,11 @@ void DialoguePrinter2::SetName
 //------------------------------------------------------------------------------
 void DialoguePrinter2::SetText
 (
-	char const* i_text
+	char const* i_text,
+	std::optional<SFXID> i_beeps
 )
 {
+	m_beeps = i_beeps;
 	m_doneAllText = false;
 	m_curText = i_text;
 	m_curTextLen = std::strlen(i_text);
@@ -294,6 +297,21 @@ void DialoguePrinter2::Update()
 	if (m_curText && m_curTextIndex < m_curTextLen)
 	{
 		bool const moreToDisplay = DrawChar();
+		if (m_beeps)
+		{
+			// TODO: Probably a better way of doing this...
+			if (moreToDisplay)
+			{
+				if (!m_game->SFX().IsPlaying(*m_beeps))
+				{
+					m_game->SFX().PlaySFX(*m_beeps);
+				}
+			}
+			else
+			{
+				m_game->SFX().StopSFX(*m_beeps);
+			}
+		}
 		showArrow = !moreToDisplay; // && m_curTextIndex != m_curTextLen; // Always display the arrow when at the end now
 		m_doneAllText = !moreToDisplay && m_curTextIndex == m_curTextLen;
 	}
@@ -327,6 +345,11 @@ void DialoguePrinter2::Next()
 	if(!m_curText)
 	{
 		return;
+	}
+
+	if (m_beeps)
+	{
+		m_game->SFX().StopSFX(*m_beeps);
 	}
 
 	if(!DrawChar())

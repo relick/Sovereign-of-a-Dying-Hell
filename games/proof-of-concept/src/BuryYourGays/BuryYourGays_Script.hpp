@@ -37,6 +37,11 @@ class Script
 	std::unique_ptr<Game::Scene> m_currentScene;
 	Game::SceneRoutine m_currentSceneRoutine;
 	std::optional<Scenes> m_nextScene;
+
+public:
+	Game::SFXID stacey_beeps;
+	Game::SFXID beans_beeps;
+
 };
 
 }

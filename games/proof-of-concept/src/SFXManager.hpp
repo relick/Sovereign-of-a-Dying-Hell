@@ -30,7 +30,11 @@ public:
     SFXID AddSFX(u8 const* i_sample, u32 i_len, Channel i_channel);
     void RemoveSFX(SFXID i_id);
 
+    bool IsPlaying(SFXID i_id) const; // Checks channel for given SFX
+    bool IsPlaying(Channel i_channel) const;
     void PlaySFX(SFXID i_id, u8 i_priority = 8) const;
+    void StopSFX(SFXID i_id) const; // Stops channel for given SFX
+    void StopSFX(Channel i_channel) const;
 };
 
 }

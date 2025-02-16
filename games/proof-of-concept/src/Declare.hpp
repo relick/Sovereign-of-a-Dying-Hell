@@ -4,6 +4,7 @@
 #include "Constants.hpp"
 
 #include <array>
+#include <optional>
 
 // Specify which section of frame some code is running in for template differences
 enum class During
@@ -23,6 +24,7 @@ using VBlankCallbackID = u8;
 
 // SFXManager
 using SFXID = u8;
+using NoSFX = std::nullopt_t; // Allows for missing beeps for a character
 class SFXManager;
 
 // SpriteManager

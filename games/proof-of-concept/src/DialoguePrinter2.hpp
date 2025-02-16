@@ -4,6 +4,7 @@
 #include "TileData.hpp"
 
 #include <array>
+#include <optional>
 
 namespace Game
 {
@@ -21,6 +22,7 @@ class DialoguePrinter2
 
 	VBlankCallbackID m_dmaCallbackID{};
 
+	std::optional<SFXID> m_beeps;
 	char const* m_curText{nullptr};
 	u16 m_curTextLen{0};
 	u16 m_curTextIndex{0};
@@ -52,7 +54,7 @@ public:
 	~DialoguePrinter2();
 
 	void SetName(char const* i_name, bool i_left);
-	void SetText(char const *i_text);
+	void SetText(char const* i_text, std::optional<SFXID> i_beeps);
 
 	// Advances render and queues DMA
 	void Update();

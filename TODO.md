@@ -8,9 +8,9 @@ Main list of TODO:
 - Triggered SFX // done!
 - Save data (straightforward to do but just bear in mind while making script engine) // done!
 - Title screen // done!
+- Text beeps // done!
 
 Left before jam:
-- Text beeps // SFXManager made, just needs to be hooked up to character and dialogue engine
 - Character animation layering
 - CG mode
 

@@ -40,6 +40,24 @@ void SFXManager::RemoveSFX
 }
 
 //------------------------------------------------------------------------------
+bool SFXManager::IsPlaying
+(
+    SFXID i_id
+) const
+{
+    return IsPlaying(m_sfxData[i_id].m_channel);
+}
+
+//------------------------------------------------------------------------------
+bool SFXManager::IsPlaying
+(
+    Channel i_channel
+) const
+{
+    return XGM_isPlayingPCM(1 << static_cast<u16>(i_channel));
+}
+
+//------------------------------------------------------------------------------
 void SFXManager::PlaySFX
 (
     SFXID i_id,
@@ -47,6 +65,24 @@ void SFXManager::PlaySFX
 ) const
 {
     XGM_startPlayPCM(SFXIDToXGMID(i_id), i_priority, static_cast<u16>(m_sfxData[i_id].m_channel));
+}
+
+//------------------------------------------------------------------------------
+void SFXManager::StopSFX
+(
+    SFXID i_id
+) const
+{
+    StopSFX(m_sfxData[i_id].m_channel);
+}
+
+//------------------------------------------------------------------------------
+void SFXManager::StopSFX
+(
+    Channel i_channel
+) const
+{
+    XGM_stopPlayPCM(static_cast<u16>(i_channel));
 }
 
 }
