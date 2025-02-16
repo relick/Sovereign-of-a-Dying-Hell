@@ -1,6 +1,7 @@
 #include "BuryYourGays_Scenes.hpp"
 #include "BuryYourGays_Script.hpp"
 #include "BuryYourGays_Chara.hpp"
+#include "IntroWorld.hpp"
 
 #include "SceneDefines.hpp"
 

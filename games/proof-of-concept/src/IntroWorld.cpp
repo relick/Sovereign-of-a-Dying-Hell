@@ -1,8 +1,8 @@
-#include "Worlds.hpp"
+#include "IntroWorld.hpp"
 
 #include "Game.hpp"
 #include "Version.hpp"
-#include "VNWorld.hpp"
+#include "TitleWorld.hpp"
 
 #include "BuryYourGays/BuryYourGays_Script.hpp"
 //#include "TestZanmu/TestZanmu_Script.hpp"
@@ -11,6 +11,7 @@
 namespace Game
 {
 
+//------------------------------------------------------------------------------
 WorldRoutine IntroWorld::Init
 (
 	Game& io_game
@@ -24,6 +25,7 @@ WorldRoutine IntroWorld::Init
 	co_return;
 }
 
+//------------------------------------------------------------------------------
 WorldRoutine IntroWorld::Shutdown
 (
 	Game& io_game
@@ -40,6 +42,7 @@ WorldRoutine IntroWorld::Shutdown
 	co_return;
 }
 
+//------------------------------------------------------------------------------
 void IntroWorld::Run
 (
 	Game& io_game
@@ -70,8 +73,8 @@ void IntroWorld::Run
 	{
 		PAL_interruptFade();
 		PAL_setPalette(PAL0, palette_black, DMA_QUEUE);
-		io_game.RequestNextWorld(std::make_unique<VNWorld>(std::make_unique<BuryYourGays::Script>()));
-		//io_game.RequestNextWorld(std::make_unique<VNWorld>(std::make_unique<TestZanmu::Script>()));
+		io_game.RequestNextWorld(std::make_unique<TitleWorld>(std::make_unique<BuryYourGays::Script>()));
+		//io_game.RequestNextWorld(std::make_unique<TitleWorld>(std::make_unique<TestZanmu::Script>()));
 	}
 	m_timer += FrameStep();
 	
@@ -88,6 +91,7 @@ void IntroWorld::Run
 	m_sineScroll += 4;
 }
 
+//------------------------------------------------------------------------------
 void IntroWorld::DMAScrollData()
 {
 	VDP_setHorizontalScrollLine(BG_B, 0, m_lineTable.data(), m_lineTable.size(), DMA);

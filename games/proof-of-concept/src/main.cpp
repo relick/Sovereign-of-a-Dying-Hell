@@ -1,5 +1,5 @@
 #include "Game.hpp"
-#include "Worlds.hpp"
+#include "IntroWorld.hpp"
 #include "Version.hpp"
 
 int main( bool hardReset )
