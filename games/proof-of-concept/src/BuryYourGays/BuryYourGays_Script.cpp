@@ -9,6 +9,7 @@
 #include "VNWorld.hpp"
 
 #include "res_bg.h"
+#include "res_spr.h"
 
 namespace BuryYourGays
 {
@@ -25,19 +26,31 @@ void Script::InitTitle
 		Tiles::c_emptyPlane
 	));
 	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_B, forest.tilemap->tilemap, forest.tilemap->w, forest.tilemap->h, c_tilesStart));
+	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(title.tileset, c_tilesEnd - title.tileset->numTile));
+	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_A, title.tilemap->tilemap, title.tilemap->w, title.tilemap->h,
+		TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, c_tilesEnd - title.tileset->numTile)
+	));
 	io_game.QueueLambdaTask([] -> Game::Task {
-		std::array<u16, 16> bgPal;
-		Palettes::FadeOp<16> fade = Palettes::CreateFade<16>(bgPal.data(), forest.palette->data, FramesPerSecond());
+		std::array<u16, 32> pal;
+		Palettes::FadeOp<16> fade = Palettes::CreateFade<16>(pal.data(), forest.palette->data, FramesPerSecond());
+		Palettes::FadeOp<16> fade2 = Palettes::CreateFade<16>(pal.data() + 16, title.palette->data, FramesPerSecond());
 
 		while (fade)
 		{
 			fade.DoFadeStep();
-			PAL_setColors(0, bgPal.data(), 16, DMA_QUEUE);
+			fade2.DoFadeStep();
+			PAL_setColors(0, pal.data(), 32, DMA_QUEUE);
 			co_yield{};
 		}
 
 		co_return;
 	});
+
+	u16 const arrowTiles = io_game.Sprites().InsertMiscTiles(misc_spr);
+	auto [arrowID, spr] = io_game.Sprites().AddSprite(Game::SpriteSize::r1c1, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, arrowTiles + 1));
+	m_arrowSpr = arrowID;
+	spr.SetX(8 * 5);
+	spr.SetY(8 * 21);
 }
 
 void Script::UpdateTitle
@@ -46,11 +59,51 @@ void Script::UpdateTitle
 	Game::TitleWorld& io_title
 )
 {
+	static bool pressed = false;
+
 	u16 const buttons = JOY_readJoypad(JOY_1);
 	if ((buttons & BUTTON_A) != 0)
 	{
+		if (m_selection == 0)
+		{
+			io_game.LoadVariables();
+		}
+
 		io_title.GoToVNWorld(io_game);
 		return;
+	}
+	else if ((buttons & BUTTON_DOWN) != 0)
+	{
+		if (!pressed)
+		{
+			++m_selection;
+			if (m_selection > 1)
+			{
+				m_selection = 0;
+			}
+
+			auto spr = io_game.Sprites().EditSpriteData(m_arrowSpr);
+			spr.SetY(8 * 21 + m_selection * 24);
+		}
+		pressed = true;
+	}
+	else if ((buttons & BUTTON_UP) != 0)
+	{
+		if (!pressed)
+		{
+			--m_selection;
+			if (m_selection < 0)
+			{
+				m_selection = 1;
+			}
+			auto spr = io_game.Sprites().EditSpriteData(m_arrowSpr);
+			spr.SetY(8 * 21 + m_selection * 24);
+		}
+		pressed = true;
+	}
+	else
+	{
+		pressed = false;
 	}
 }
 
@@ -60,8 +113,6 @@ void Script::InitVN
 	Game::VNWorld& io_vn
 )
 {
-	io_game.LoadVariables();
-
 	// First scene
 	Scenes sceneToStart = Scenes::forestShed_runningThroughWoods;
 

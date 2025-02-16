@@ -31,6 +31,9 @@ class Script
 	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
 	std::unique_ptr<Game::Scene> CreateScene(Scenes i_scene);
 
+	Game::SpriteID m_arrowSpr;
+	s16 m_selection{ 0 };
+
 	std::unique_ptr<Game::Scene> m_currentScene;
 	Game::SceneRoutine m_currentSceneRoutine;
 	std::optional<Scenes> m_nextScene;
