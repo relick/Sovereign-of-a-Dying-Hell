@@ -22,8 +22,8 @@ enum class Variables : u8
 class Script
 	: public Game::Script
 {
-	void Init(Game::Game& io_game, Game::VNWorld& io_vn) override;
-	void Update(Game::Game& io_game, Game::VNWorld& io_vn) override;
+	void InitVN(Game::Game& io_game, Game::VNWorld& io_vn) override;
+	void UpdateVN(Game::Game& io_game, Game::VNWorld& io_vn) override;
 	
 	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
 	std::unique_ptr<Game::Scene> CreateScene(Scenes i_scene);

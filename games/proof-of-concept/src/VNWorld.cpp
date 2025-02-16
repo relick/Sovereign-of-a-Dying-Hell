@@ -113,7 +113,7 @@ WorldRoutine VNWorld::Init
 		co_yield{};
 	}
 
-	m_script->Init(io_game, *this);
+	m_script->InitVN(io_game, *this);
 
 	co_return;
 }
@@ -222,7 +222,7 @@ void VNWorld::Run
 		{
 		case ProgressMode::Always:
 		{
-			m_script->Update(io_game, *this);
+			m_script->UpdateVN(io_game, *this);
 			break;
 		}
 		case ProgressMode::Dialogue:
@@ -230,7 +230,7 @@ void VNWorld::Run
 			if (ABCpressedThisFrame && Get<SceneMode::Dialogue>().Done())
 			{
 				m_progressMode = ProgressMode::Always;
-				m_script->Update(io_game, *this);
+				m_script->UpdateVN(io_game, *this);
 			}
 			break;
 		}
@@ -240,7 +240,7 @@ void VNWorld::Run
 			{
 				// We have MADE OUR CHOICE!
 				m_progressMode = ProgressMode::Always;
-				m_script->Update(io_game, *this);
+				m_script->UpdateVN(io_game, *this);
 				m_choiceMade = std::nullopt;
 			}
 			break;

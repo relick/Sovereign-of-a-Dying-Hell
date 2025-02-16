@@ -5,7 +5,7 @@
 namespace BuryYourGays
 {
 
-void Script::Init
+void Script::InitVN
 (
 	Game::Game& io_game,
 	Game::VNWorld& io_vn
@@ -28,10 +28,10 @@ void Script::Init
 	}
 
 	m_nextScene = sceneToStart;
-	Update(io_game, io_vn);
+	UpdateVN(io_game, io_vn);
 }
 
-void Script::Update
+void Script::UpdateVN
 (
 	Game::Game& io_game,
 	Game::VNWorld& io_vn

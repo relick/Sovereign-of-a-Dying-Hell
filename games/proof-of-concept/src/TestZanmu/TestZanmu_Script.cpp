@@ -3,7 +3,7 @@
 namespace TestZanmu
 {
 
-void Script::Init
+void Script::InitVN
 (
 	Game::Game& io_game,
 	Game::VNWorld& io_vn
@@ -11,10 +11,10 @@ void Script::Init
 {
 	// First scene
 	m_nextScene = CreateScene(Scenes::BlinkingInHell);
-	Update(io_game, io_vn);
+	UpdateVN(io_game, io_vn);
 }
 
-void Script::Update
+void Script::UpdateVN
 (
 	Game::Game& io_game,
 	Game::VNWorld& io_vn

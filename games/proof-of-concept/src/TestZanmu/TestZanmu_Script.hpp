@@ -13,8 +13,8 @@ namespace TestZanmu
 class Script
 	: public Game::Script
 {
-	void Init(Game::Game& io_game, Game::VNWorld& io_vn) override;
-	void Update(Game::Game& io_game, Game::VNWorld& io_vn) override;
+	void InitVN(Game::Game& io_game, Game::VNWorld& io_vn) override;
+	void UpdateVN(Game::Game& io_game, Game::VNWorld& io_vn) override;
 	
 	std::unique_ptr<Game::Scene> CreateScene(Scenes i_scene);
 
