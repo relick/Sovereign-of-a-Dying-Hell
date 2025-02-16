@@ -23,7 +23,13 @@ WorldRoutine TitleWorld::Init
 	Game& io_game
 )
 {
-	io_game.RequestNextWorld(std::make_unique<VNWorld>(std::move(m_script)));
+	m_script->InitTitle(io_game, *this);
+	
+	while (io_game.TasksInProgress())
+	{
+		co_yield{};
+	}
+
 	co_return;
 }
 
@@ -42,6 +48,16 @@ void TitleWorld::Run
 	Game& io_game
 )
 {
+	m_script->UpdateTitle(io_game, *this);
+}
+
+//------------------------------------------------------------------------------
+void TitleWorld::GoToVNWorld
+(
+	Game& io_game
+)
+{
+	io_game.RequestNextWorld(std::make_unique<VNWorld>(std::move(m_script)));
 }
 
 }

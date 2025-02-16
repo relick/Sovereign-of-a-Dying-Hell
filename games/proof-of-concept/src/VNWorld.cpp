@@ -17,14 +17,6 @@
 namespace Game
 {
 
-consteval std::array<u16, 64*32> FillHighlightPlaneA()
-{
-	std::array<u16, 64 * 32> arr;
-	arr.fill(TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, 2047));
-	return arr;
-}
-
-constexpr std::array<u16, 64 * 32> c_highlightEmptyPlaneA = FillHighlightPlaneA();
 constexpr Palettes::RGB3Colour c_tintColour{ 0, 1, 2 }; // TODO: customisable by player/scene/character?
 
 static u16 const* s_bgNormalPal{ palette_black };
@@ -309,14 +301,14 @@ void VNWorld::SetBG
 	});
 	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
 		i_bg.tileset,
-		0
+		c_tilesStart
 	));
 	io_game.QueueFunctionTask(Tiles::SetMap_Full(
 		VDP_BG_B,
 		i_bg.tilemap->tilemap,
 		i_bg.tilemap->w,
 		i_bg.tilemap->h,
-		TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, 0)
+		TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, c_tilesStart)
 	));
 	io_game.QueueLambdaTask([this, &i_bg]() -> Task {
 		m_bgSrcPal = i_bg.palette->data;
@@ -432,7 +424,7 @@ void VNWorld::SetCharacterVisual
 
 		co_return;
 	});
-	u16 const tileIndex = 1536 - i_pose.m_tileset->numTile;
+	u16 const tileIndex = c_tilesEnd - i_pose.m_tileset->numTile;
 	u16 const baseTile = TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex);
 	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
 		i_pose.m_tileset,
@@ -466,21 +458,16 @@ void VNWorld::HideCharacterVisual
 	// Fill with reserved but highlighted empty tile
 	if (i_fast)
 	{
-		io_game.QueueFunctionTask([] -> Task {
-			//AutoProfileScope profile("VNWorld::HideCharacter: %lu");
-			while (!DMA_transfer(DMA_QUEUE, DMA_VRAM, (void*)c_highlightEmptyPlaneA.data(), VDP_BG_A, c_highlightEmptyPlaneA.size(), 2))
-			{
-				co_yield {};
-			}
-
-			co_return;
-		}());
+		io_game.QueueFunctionTask(Tiles::ClearMap_Full(
+			VDP_BG_A,
+			Tiles::c_emptyPlane_Highlight
+		));
 	}
 	else
 	{
 		io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Down>(
 			VDP_BG_A,
-			c_highlightEmptyPlaneA.data(),
+			Tiles::c_emptyPlane_Highlight.data(),
 			40,
 			28,
 			0

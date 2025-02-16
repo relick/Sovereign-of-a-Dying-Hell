@@ -21,14 +21,14 @@ class World;
 
 using VBlankCallbackID = u8;
 
+// SFXManager
+using SFXID = u8;
+class SFXManager;
+
 // SpriteManager
 using SpriteID = u16;
 class SpriteData;
 class SpriteManager;
-
-// SFXManager
-using SFXID = u8;
-class SFXManager;
 
 //------------------------------------------------------------------------------
 enum class SpriteSize : u8
@@ -59,6 +59,12 @@ enum class SpritePalette : u8
     Pal2 = 2,
     Pal3 = 3,
 };
+
+// IntroWorld
+class IntroWorld;
+
+// TitleWorld
+class TitleWorld;
 
 // CharacterData
 struct AnimFrame;

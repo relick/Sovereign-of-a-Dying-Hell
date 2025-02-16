@@ -22,6 +22,9 @@ enum class Variables : u8
 class Script
 	: public Game::Script
 {
+	void InitTitle(Game::Game& io_game, Game::TitleWorld& io_title) override;
+	void UpdateTitle(Game::Game& io_game, Game::TitleWorld& io_title) override;
+
 	void InitVN(Game::Game& io_game, Game::VNWorld& io_vn) override;
 	void UpdateVN(Game::Game& io_game, Game::VNWorld& io_vn) override;
 	

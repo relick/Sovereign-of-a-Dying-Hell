@@ -9,9 +9,8 @@
 namespace Game
 {
 
-inline constexpr u16 c_miscTilesBaseAddress = 0xF680; // Sprite list is last thing placed in VRAM, and it ends at F680.
-inline constexpr u16 c_miscTilesBaseIndex = c_miscTilesBaseAddress / 32;
-inline constexpr u16 c_maxMiscTiles = u16((0x10000 - u32(c_miscTilesBaseAddress)) / 32);
+inline constexpr u16 c_miscTilesBaseIndex = c_extraTilesStart;
+inline constexpr u16 c_maxMiscTiles = c_extraTilesCount;
 inline constexpr VRAMSprite c_noSprites{};
 
 //------------------------------------------------------------------------------

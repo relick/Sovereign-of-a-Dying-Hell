@@ -7,6 +7,39 @@
 namespace Tiles
 {
 
+consteval std::array<u16, 64*32> FillEmptyPlane()
+{
+	std::array<u16, 64 * 32> arr;
+	arr.fill(TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, c_reservedClearTile));
+	return arr;
+}
+
+consteval std::array<u16, 64*32> FillEmptyPlane_Highlight()
+{
+	std::array<u16, 64 * 32> arr;
+	arr.fill(TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, c_reservedClearTile));
+	return arr;
+}
+
+inline constexpr std::array<u16, 64 * 32> c_emptyPlane = FillEmptyPlane();
+inline constexpr std::array<u16, 64 * 32> c_emptyPlane_Highlight = FillEmptyPlane_Highlight();
+
+//------------------------------------------------------------------------------
+inline Game::Task ClearMap_Full
+(
+	u16 i_planeAddr,
+	std::array<u16, 64 * 32> const& i_emptyPlane
+)
+{
+	// Simply schedule DMA
+	while (!DMA_queueDma(DMA_VRAM, (void*)i_emptyPlane.data(), i_planeAddr, i_emptyPlane.size(), 2))
+	{
+		co_yield{};
+	}
+
+	co_return;
+}
+
 //------------------------------------------------------------------------------
 // Based on VDP_setTileMapEx
 //------------------------------------------------------------------------------

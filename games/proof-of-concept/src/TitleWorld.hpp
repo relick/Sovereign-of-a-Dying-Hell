@@ -20,6 +20,8 @@ public:
 	WorldRoutine Init(Game& io_game) override;
 	WorldRoutine Shutdown(Game& io_game) override;
 	void Run(Game& io_game) override;
+
+	void GoToVNWorld(Game& io_game);
 };
 
 }
