@@ -6,10 +6,10 @@ Main list of TODO:
 - Choices // done!
 - Timed choices // logic done, just need graphics
 - Triggered SFX // done!
+- Save data (straightforward to do but just bear in mind while making script engine) // done!
 
 Left before jam:
 - Text beeps // SFXManager made, just needs to be hooked up to character and dialogue engine
-- Save data (straightforward to do but just bear in mind while making script engine)
 - Title screen
 - Character animation layering
 - CG mode

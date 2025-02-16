@@ -1,5 +1,7 @@
 #include "BuryYourGays_Script.hpp"
 
+#include "Game.hpp"
+
 namespace BuryYourGays
 {
 
@@ -9,8 +11,25 @@ void Script::Init
 	Game::VNWorld& io_vn
 )
 {
+	io_game.LoadVariables();
+
 	// First scene
-	m_nextScene = CreateScene(Scenes::forestShed_runningThroughWoods);
+	Scenes sceneToStart = Scenes::forestShed_runningThroughWoods;
+
+	// Set up variables
+	if (io_game.HasLoadedData())
+	{
+		// Get scene num
+		sceneToStart = io_game.ReadVar<Scenes>(Variables::SceneNum);
+	}
+	else
+	{
+		io_game.SetVariableCount(static_cast<u16>(Variables::Count));
+	}
+
+	io_game.SaveVariables();
+
+	m_nextScene = CreateScene(sceneToStart);
 	Update(io_game, io_vn);
 }
 

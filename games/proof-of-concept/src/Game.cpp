@@ -146,16 +146,30 @@ bool Game::TasksInProgress() const
 	return DMA_getQueueSize() > 0 || !m_tasks.empty();
 }
 
+static constexpr std::array<u16, 4> c_magicString = {
+	0x27FE,
+	0x7580,
+	0xC823,
+	0x5F83,
+};
+
 //------------------------------------------------------------------------------
 void Game::SaveVariables()
 {
 	SRAM_enable();
 
-	auto fnWriteWord = [offset = u32{ 0 }](u16 i_val) mutable
-		{
-			SRAM_writeWord(offset, i_val);
-			offset += 2;
-		};
+	auto fnWriteWord = [offset = u32{ 0 }] (u16 i_val) mutable
+	{
+		SRAM_writeWord(offset, i_val);
+		offset += 2;
+	};
+
+	// TODO: Save data twice, with a magic string and version number with each.
+	// this will help avoid issues on actual cartridges
+	for (u16 const magic : c_magicString)
+	{
+		fnWriteWord(magic);
+	}
 
 	fnWriteWord(m_gameVariables.size());
 	for (u16 var : m_gameVariables)
@@ -172,11 +186,40 @@ bool Game::LoadVariables()
 	SRAM_enableRO();
 
 	auto fnReadWord = [offset = u32{ 0 }] mutable -> u16
+	{
+		u16 val = SRAM_readWord(offset);
+		offset += 2;
+		return val;
+	};
+
+	bool needsClearing = false;
+	for (u16 const magic : c_magicString)
+	{
+		u16 const savedMagic = fnReadWord();
+		if (magic != savedMagic)
 		{
-			u16 val = SRAM_readWord(offset);
-			offset += 2;
-			return val;
-		};
+			needsClearing = true;
+			break;
+
+		}
+	}
+
+	if (needsClearing)
+	{
+		SRAM_enable();
+
+		// Need to clear SRAM
+		u32 const sramSize = (rom_header.sram_end - rom_header.sram_start) / 2;
+		for (u32 i = 0; i < sramSize; ++i)
+		{
+			SRAM_writeByte(i, 0);
+		}
+
+		SRAM_disable();
+
+		m_loadedData = false;
+		return m_loadedData;
+	}
 
 	u16 const varCount = fnReadWord();
 	m_gameVariables.resize(varCount);
@@ -187,7 +230,8 @@ bool Game::LoadVariables()
 
 	SRAM_disable();
 
-	return varCount > 0;
+	m_loadedData = varCount > 0;
+	return m_loadedData;
 }
 
 //------------------------------------------------------------------------------

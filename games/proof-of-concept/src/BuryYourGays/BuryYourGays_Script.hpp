@@ -10,6 +10,14 @@
 namespace BuryYourGays
 {
 
+enum class Variables : u8
+{
+	SceneNum,
+	StaceyApproval,
+
+	Count,
+};
+
 class Script
 	: public Game::Script
 {

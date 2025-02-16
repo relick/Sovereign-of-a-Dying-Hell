@@ -61,6 +61,7 @@ class Game
 	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
 
 	// TODO: improve beyond just being a set of numbers.
+	bool m_loadedData{ false };
 	std::vector<u16> m_gameVariables;
 
 public:
@@ -89,13 +90,22 @@ public:
 	bool TasksInProgress() const;
 
 	void SetVariableCount(u16 i_count) { m_gameVariables.resize(i_count); }
-	template<typename T = u16>
-	void SetVar(u16 i_varIndex, T i_value) requires(sizeof(T) == sizeof(u16)) { m_gameVariables[i_varIndex] = std::bit_cast<u16>(i_value); }
-	template<typename T = u16>
-	T ReadVar(u16 i_varIndex) const requires(sizeof(T) == sizeof(u16)) { return std::bit_cast<T>(m_gameVariables[i_varIndex]); }
+	template<typename T, typename T_Index = u16>
+	void SetVar(T_Index i_varIndex, T i_value) requires(sizeof(T) == sizeof(u16)) { m_gameVariables[static_cast<u16>(i_varIndex)] = std::bit_cast<u16>(i_value); }
+	template<typename T, typename T_Index = u8>
+	void SetVar(T_Index i_varIndex, T i_value) requires(sizeof(T) == sizeof(u8)) { m_gameVariables[static_cast<u16>(i_varIndex)] = std::bit_cast<u8>(i_value); }
+	template<typename T_Index = u16>
+	void SetVar(T_Index i_varIndex, bool i_value) { m_gameVariables[static_cast<u16>(i_varIndex)] = i_value ? 1 : 0; }
+	template<typename T, typename T_Index = u16>
+	T ReadVar(T_Index i_varIndex) const requires(sizeof(T) == sizeof(u16)) { return std::bit_cast<T>(m_gameVariables[static_cast<u16>(i_varIndex)]); }
+	template<typename T, typename T_Index = u8>
+	T ReadVar(T_Index i_varIndex) const requires(sizeof(T) == sizeof(u8)) { return std::bit_cast<T>(static_cast<u8>(m_gameVariables[static_cast<u16>(i_varIndex)])); }
+	template<typename T_Index = u16>
+	bool ReadVar(T_Index i_varIndex) const { return m_gameVariables[static_cast<u16>(i_varIndex)] == 1; }
 
 	void SaveVariables();
 	bool LoadVariables();
+	bool HasLoadedData() const { return m_loadedData; }
 
 private:
 	static void VIntCallback();
