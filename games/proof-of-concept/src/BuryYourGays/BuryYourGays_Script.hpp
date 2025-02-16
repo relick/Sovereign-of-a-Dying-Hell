@@ -6,6 +6,7 @@
 #include "BuryYourGays_Scenes.hpp"
 
 #include <memory>
+#include <optional>
 
 namespace BuryYourGays
 {
@@ -24,11 +25,12 @@ class Script
 	void Init(Game::Game& io_game, Game::VNWorld& io_vn) override;
 	void Update(Game::Game& io_game, Game::VNWorld& io_vn) override;
 	
+	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
 	std::unique_ptr<Game::Scene> CreateScene(Scenes i_scene);
 
 	std::unique_ptr<Game::Scene> m_currentScene;
 	Game::SceneRoutine m_currentSceneRoutine;
-	std::unique_ptr<Game::Scene> m_nextScene;
+	std::optional<Scenes> m_nextScene;
 };
 
 }

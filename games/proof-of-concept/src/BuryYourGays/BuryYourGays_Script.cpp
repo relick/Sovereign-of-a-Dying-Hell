@@ -27,9 +27,7 @@ void Script::Init
 		io_game.SetVariableCount(static_cast<u16>(Variables::Count));
 	}
 
-	io_game.SaveVariables();
-
-	m_nextScene = CreateScene(sceneToStart);
+	m_nextScene = sceneToStart;
 	Update(io_game, io_vn);
 }
 
@@ -41,7 +39,11 @@ void Script::Update
 {
 	if (m_nextScene)
 	{
-		m_currentScene = std::move(m_nextScene);
+		io_game.SetVar<Scenes>(Variables::SceneNum, *m_nextScene);
+		io_game.SaveVariables();
+
+		m_currentScene = CreateScene(*m_nextScene);
+		m_nextScene = std::nullopt;
 		m_currentSceneRoutine = m_currentScene->Run(io_game, io_vn, *this);
 	}
 	else if (m_currentSceneRoutine)
