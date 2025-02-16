@@ -67,7 +67,7 @@ void HInt_TextArea_Reset()
 //------------------------------------------------------------------------------
 VNWorld::VNWorld
 (
-	std::unique_ptr<Script>&& i_script
+	std::unique_ptr<Script> i_script
 )
 	: m_script{ std::move(i_script) }
 {
