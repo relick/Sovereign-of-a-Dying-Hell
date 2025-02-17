@@ -1,0 +1,1 @@
+XGM test "music/lost emotion.vgm"

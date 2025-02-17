@@ -7,7 +7,7 @@
 #include "SFXManager.hpp"
 #include "SpriteManager.hpp"
 
-#include "res_spr.h"
+#include "res_vn.h"
 
 #include <cstring>
 

@@ -4,9 +4,8 @@
 #include "Version.hpp"
 #include "TitleWorld.hpp"
 
-#include "BuryYourGays/BuryYourGays_Script.hpp"
-//#include "TestZanmu/TestZanmu_Script.hpp"
-#include "res_bg.h"
+#include "Jam15/Jam15_Script.hpp"
+#include "res_intro.h"
 
 namespace Game
 {
@@ -73,8 +72,7 @@ void IntroWorld::Run
 	{
 		PAL_interruptFade();
 		PAL_setPalette(PAL0, palette_black, DMA_QUEUE);
-		io_game.RequestNextWorld(std::make_unique<TitleWorld>(std::make_unique<BuryYourGays::Script>()));
-		//io_game.RequestNextWorld(std::make_unique<TitleWorld>(std::make_unique<TestZanmu::Script>()));
+		io_game.RequestNextWorld(std::make_unique<TitleWorld>(std::make_unique<Jam15::Script>()));
 	}
 	m_timer += FrameStep();
 	

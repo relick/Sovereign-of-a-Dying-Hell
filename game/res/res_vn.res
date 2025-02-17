@@ -1,0 +1,1 @@
+TILESET misc_spr "vn/misc_spr.png" NONE NONE

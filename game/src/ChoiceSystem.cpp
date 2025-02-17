@@ -4,7 +4,7 @@
 #include "Game.hpp"
 #include "Version.hpp"
 
-#include "res_spr.h"
+#include "res_vn.h"
 
 namespace Game
 {

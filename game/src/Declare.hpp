@@ -24,7 +24,7 @@ using VBlankCallbackID = u8;
 
 // SFXManager
 using SFXID = u8;
-using NoSFX = std::nullopt_t; // Allows for missing beeps for a character
+struct NoSFX { constexpr operator std::nullopt_t() const { return std::nullopt; } }; // Allows for missing beeps for a character
 class SFXManager;
 
 // SpriteManager
