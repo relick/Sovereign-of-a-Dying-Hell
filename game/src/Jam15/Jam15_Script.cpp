@@ -21,19 +21,19 @@ void Script::InitTitle
 	Game::TitleWorld& io_title
 )
 {
-	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(beach2.tileset, c_tilesStart));
+	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(kishin_council.tileset, c_tilesStart));
 	io_game.QueueFunctionTask(Tiles::ClearMap_Full(
 		VDP_BG_A,
 		Tiles::c_emptyPlane
 	));
-	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_B, beach2.tilemap->tilemap, beach2.tilemap->w, beach2.tilemap->h, c_tilesStart));
+	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_B, kishin_council.tilemap->tilemap, kishin_council.tilemap->w, kishin_council.tilemap->h, c_tilesStart));
 	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(title.tileset, c_tilesEnd - title.tileset->numTile));
 	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_A, title.tilemap->tilemap, title.tilemap->w, title.tilemap->h,
 		TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, c_tilesEnd - title.tileset->numTile)
 	));
 	io_game.QueueLambdaTask([] -> Game::Task {
 		std::array<u16, 32> pal;
-		Palettes::FadeOp<16> fade = Palettes::CreateFade<16>(pal.data(), beach2.palette->data, FramesPerSecond());
+		Palettes::FadeOp<16> fade = Palettes::CreateFade<16>(pal.data(), kishin_council.palette->data, FramesPerSecond());
 		Palettes::FadeOp<16> fade2 = Palettes::CreateFade<16>(pal.data() + 16, title.palette->data, FramesPerSecond());
 
 		while (fade)

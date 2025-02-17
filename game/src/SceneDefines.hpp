@@ -32,3 +32,5 @@
 #define get_timed_choice_result() io_vn.GetChoiceResult()
 
 #define vpunch()
+
+#define cg(CG)
