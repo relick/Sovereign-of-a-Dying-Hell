@@ -10,7 +10,7 @@
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build and Run (Debug)",
-            "program": "games/proof-of-concept/out/rom.out",
+            "program": "game/out/rom.out",
             /*"logging": {
                 "engineLogging": true,
                 "trace": true,

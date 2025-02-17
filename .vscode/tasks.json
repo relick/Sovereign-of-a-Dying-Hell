@@ -78,7 +78,7 @@
         {
             "label": "Run",
             "type": "shell",
-            "command": "\"..\\..\\SDKs\\blastem\\blastem.exe\" \"games\\proof-of-concept\\out\\rom.bin\"",
+            "command": "\"..\\..\\SDKs\\blastem\\blastem.exe\" \"game\\out\\rom.bin\"",
             "presentation": {
                 "echo": true,
                 "reveal": "never",
@@ -91,7 +91,7 @@
         {
             "label": "Run (Debug)",
             "type": "shell",
-            "command": "\"..\\..\\SDKs\\blastem\\blastem.exe\" \"games\\proof-of-concept\\out\\rom.bin\" -D",
+            "command": "\"..\\..\\SDKs\\blastem\\blastem.exe\" \"game\\out\\rom.bin\" -D",
             "presentation": {
                 "echo": true,
                 "reveal": "never",

@@ -7,10 +7,9 @@ SET "GDK_WIN=%cd%/../../SDKs/SGDKplusplus"
 SET "XGCC_WIN=%GDK_WIN%\x68k-gcc\bin"
 SET "PATH=%GDK_WIN%\bin;%XGCC_WIN%;%PATH%"
 
-set DIRS=games\proof-of-concept
+set DIR=game
 
-for /D %%i in (%DIRS%) do (
-    echo "%%i"
-    %GDK_WIN%\bin\make -C "%%i" clean -f %GDK_WIN%\makefilecpp.gen
-    %GDK_WIN%\bin\make -C "%%i" asm -f %GDK_WIN%\makefilecpp.gen
-)  
+echo "Building '%DIR%' as asm..."
+%GDK_WIN%\bin\make -C "%DIR%" clean -f %GDK_WIN%\makefilecpp.gen
+%GDK_WIN%\bin\make -C "%DIR%" asm -f %GDK_WIN%\makefilecpp.gen
+echo "Build complete."
