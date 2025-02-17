@@ -31,4 +31,29 @@ inline constexpr Game::Character c_zanmu = {
 	c_zanmu_poses,
 };
 
+inline constexpr Game::Character c_hisami = {
+	"HISAMI", false,
+	{},
+};
+
+inline constexpr Game::Character c_suika = {
+	"SUIKA", false,
+	{},
+};
+
+inline constexpr Game::Character c_yuugi = {
+	"YUUGI", false,
+	{},
+};
+
+inline constexpr Game::Character c_yuuma = {
+	"YUUMA", false,
+	{},
+};
+
+inline constexpr Game::Character c_kishin = {
+	"?????", false,
+	{},
+};
+
 }

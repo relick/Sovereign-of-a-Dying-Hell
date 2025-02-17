@@ -118,7 +118,7 @@ void Script::InitVN
 	// zanmu_beeps = io_game.SFX().AddSFX(mid_beep, std::size(mid_beep), Game::Channel::TextBeeps);
 
 	// First scene
-	Scenes sceneToStart = Scenes::scene1;
+	Scenes sceneToStart = Scenes::FirstVoteProposal;
 
 	// Set up variables
 	if (io_game.HasLoadedData())
@@ -163,7 +163,25 @@ std::unique_ptr<Game::Scene> Script::CreateScene
 {
 	switch(i_scene)
 	{
-	case Scenes::scene1: return std::make_unique<scene1>();
+	case Scenes::FirstVoteProposal: return std::make_unique<FirstVoteProposal>();
+	case Scenes::HatchingThePlan: return std::make_unique<HatchingThePlan>();
+	case Scenes::LobbyingYuugi: return std::make_unique<LobbyingYuugi>();
+	case Scenes::VotingForAnimalRights: return std::make_unique<VotingForAnimalRights>();
+	case Scenes::SuikaApproaches: return std::make_unique<SuikaApproaches>();
+	case Scenes::DelegatingToHisami: return std::make_unique<DelegatingToHisami>();
+	case Scenes::VotingForPriceIncreases: return std::make_unique<VotingForPriceIncreases>();
+	case Scenes::MeetingTheShadowyKishin: return std::make_unique<MeetingTheShadowyKishin>();
+	case Scenes::EngagingYuuma: return std::make_unique<EngagingYuuma>();
+	case Scenes::VotingForExecutive: return std::make_unique<VotingForExecutive>();
+	case Scenes::FinalHisami: return std::make_unique<FinalHisami>();
+	case Scenes::FinalYuugi: return std::make_unique<FinalYuugi>();
+	case Scenes::FinalSuika: return std::make_unique<FinalSuika>();
+	case Scenes::FinalYuuma: return std::make_unique<FinalYuuma>();
+	case Scenes::VotingToRelocateHell: return std::make_unique<VotingToRelocateHell>();
+
+	case Scenes::Ending_RulingDecay: return std::make_unique<Ending_RulingDecay>();
+	case Scenes::Ending_NewHell: return std::make_unique<Ending_NewHell>();
+	case Scenes::Ending_AdministratingCollapse: return std::make_unique<Ending_AdministratingCollapse>();
 	}
 	
 	return {};
