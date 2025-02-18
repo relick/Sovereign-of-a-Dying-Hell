@@ -104,7 +104,7 @@ SCENE_RUN(EngagingYuuma)
     bool const punishmentVotePassed = io_game.ReadVar<bool>(Variables::PunishmentVotePasses);
     bool const priceIncreaseVoteFailed = io_game.ReadVar<bool>(Variables::PriceIncreaseVoteFails);
 
-    show(yuuma, placeholder);
+    show(yuuma, neutral);
     say_hidden(yuuma, "Nippaku...");
 
     bool onGoodTerms = false;
@@ -119,7 +119,11 @@ SCENE_RUN(EngagingYuuma)
         say_hidden(yuuma, "The bleeding heart making symbolic votes over our conditions?");
 
         {
-            choice({"I'm sorry it wasn't passed.", "The oni are shortsighted."});
+            static constexpr std::array choices = {
+                "I'm sorry it wasn't passed.",
+                "The oni are shortsighted."
+            };
+            choice(choices);
             auto const res = get_choice_result();
             switch(res)
             {
@@ -141,7 +145,7 @@ SCENE_RUN(EngagingYuuma)
     }
 
     say(yuuma, "I'm Yuuma. What do you want?");
-    say(zanmu, "")
+    say(zanmu, "");
 
     end;
 }

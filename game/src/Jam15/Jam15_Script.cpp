@@ -118,7 +118,7 @@ void Script::InitVN
 	// zanmu_beeps = io_game.SFX().AddSFX(mid_beep, std::size(mid_beep), Game::Channel::TextBeeps);
 
 	// First scene
-	Scenes sceneToStart = Scenes::FirstVoteProposal;
+	Scenes sceneToStart = Scenes::EngagingYuuma;
 
 	// Set up variables
 	if (io_game.HasLoadedData())
