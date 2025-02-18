@@ -23,6 +23,9 @@
 #define hide() io_vn.HideCharacterVisual(io_game, false)
 #define face(CHARA, EXPRESSION) // TODO
 
+// TODO: special formatting
+#define desc(TEXT) io_vn.SetText(io_game, nullptr, TEXT, std::nullopt); wait
+
 #define think(TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")", std::nullopt); wait
 
 #define say(CHARA, TEXT) io_vn.SetText(io_game, &c_ ## CHARA, TEXT, script. CHARA ## _beeps); wait

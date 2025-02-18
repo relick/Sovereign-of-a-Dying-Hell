@@ -29,7 +29,6 @@ class Script
 	void InitVN(Game::Game& io_game, Game::VNWorld& io_vn) override;
 	void UpdateVN(Game::Game& io_game, Game::VNWorld& io_vn) override;
 	
-	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
 	std::unique_ptr<Game::Scene> CreateScene(Scenes i_scene);
 
 	Game::SpriteID m_arrowSpr;
@@ -40,6 +39,8 @@ class Script
 	std::optional<Scenes> m_nextScene;
 
 public:
+	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
+	
 	Game::NoSFX zanmu_beeps;
 	Game::NoSFX hisami_beeps;
 	Game::NoSFX suika_beeps;
