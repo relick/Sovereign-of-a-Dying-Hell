@@ -14,13 +14,18 @@ Left before jam:
 - Character animation layering
 - CG mode
 
+Jam todo:
+- 2nd Character (portrait)
+- Voting mechanic
+- Sharp transition between scenes
+
 Stretch:
 - vpunch/hpunch
 - Intro world sounds
 - Credits animation
 - Music room
 - Better font (thicker, for better visibility on composite signal?)
-- 2nd Character (portrait)
+
 
 Known Bugs:
 - Unresponsiveness when pressing buttons on 'blocked' frames where progression isn't allowed. Should be reasonable to just buffer the input for a few frames.

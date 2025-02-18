@@ -40,12 +40,14 @@ class Script
 
 public:
 	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
-	
+
 	Game::NoSFX zanmu_beeps;
 	Game::NoSFX hisami_beeps;
 	Game::NoSFX suika_beeps;
 	Game::NoSFX yuugi_beeps;
 	Game::NoSFX yuuma_beeps;
+	Game::NoSFX councilL_beeps;
+	Game::NoSFX councilR_beeps;
 	Game::NoSFX kishin_beeps;
 };
 

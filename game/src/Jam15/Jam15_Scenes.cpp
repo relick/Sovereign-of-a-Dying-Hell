@@ -20,8 +20,9 @@ SCENE_RUN(FirstVoteProposal)
 
     scene(kishin_council);
 
-    play_music(test, 1.0, true);
+    // TODO
 
+    script.SetNextScene(Scenes::HatchingThePlan);
     end;
 }
 
@@ -31,6 +32,9 @@ SCENE_RUN(HatchingThePlan)
 
     scene(zanmu_study);
 
+    // TODO
+
+    script.SetNextScene(Scenes::LobbyingYuugi);
     end;
 }
 
@@ -40,6 +44,9 @@ SCENE_RUN(LobbyingYuugi)
 
     scene(hell_city);
 
+    // TODO
+
+    script.SetNextScene(Scenes::VotingForAnimalRights);
     end;
 }
 
@@ -49,6 +56,9 @@ SCENE_RUN(VotingForAnimalRights)
 
     scene(kishin_council);
 
+    // TODO
+
+    script.SetNextScene(Scenes::SuikaApproaches);
     end;
 }
 
@@ -58,6 +68,9 @@ SCENE_RUN(SuikaApproaches)
 
     scene(zanmu_study);
 
+    // TODO
+
+    script.SetNextScene(Scenes::DelegatingToHisami);
     end;
 }
 
@@ -67,6 +80,9 @@ SCENE_RUN(DelegatingToHisami)
 
     scene(zanmu_study);
 
+    // TODO
+
+    script.SetNextScene(Scenes::VotingForPriceIncreases);
     end;
 }
 
@@ -76,6 +92,9 @@ SCENE_RUN(VotingForPriceIncreases)
 
     scene(kishin_council);
 
+    // TODO
+
+    script.SetNextScene(Scenes::MeetingTheShadowyKishin);
     end;
 }
 
@@ -85,6 +104,9 @@ SCENE_RUN(MeetingTheShadowyKishin)
 
     scene(hell_palace);
 
+    // TODO
+
+    script.SetNextScene(Scenes::EngagingYuuma);
     end;
 }
 
@@ -155,13 +177,15 @@ SCENE_RUN(EngagingYuuma)
     say(zanmu, "I wanted to see who was acting as a leader to the eagle spirits. I'm keen to see them prosper.");
 
     think("A taotie is their leader? She might turn out to be a loose cannon. Still, I need to get on her good side...");
-
+    
     // TODO: a bit more chatter to get to know Yuuma?
+    
+    think("What I say next will be very important.");
 
     bool freeAnimalRealm = false;
     {
         static constexpr std::array choices = {
-            "Raise the idea of a completely free Animal Realm",
+            "Raise the idea of a liberated Animal Realm",
             "Offer advice on growing her organisation",
         };
         choice(choices);
@@ -309,7 +333,6 @@ SCENE_RUN(EngagingYuuma)
     }
 
     script.SetNextScene(Scenes::VotingForExecutive);
-
     end;
 }
 
@@ -317,12 +340,84 @@ SCENE_RUN(VotingForExecutive)
 {
     SCENE_SETUP();
 
-    scene(zanmu_study);
-
     scene(kishin_council);
 
+    show(zanmu, neutral);
+    say(zanmu, "Illustrious Council! Before we attend to any further matters, I have an urgent proposal to make.");
+    say(councilR, "Go ahead, Nippaku.");
+    say(zanmu, "I have spent the last few days surveying the realms again, as I often do. I've seen decay, paralysis, and overpopulation. This council has... struggled to respond over the years.");
+    say(zanmu, "But it's reaching a breaking point. If this goes on much longer, the Yama will turn elsewhere to send damned souls.");
+    say(zanmu, "I see no other choice but this: we must empower one of us as an executive that can lead Hell out of its rot.");
+    say(zanmu, "They must be untethered by the debates of this council.");
+    say(zanmu, "They must have a singular strong vision, to end this slow death by committee.");
+
+    say(councilL, "What?");
+    say(councilR, "Preposterous!");
+    say(councilL, "She has a point, we barely achieve anything.");
+    say(councilR, "None of us deserve to rule without restriction.");
+    say(councilL, "Exactly! This is a power move!");
+
+    think("They're taking it about as well as I expected.");
+
+    say(councilR, "...QUIET!");
+    say(councilR, "Nippaku, your proposal is acknolwedged, let's get it out the way first. Hopefully a productive meeting can follow.");
+
+    // TODO-VOTE
+    bool const voteSucceeded = {};
+
+    if (voteSucceeded)
+    {
+        // TODO
+        script.SetNextScene(Scenes::Ending_RulingDecay);
+        end;
+    }
+    
+    // TODO eh could be better
+    say(zanmu, "I accept the council's decision, but I see it as a refusal of reality.");
+    say(zanmu, "Nevertheless, I do acknowledge the risk of allocating supreme power. I still see another way forward, that avoids this risk.");
+    say(zanmu, "I will take leave of the remainder of this meeting, and will raise a fresh idea in tomorrow's meeting.");
+
     scene(zanmu_study);
 
+    think("That was no surprise. It would have taken all my influence to win that vote.");
+    think("If I could have ruled this Hell... it would have had a chance.");
+    think("But maybe it was always going to be easier to take the more drastic option.");
+    think("Tomorrow, I will propose a relocation, to a new Hell.");
+    think("...");
+    think("I should spend the rest of the day shoring up my support.");
+
+    {
+        static constexpr std::array choices = {
+            "Stay with Hisami",
+            "Revisit Yuugi",
+            "Revisit Suika",
+            "Revisit Yuuma",
+        };
+        auto const res = get_choice_result();
+        switch (res)
+        {
+        case 0:
+        {
+            script.SetNextScene(Scenes::FinalHisami);
+            break;
+        }
+        case 1:
+        {
+            script.SetNextScene(Scenes::FinalYuugi);
+            break;
+        }
+        case 2:
+        {
+            script.SetNextScene(Scenes::FinalSuika);
+            break;
+        }
+        case 3:
+        {
+            script.SetNextScene(Scenes::FinalYuuma);
+            break;
+        }
+        }
+    }
 
     end;
 }
@@ -333,6 +428,9 @@ SCENE_RUN(FinalHisami)
 
     scene(zanmu_study);
 
+    // TODO
+
+    script.SetNextScene(Scenes::VotingToRelocateHell);
     end;
 }
 
@@ -342,6 +440,9 @@ SCENE_RUN(FinalYuugi)
 
     scene(hell_city);
 
+    // TODO
+
+    script.SetNextScene(Scenes::VotingToRelocateHell);
     end;
 }
 
@@ -351,6 +452,9 @@ SCENE_RUN(FinalSuika)
 
     scene(hell_palace);
 
+    // TODO
+
+    script.SetNextScene(Scenes::VotingToRelocateHell);
     end;
 }
 
@@ -360,6 +464,9 @@ SCENE_RUN(FinalYuuma)
 
     scene(animal_realm);
 
+    // TODO
+
+    script.SetNextScene(Scenes::VotingToRelocateHell);
     end;
 }
 

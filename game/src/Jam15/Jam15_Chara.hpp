@@ -107,10 +107,22 @@ inline constexpr Game::Character c_yuuma = {
 };
 
 //------------------------------------------------------------------------------
-/// Shadowy Kishin
+/// Various without images
 //------------------------------------------------------------------------------
+// A generic councillor on the left
+inline constexpr Game::Character c_councilL = {
+	"KISHIN", true,
+	{},
+};
+// A generic councillor on the right
+inline constexpr Game::Character c_councilR = {
+	"KISHIN", false,
+	{},
+};
+
+// The shadowy kishin
 inline constexpr Game::Character c_kishin = {
-	"?????", false,
+	"HIDDEN KISHIN", false,
 	{},
 };
 
