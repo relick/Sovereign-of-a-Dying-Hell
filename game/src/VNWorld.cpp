@@ -72,10 +72,6 @@ WorldRoutine VNWorld::Init
 	Game& io_game
 )
 {
-	// Way low. It'll take several frames but we'll cope
-	DMA_setMaxTransferSize(4096);
-	DMA_setIgnoreOverCapacity(true);
-
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
 

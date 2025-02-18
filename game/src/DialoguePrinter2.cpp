@@ -47,12 +47,14 @@ DialoguePrinter2::DialoguePrinter2
 {
 	m_dmaCallbackID = m_game->AddVBlankCallback(
 		[this] {
+			// NB: This limit is disabled, to allow text to DMA in parallel with tasks
+			// Hopefully this never presents an issue!
 			// Wait for next frame if there are any tasks queued, to avoid piling too much DMA
 			// Text can be quite heavy!
-			if (m_game->TasksInProgress())
+			/*if (m_game->TasksInProgress())
 			{
 				return;
-			}
+			}*/
 
 			// Must clear VRAM by DMA fill in the VBlank, otherwise it swallows up the whole frame
 			if (!m_vramInitialised)

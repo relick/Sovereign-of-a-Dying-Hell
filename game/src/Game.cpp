@@ -31,6 +31,12 @@ Game::Game()
 	VDP_setScreenWidth320();
 	VDP_setScreenHeight224();
 
+	// The 'hard' limit is just over 7kB for NTSC
+	// By being substantially lower than that we allow some room for extra
+	// CPU processing and for dialogue text DMA to happen in parallel
+	DMA_setMaxTransferSize(4096);
+	DMA_setIgnoreOverCapacity(true);
+
 	PreWorldInit();
 }
 
