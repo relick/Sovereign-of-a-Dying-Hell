@@ -21,6 +21,7 @@
 
 #define show(CHARA, POSE) io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose)
 #define hide() io_vn.HideCharacterVisual(io_game, false)
+#define face(CHARA, EXPRESSION) // TODO
 
 #define think(TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")", std::nullopt); wait
 

@@ -111,11 +111,13 @@ SCENE_RUN(EngagingYuuma)
     if (punishmentVotePassed)
     {
         onGoodTerms = true;
+        face(yuuma, pleased);
         say_hidden(yuuma, "Ah! You're the one who cut back our punishments.");
         say_hidden(yuuma, "Hehehe. You must be scheming something good.");
     }
     else
     {
+        face(yuuma, annoyed);
         say_hidden(yuuma, "The bleeding heart making symbolic votes over our conditions?");
 
         {
@@ -144,7 +146,9 @@ SCENE_RUN(EngagingYuuma)
         }
     }
 
+    face(yuuma, neutral);
     say(yuuma, "I'm Yuuma. What do you want?");
+    
     say(zanmu, "");
 
     end;
