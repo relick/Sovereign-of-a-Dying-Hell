@@ -14,6 +14,8 @@ namespace Jam15
 enum class Variables : u8
 {
 	SceneNum,
+	PunishmentVotePasses,
+	PriceIncreaseVoteFails,
 
 	Count,
 };

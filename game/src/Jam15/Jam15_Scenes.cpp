@@ -22,8 +22,6 @@ SCENE_RUN(FirstVoteProposal)
 
     play_music(test, 1.0, true);
 
-    say(zanmu, "Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test ");
-
     end;
 }
 
@@ -95,6 +93,55 @@ SCENE_RUN(EngagingYuuma)
     SCENE_SETUP();
 
     scene(animal_realm);
+
+    think("It should be around here.");
+    think("Ah, I've been spotted.");
+
+    say_hidden(yuuma, "Oi. Scram, oni.");
+
+    say(zanmu, "It's Nippaku.");
+
+    bool const punishmentVotePassed = io_game.ReadVar<bool>(Variables::PunishmentVotePasses);
+    bool const priceIncreaseVoteFailed = io_game.ReadVar<bool>(Variables::PriceIncreaseVoteFails);
+
+    show(yuuma, placeholder);
+    say_hidden(yuuma, "Nippaku...");
+
+    bool onGoodTerms = false;
+    if (punishmentVotePassed)
+    {
+        onGoodTerms = true;
+        say_hidden(yuuma, "Ah! You're the one who cut back our punishments.");
+        say_hidden(yuuma, "Hehehe. You must be scheming something good.");
+    }
+    else
+    {
+        say_hidden(yuuma, "The bleeding heart making symbolic votes over our conditions?");
+
+        {
+            choice({"I'm sorry it wasn't passed.", "The oni are shortsighted."});
+            auto const res = get_choice_result();
+            switch(res)
+            {
+                case 0:
+                {
+                    say_hidden(yuuma, "Whatever.");
+                    break;
+                }
+                case 1:
+                {
+                    onGoodTerms = true;
+                    say_hidden(yuuma, "They are. And you're different?");
+                    say(zanmu, "Certainly.");
+                    say_hidden(yuuma, "Hehe. Alright then.");
+                    break;
+                }
+            }
+        }
+    }
+
+    say(yuuma, "I'm Yuuma. What do you want?");
+    say(zanmu, "")
 
     end;
 }
