@@ -60,6 +60,8 @@ SCENE_RUN(HatchingThePlan)
     scene(zanmu_study);
     wait_for_tasks();
 
+    desc("Zanmu's study is cold and devoid of decoration.");
+
     think("Tch. The kishin are always so fickle.");
     think("I'll need to raise that again another time, but this rate of change isn't fast enough. Hell's institutions are already faltering.");
     think("Perhaps working within the Council isn't the play any more...");
