@@ -46,7 +46,9 @@ class DialoguePrinter2
 	u16 m_lineTileRefreshStart{UINT16_MAX};
 	u16 m_lineTileRefreshEnd{0};
 
-	bool m_doneAllText{false};
+	bool m_doneAllText{ false };
+
+	s8 m_timer{ 0 };
 
 public:
 	// Sets up tiles and tilemap

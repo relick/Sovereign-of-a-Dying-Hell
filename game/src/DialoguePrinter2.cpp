@@ -35,6 +35,10 @@ inline constexpr u16 c_lineSeparation = 2;
 inline constexpr u16 c_lineIndent = 1;
 
 inline constexpr u8 c_arrowSpeed = 2; // Number of updates between arrow flashes i.e. higher number = longer.
+inline constexpr s8 c_framesUntilNextCharacter = 2; // Number of frames between characters being drawn on screen. Equivalent to number of updates too
+inline constexpr s8 c_extraFramesWaitedOnComma = 10; // Delay for ,
+inline constexpr s8 c_extraFramesWaitedOnFullStop = 20; // Delay for . ! ?
+inline constexpr s8 c_extraFramesWaitedOnEllipsis = 40; // Delay for ... ..! ..?
 
 //------------------------------------------------------------------------------
 DialoguePrinter2::DialoguePrinter2
@@ -283,15 +287,13 @@ void DialoguePrinter2::Update()
 		}
 	}
 
-	// TODO: properly controllable timer
-	static u16 time = 0;
-	if (time == 3)
+	if (m_timer == c_framesUntilNextCharacter)
 	{
-		time = 0;
+		m_timer = 0;
 	}
 	else
 	{
-		++time;
+		++m_timer;
 		return;
 	}
 
@@ -432,7 +434,27 @@ bool DialoguePrinter2::DrawChar
 		}
 	}
 
-	u8 curChar = m_curText[m_curTextIndex];
+	char const curChar = m_curText[m_curTextIndex];
+
+	// First, add mid-line delays depending on char type
+	if ((m_curTextIndex + 1) < m_curTextLen && m_curText[m_curTextIndex + 1] == ' ')
+	{
+		if (curChar == ',')
+		{
+			m_timer = -c_extraFramesWaitedOnComma;
+		}
+		else if (curChar == '.' || curChar == '!' || curChar == '?')
+		{
+			if (m_curTextIndex > 2 && m_curText[m_curTextIndex - 1] == '.' && m_curText[m_curTextIndex - 2] == '.')
+			{
+				m_timer = -c_extraFramesWaitedOnEllipsis;
+			}
+			else
+			{
+				m_timer = -c_extraFramesWaitedOnFullStop;
+			}
+		}
+	}
 
 	m_lastCharWasSpace = curChar == ' ';
 
