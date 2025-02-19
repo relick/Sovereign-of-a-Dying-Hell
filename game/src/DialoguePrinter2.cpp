@@ -198,7 +198,7 @@ void DialoguePrinter2::SetName
 	bool i_left
 )
 {
-	if (i_name == m_curName)
+	if (i_name == m_curName && i_left == m_nameOnLeft)
 	{
 		return;
 	}
