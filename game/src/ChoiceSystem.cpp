@@ -13,7 +13,7 @@ inline constexpr u16 c_textTilesAddress = 0xD000;
 inline constexpr u16 c_textTilesIndex = c_textTilesAddress / 32;
 
 inline constexpr u16 c_pixelsPerTile = 8;
-inline constexpr u16 c_spritesPerChoice = 4;
+inline constexpr u16 c_spritesPerChoice = 7;
 inline constexpr u16 c_tilesPerChoice = c_spritesPerChoice * 4;
 inline constexpr u16 c_pixelsPerChoice = c_tilesPerChoice * c_pixelsPerTile;
 
@@ -175,6 +175,7 @@ Task ChoiceSystem::RenderText()
 				if (curCharWidth + x > c_pixelsPerChoice)
 				{
 					// Can't fit any more characters
+					++str;
 					continue;
 				}
 
