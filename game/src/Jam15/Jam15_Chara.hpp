@@ -37,10 +37,14 @@ inline constexpr Game::Character c_zanmu = {
 //------------------------------------------------------------------------------
 /// Hisami
 //------------------------------------------------------------------------------
+inline constexpr Game::AnimFrames<1> c_hisami_placeholder = { {
+	{ &hisami_placeholder, Game::AnimFrameDuration::Infinite(), },
+} };
+
 inline constexpr Game::Pose c_hisami_neutral_pose = {
-	&zanmu_tileset,
-	&zanmu_pal,
-	c_zanmu_blink_anim
+	&hisami_tileset,
+	&hisami_pal,
+	c_hisami_placeholder
 };
 
 inline constexpr Game::Poses<1> c_hisami_poses = {
@@ -55,10 +59,14 @@ inline constexpr Game::Character c_hisami = {
 //------------------------------------------------------------------------------
 /// Suika
 //------------------------------------------------------------------------------
+inline constexpr Game::AnimFrames<1> c_suika_placeholder = { {
+	{ &suika_placeholder, Game::AnimFrameDuration::Infinite(), },
+} };
+
 inline constexpr Game::Pose c_suika_neutral_pose = {
-	&zanmu_tileset,
-	&zanmu_pal,
-	c_zanmu_blink_anim
+	&suika_tileset,
+	&suika_pal,
+	c_suika_placeholder
 };
 
 inline constexpr Game::Poses<1> c_suika_poses = {
@@ -73,10 +81,14 @@ inline constexpr Game::Character c_suika = {
 //------------------------------------------------------------------------------
 /// Yuugi
 //------------------------------------------------------------------------------
+inline constexpr Game::AnimFrames<1> c_yuugi_placeholder = { {
+	{ &yuugi_placeholder, Game::AnimFrameDuration::Infinite(), },
+} };
+
 inline constexpr Game::Pose c_yuugi_neutral_pose = {
-	&zanmu_tileset,
-	&zanmu_pal,
-	c_zanmu_blink_anim
+	&yuugi_tileset,
+	&yuugi_pal,
+	c_yuugi_placeholder
 };
 
 inline constexpr Game::Poses<1> c_yuugi_poses = {
@@ -91,10 +103,14 @@ inline constexpr Game::Character c_yuugi = {
 //------------------------------------------------------------------------------
 /// Yuuma
 //------------------------------------------------------------------------------
+inline constexpr Game::AnimFrames<1> c_yuuma_placeholder = { {
+	{ &yuuma_placeholder, Game::AnimFrameDuration::Infinite(), },
+} };
+
 inline constexpr Game::Pose c_yuuma_neutral_pose = {
-	&zanmu_tileset,
-	&zanmu_pal,
-	c_zanmu_blink_anim
+	&yuuma_tileset,
+	&yuuma_pal,
+	c_yuuma_placeholder
 };
 
 inline constexpr Game::Poses<1> c_yuuma_poses = {
