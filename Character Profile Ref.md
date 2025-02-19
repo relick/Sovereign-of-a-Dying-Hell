@@ -7,6 +7,13 @@ Looks down on more or less everyone, but avoids letting it show.
 Dislikes: Hisami, and those that don't try to solve problems
 Likes: Modernism, strength
 
+Hisami
+Takes her role as zanmu's assistant very seriously, and loyal
+Not yet so enamoured with zanmu that she'd sabotage anything
+Quite friendly and even tries to do kind things
+Dislikes: those opposed to zanmu, fire/heat
+Likes: Zanmu, messing with people
+
 Yuugi
 Strong, and admires strength.
 Totally straightforward, not interested in playing word games.

@@ -19,6 +19,7 @@ SCENE_RUN(FirstVoteProposal)
     SCENE_SETUP();
 
     scene(kishin_council);
+    wait_for_tasks();
 
     // TODO
 
@@ -31,6 +32,7 @@ SCENE_RUN(HatchingThePlan)
     SCENE_SETUP();
 
     scene(zanmu_study);
+    wait_for_tasks();
 
     // TODO
 
@@ -43,6 +45,7 @@ SCENE_RUN(LobbyingYuugi)
     SCENE_SETUP();
 
     scene(hell_city);
+    wait_for_tasks();
 
     // TODO
 
@@ -55,6 +58,7 @@ SCENE_RUN(VotingForAnimalRights)
     SCENE_SETUP();
 
     scene(kishin_council);
+    wait_for_tasks();
 
     // TODO
 
@@ -67,6 +71,7 @@ SCENE_RUN(SuikaApproaches)
     SCENE_SETUP();
 
     scene(zanmu_study);
+    wait_for_tasks();
 
     desc("The study is cold and sterile. Just how Zanmu likes it.");
     desc("An oni with towering horns gently pushes open the shoji door.");
@@ -127,6 +132,7 @@ SCENE_RUN(DelegatingToHisami)
     SCENE_SETUP();
 
     scene(zanmu_study);
+    wait_for_tasks();
 
     // TODO
 
@@ -139,6 +145,7 @@ SCENE_RUN(VotingForPriceIncreases)
     SCENE_SETUP();
 
     scene(kishin_council);
+    wait_for_tasks();
 
     // TODO
 
@@ -151,6 +158,7 @@ SCENE_RUN(MeetingTheShadowyKishin)
     SCENE_SETUP();
 
     scene(hell_palace);
+    wait_for_tasks();
 
     // TODO
 
@@ -163,6 +171,7 @@ SCENE_RUN(EngagingYuuma)
     SCENE_SETUP();
 
     scene(animal_realm);
+    wait_for_tasks();
 
     // music(shining_law_of_the_strong_eating_the_weak, 0.0, true);
 
@@ -389,6 +398,7 @@ SCENE_RUN(VotingForExecutive)
     SCENE_SETUP();
 
     scene(kishin_council);
+    wait_for_tasks();
 
     show(zanmu, neutral);
     say(zanmu, "Illustrious Council! Before we attend to any further matters, I have an urgent proposal to make.");
@@ -476,6 +486,7 @@ SCENE_RUN(FinalHisami)
     SCENE_SETUP();
 
     scene(zanmu_study);
+    wait_for_tasks();
 
     // TODO
 
@@ -488,6 +499,7 @@ SCENE_RUN(FinalYuugi)
     SCENE_SETUP();
 
     scene(hell_city);
+    wait_for_tasks();
 
     // TODO
 
@@ -500,6 +512,7 @@ SCENE_RUN(FinalSuika)
     SCENE_SETUP();
 
     scene(hell_palace);
+    wait_for_tasks();
 
     // TODO
 
@@ -512,6 +525,7 @@ SCENE_RUN(FinalYuuma)
     SCENE_SETUP();
 
     scene(animal_realm);
+    wait_for_tasks();
 
     // TODO
 
@@ -524,6 +538,7 @@ SCENE_RUN(VotingToRelocateHell)
     SCENE_SETUP();
 
     scene(kishin_council);
+    wait_for_tasks();
 
     end;
 }
