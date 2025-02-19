@@ -135,6 +135,11 @@ inline constexpr Game::Character c_councilR = {
 	"KISHIN", false,
 	{},
 };
+// The chair
+inline constexpr Game::Character c_speaker = {
+	"CHAIR", false,
+	{},
+};
 
 // The shadowy kishin
 inline constexpr Game::Character c_kishin = {

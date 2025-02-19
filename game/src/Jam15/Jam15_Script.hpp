@@ -48,6 +48,7 @@ public:
 	Game::NoSFX yuuma_beeps;
 	Game::NoSFX councilL_beeps;
 	Game::NoSFX councilR_beeps;
+	Game::NoSFX speaker_beeps;
 	Game::NoSFX kishin_beeps;
 };
 
