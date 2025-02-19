@@ -21,7 +21,33 @@ SCENE_RUN(FirstVoteProposal)
     scene(kishin_council);
     wait_for_tasks();
 
-    // TODO
+    desc("The musky chamber is packed with oni, of low and high rank alike.");
+    desc("Those of the highest rank sit in the centre, in irreverent, informal seiza.");
+    desc("The oni make up the Council, and the kishin lead its ferocious debates.");
+
+    show(zanmu, neutral);
+    say(zanmu, "Council, allow me my third proposal for today.");
+    say(zanmu, "This one, I consider of critical importance.");
+    say(councilR, "Nippaku, you always say that.");
+    say(zanmu, "It's always true~");
+    say(councilR, "Get on with it, then.");
+    say(zanmu, "The earth spirits are idle, and have been since the completion of the most recent oni palace.");
+    say(zanmu, "They must be given work, and Hell has plenty of it to give out.");
+    say(zanmu, "We've been short on labour for maintaining the torture chambers for decades now. My suggestion is to put them all to work there.");
+    say(councilR, "Nippaku, you persist with the earth spirits? You know they've been earmarked for the blood pools development.");
+    say(councilL, "That's right, we really shouldn't disrupt a plan in progress. Finding others to do the work would delay it by decades.");
+    say(zanmu, "Ridiculous! 27.9\% of the torture chambers have already been forced to close due to malfunction, and our income is suffering for it.");
+    say(zanmu, "There's no money for the vanity projects if we refuse to grease the wheels of the economy.");
+    say(councilR, "We'll just need to find others to do the work...");
+    play_sfx(gavel);
+    say(speaker, "That's enough back and forth. Let's not waste time here.");
+    say(speaker, "Council, declare your votes!");
+
+    // TODO VOTE (always lost)
+
+    say(speaker, "A decisive defeat. No more proposals from you today, Nippaku, please.");
+    say(zanmu, "The lack of wisdom in this Council once again astounds.");
+    say(zanmu, "Fine, argue over seating arrangements, or whatever it is you do, I will attend to real business.");
 
     script.SetNextScene(Scenes::HatchingThePlan);
     end;
@@ -34,7 +60,9 @@ SCENE_RUN(HatchingThePlan)
     scene(zanmu_study);
     wait_for_tasks();
 
-    // TODO
+    think("Tch. The kishin are always so fickle.");
+    think("I'll need to raise that again another time, but this rate of change isn't fast enough. Hell's institutions are already faltering.");
+    think("Perhaps working within the Council isn't the play any more...");
 
     script.SetNextScene(Scenes::LobbyingYuugi);
     end;

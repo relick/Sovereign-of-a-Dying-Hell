@@ -13,6 +13,7 @@
 #define scene(BG) io_vn.SetBG(io_game, BG)
 
 #define play_music(MUSIC, FADE_IN_SECONDS, LOOP) io_vn.StartMusic(MUSIC, fix16ToInt(fix16Mul(FIX16(FADE_IN_SECONDS), FramesPerSecond())), LOOP)
+#define play_sfx(SFX)
 
 #define wait_for_tasks() io_vn.WaitForTasks(io_game); wait
 
