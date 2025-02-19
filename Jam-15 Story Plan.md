@@ -8,6 +8,7 @@ Outcome: Always fails, acts as a tutorial for voting and to demonstrate Zanmu's 
 Scene: Zanmu talks to Hisami, who informs Zanmu of a burgeoning but secretive resistance among the heavily punished beasts of the animal realm.
 Zanmu decides this is her opportunity for a power grab, and proposes a new vote for a reduction in the severity of punishment for beasts.
 She decides to frame it as a matter of improving slave productivity, given the anemic economy of hell. In reality, she desires to increase the power of the beasts whilst growing their loyalty to her.
+
 Scene: To help aid the vote, Zanmu speaks with Yuugi who is also on the council, and sympathetic to relaxing punishment in general.
 Yuugi's support is easily won as long as the player appeals to her as an equal rather than moralising.
 

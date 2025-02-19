@@ -68,7 +68,55 @@ SCENE_RUN(SuikaApproaches)
 
     scene(zanmu_study);
 
-    // TODO
+    desc("The study is cold and sterile. Just how Zanmu likes it.");
+    desc("An oni with towering horns gently pushes open the shoji door.");
+
+    say(zanmu, "Suika? What a pleasant surprise.");
+
+    show(suika, neutral);
+    face(suika, happy);
+    say(suika, "Zanmu!");
+    say(suika, "I'm glad you're glad to see me. Is the potted plant around?");
+
+    say(zanmu, "She's on an errand.");
+
+    face(suika, neutral);
+    say(suika, "Good, 'cause I wanted to talk with you *extra* privately.");
+    say(suika, "I was puzzling over your recent proposals in the council meetings. I reckon you're up to something.");
+    say(suika, "You don't *have* to tell me, but we're friends, right? Maybe I'll even support you.");
+
+    think("Suika always hides her true intentions under that playful mask.");
+    think("I need to think over carefully if she can be trusted.");
+
+    say(zanmu, "Straight to the point, huh?");
+    
+    {
+        static constexpr std::array choices = {
+            "Share your plans with her",
+            "Keep the plans secret",
+        };
+        choice(choices);
+        auto const res = get_choice_result();
+        switch(res)
+        {
+        case 0:
+        {
+            // TODO
+            break;
+        }
+        case 1:
+        {
+            say(zanmu, "I'm not scheming anything. Has it become wrong to propose improvements to Hell?");
+
+            face(suika, pout);
+            say(suika, "Ehhhh...");
+            say(suika, "Fine! But if I find out you just lied, I don't care what it is. I'll fight it down.");
+
+            think("Oh dear. Suika has considerable influence with the other kishin. This could become a problem...");
+            break;
+        }
+        }
+    }
 
     script.SetNextScene(Scenes::DelegatingToHisami);
     end;
@@ -279,14 +327,14 @@ SCENE_RUN(EngagingYuuma)
             // TODO
             static constexpr std::array choices = {
                 "\"\"",
-                "\"\"",
+                "\"I'll tell everyone of your plans if you don't help.\"",
                 "\"\"",
             };
             choice(choices);
             auto const res = get_choice_result();
             switch (res)
             {
-            case 1:
+            case 2:
             {
                 failedBothFlattery = false;
                 break;
@@ -393,6 +441,7 @@ SCENE_RUN(VotingForExecutive)
             "Revisit Suika",
             "Revisit Yuuma",
         };
+        choice(choices);
         auto const res = get_choice_result();
         switch (res)
         {
