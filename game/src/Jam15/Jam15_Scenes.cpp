@@ -69,7 +69,7 @@ SCENE_RUN(HatchingThePlan)
     think("Perhaps working within the Council isn't the play any more...");
 
     show(hisami, neutral);
-    say(hisami, "Lady Zanmu~~! I have news~!");
+    say(hisami, "Lady Zanmu~~! I have news~! You're sure to like it~!");
     say(hisami, "...");
     say(zanmu, "... ... ...");
     say(hisami, "Lady Zanmu?");
@@ -97,11 +97,10 @@ SCENE_RUN(HatchingThePlan)
     
     say(hisami, "As you wish, Lady Zanmu~!");
     hide();
-    wait_for_tasks();
 
     think("I need to prepare the waters...");
     think("First, I'll make the Council weaken their own grip on the Animal Realm. That'll serve well to make them cower.");
-    think("I should talk to Hoshiguma. She's always had a soft spot for the animal spirits, and enough influence on the Council to sway it my way.");
+    think("I should talk to Hoshiguma. She's always been squeamish of the penalties dealt to the animals. That, and she has enough influence on the Council to sway it my way.");
 
     script.SetNextScene(Scenes::LobbyingYuugi);
     end;
@@ -115,10 +114,146 @@ SCENE_RUN(LobbyingYuugi)
     wait_for_tasks();
 
     say(zanmu, "Hoshiguma, thanks for the meet up.");
-    io_vn.ClearMode(io_game);
     show(yuugi, neutral);
-    wait_for_tasks();
-    say(yuugi, "");
+    say(yuugi, "You're lucky I like you, Nippaku. How many times have you turned down my party invitations?");
+
+    say(zanmu, "Ehe... Eighteen times... I've been busy?");
+
+    say(yuugi, "Don't worry about it. Sometimes I feel bad seeing you work so hard whilst I merely drink and relax. Sometimes.");
+    say(yuugi, "Anyway, work is why you wanted to meet, right?");
+
+    think("Hoshiguma prefers people to be direct. But let's start with flattery.");
+
+    say(zanmu, "Sure, but we can shoot the breeze first. I'm in no hurry.");
+
+    say(yuugi, "Great! I miss this side of you.");
+    say(yuugi, "Hear me out on this, then. The other day, ");
+
+    s8 opinion = 0;
+    // TODO: part one for opinion gaining
+
+    say(zanmu, "Yes. I need help passing a Council vote. I thought it would be particularly up your alley.");
+    say(zanmu, "My subordinate has reminded me of the horribly harsh conditions of the spirits in the Animal Realm.");
+
+    {
+        choice(
+            "\"You wouldn't want them to suffer much longer, right?\"",
+            "\"And you've done nothing, don't you care about them?\"",
+            "\"We should work together to ease the worst of it.\"",
+        );
+        auto const res = get_choice_result();
+        switch(res)
+        {
+        case 0:
+        {
+            opinion -= 1;
+            say(yuugi, "Of course I wouldn't, give me a break!");
+
+            think("Oops. I need to remember not to pressure her.");
+            break;
+        }
+        case 1:
+        {
+            opinion -= 2;
+            say(yuugi, "What the hell? That better be a joke. I've done a far sight more than you!");
+
+            say(zanmu, "I... uh, yeah, a bad joke. Hahaha!");
+            think("I can't afford to insult her again.");
+            break;
+        }
+        case 2:
+        {
+            opinion += 1;
+            say(yuugi, "Huh. Yeah, we should!");
+            break;
+        }
+        }
+    }
+
+    say(yuugi, "What's with the change of heart? You've never brought it up before.");
+
+    say(zanmu, "Well, I needn't pretend. I took note of how the level of misery was greatly impacting productivity.");
+    say(zanmu, "Hell's economy is totally anaemic! We're squeezing the life out of it by stamping the boot too hard.");
+
+    say(yuugi, "Hahaha. Nothing quite like a managerial problem to get the old monk in you fired up.");
+    say(yuugi, "It's true how much excessive torture damages the economy, even if it's not why I care. I'll mention that next time I talk to the other oni.");
+
+    say(zanmu, "Great! They will appreciate your more wholistic worldview, I am sure.");
+    say(zanmu, "In any case, let me be specific. My proposal will be to end solitary confinements and provide sustenance even to those undergoing torture.");
+
+    say(yuugi, "You'd go that far..? That's a huge step! But good!");
+    say(yuugi, "What can I do, though?");
+
+    say(zanmu, "I just need you to rally the oni in your circle. Combined with those I can account for myself, it should be enough.");
+
+    say(yuugi, "Is that really enough, though? I just need to talk to a few oni?");
+
+    say(zanmu, "No, not just talk. I'm trying to *win* this vote, not make a moral statement.");
+
+    {
+        choice(
+            "\"You know them best. Get their hearts riled up!\"",
+            "\"You need to guilt trip them.\"",
+            "\"If it were me, I'd threaten them!\"",
+            );
+        auto const res = get_choice_result();
+        switch(res)
+        {
+        case 0:
+        {
+            opinion += 3;
+            say(yuugi, "Oh, hell yeah! Let's do it!");
+            say(yuugi, "We're coming to free you, little bunny spirits!");
+            break;
+        }
+        case 1:
+        {
+            opinion -= 1;
+            say(yuugi, "...Really? I don't think that's going to help.");
+            if (opinion > 0)
+            {
+                say(yuugi, "Still...");
+            }
+            break;
+        }
+        case 2:
+        {
+            opinion -= 2;
+            say(yuugi, "Noted, Nippaku. But I only threaten my enemies.");
+            say(yuugi, "If that's really how you think... I'd rather you didn't let it slip.");
+            if (opinion > 0)
+            {
+                say(yuugi, "Still...");
+            }
+            break;
+        }
+        }
+    }
+
+    if (opinion > 0)
+    {
+        say(yuugi, "I think this has a chance to work.");
+
+        say(zanmu, "Of course it does, I'm involved.");
+
+        say(yuugi, "Hahaha! How quick your arrogance returns now I'm on board!");
+        say(yuugi, "If you're holding the vote tomorrow, I'll make the rounds today.");
+        say(yuugi, "It was a nice chat. Later, Nippaku.");
+        // TODO INFLUENCE
+    }
+    else
+    {
+        say(yuugi, "Ah...");
+        say(yuugi, "You know, I'm having second thoughts. Call it an oni's hunch.");
+
+        say(zanmu, "Wait, why-");
+
+        say(yuugi, "Nope, I'm wise to your trickery, Nippaku, I'm not going to hear you out.");
+        say(yuugi, "Thanks for the chat, though, I'd genuinely like that again.");
+
+        say(zanmu, "Mhm. Alright then.");
+        think("Frustrating. I'll have to make do with the allies I have.");
+    }
 
     script.SetNextScene(Scenes::VotingForAnimalRights);
     end;
@@ -136,6 +271,8 @@ SCENE_RUN(VotingForAnimalRights)
     script.SetNextScene(Scenes::SuikaApproaches);
     end;
 }
+
+// TODO: maybe an intermission where Hisami spreads fervour with the eagle spirits?
 
 SCENE_RUN(SuikaApproaches)
 {
@@ -167,11 +304,10 @@ SCENE_RUN(SuikaApproaches)
     say(zanmu, "Straight to the point, huh?");
     
     {
-        static constexpr std::array choices = {
+        choice(
             "Share your plans with her",
             "Keep the plans secret",
-        };
-        choice(choices);
+        );
         auto const res = get_choice_result();
         switch(res)
         {
@@ -273,11 +409,10 @@ SCENE_RUN(EngagingYuuma)
         face(yuuma, annoyed);
         say_hidden(yuuma, "The bleeding heart making symbolic votes over our conditions?");
 
-        static constexpr std::array choices = {
+        choice(
             "\"I'm sorry it didn't pass.\"",
             "\"The oni are shortsighted.\""
-        };
-        choice(choices);
+        );
         auto const res = get_choice_result();
         switch(res)
         {
@@ -312,11 +447,10 @@ SCENE_RUN(EngagingYuuma)
 
     bool freeAnimalRealm = false;
     {
-        static constexpr std::array choices = {
+        choice(
             "Raise the idea of a liberated Animal Realm",
             "Offer advice on growing her organisation",
-        };
-        choice(choices);
+        );
         auto const res = get_choice_result();
         freeAnimalRealm = res == 0;
     }
@@ -367,12 +501,11 @@ SCENE_RUN(EngagingYuuma)
         bool failedBothFlattery = true;
         // Flattery 1
         {
-            static constexpr std::array choices = {
+            choice(
                 "\"The oni aren't weak. An uprising alone isn't enough.\"",
                 "\"It's true, an uprising could work.\"",
                 "\"This is the only way with long term success.\"",
-            };
-            choice(choices);
+            );
             auto const res = get_choice_result();
             switch (res)
             {
@@ -405,12 +538,11 @@ SCENE_RUN(EngagingYuuma)
             think("Now to land the finishing blow.");
 
             // TODO
-            static constexpr std::array choices = {
+            choice(
                 "\"\"",
                 "\"I'll tell everyone of your plans if you don't help.\"",
                 "\"\"",
-            };
-            choice(choices);
+            );
             auto const res = get_choice_result();
             switch (res)
             {
@@ -507,7 +639,6 @@ SCENE_RUN(VotingForExecutive)
     say(zanmu, "I will take leave of the remainder of this meeting, and will raise a fresh idea in tomorrow's meeting.");
 
     hide();
-    io_vn.ClearMode(io_game);
     scene(zanmu_study);
 
     think("That was no surprise. It would have taken all my influence to win that vote.");
@@ -518,13 +649,12 @@ SCENE_RUN(VotingForExecutive)
     think("I should spend the rest of the day shoring up my support.");
 
     {
-        static constexpr std::array choices = {
+        choice(
             "Stay with Hisami",
             "Revisit Yuugi",
             "Revisit Suika",
             "Revisit Yuuma",
-        };
-        choice(choices);
+        );
         auto const res = get_choice_result();
         switch (res)
         {
