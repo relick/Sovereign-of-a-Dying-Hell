@@ -115,7 +115,15 @@ void Script::InitVN
 )
 {
 	// Set up data
-	// zanmu_beeps = io_game.SFX().AddSFX(mid_beep, std::size(mid_beep), Game::Channel::TextBeeps);
+	zanmu_beeps = io_game.SFX().AddSFX(zanmu_beep, std::size(zanmu_beep), Game::Channel::TextBeeps);
+	hisami_beeps = zanmu_beeps;
+	suika_beeps = zanmu_beeps;
+	yuugi_beeps = zanmu_beeps;
+	yuuma_beeps = zanmu_beeps;
+	councilL_beeps = zanmu_beeps;
+	councilR_beeps = zanmu_beeps;
+	speaker_beeps = zanmu_beeps;
+	kishin_beeps = zanmu_beeps;
 
 	// First scene
 	Scenes sceneToStart = Scenes::FirstVoteProposal;

@@ -306,10 +306,7 @@ void DialoguePrinter2::Update()
 			// TODO: Probably a better way of doing this...
 			if (moreToDisplay)
 			{
-				if (!m_game->SFX().IsPlaying(*m_beeps))
-				{
-					m_game->SFX().PlaySFX(*m_beeps);
-				}
+				m_game->SFX().PlaySFX(*m_beeps);
 			}
 			else
 			{

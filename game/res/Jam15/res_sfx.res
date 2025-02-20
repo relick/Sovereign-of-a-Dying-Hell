@@ -1,2 +1,1 @@
-WAV mid_beep "sfx/mid_beep.wav" XGM
-WAV high_beep "sfx/high_beep.wav" XGM
+WAV zanmu_beep "sfx/zanmu_beep.wav" XGM
