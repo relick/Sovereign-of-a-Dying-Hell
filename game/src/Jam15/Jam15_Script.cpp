@@ -126,7 +126,7 @@ void Script::InitVN
 	kishin_beeps = zanmu_beeps;
 
 	// First scene
-	Scenes sceneToStart = Scenes::FirstVoteProposal;
+	Scenes sceneToStart = Scenes::LobbyingYuugi;
 
 	// Set up variables
 	if (io_game.HasLoadedData())
