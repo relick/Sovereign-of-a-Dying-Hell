@@ -465,6 +465,8 @@ SCENE_RUN(VotingForExecutive)
     say(zanmu, "Nevertheless, I do acknowledge the risk of allocating supreme power. I still see another way forward, that avoids this risk.");
     say(zanmu, "I will take leave of the remainder of this meeting, and will raise a fresh idea in tomorrow's meeting.");
 
+    hide();
+    io_vn.ClearMode(io_game);
     scene(zanmu_study);
 
     think("That was no surprise. It would have taken all my influence to win that vote.");
