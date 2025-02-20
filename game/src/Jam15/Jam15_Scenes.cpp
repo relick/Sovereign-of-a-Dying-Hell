@@ -61,10 +61,39 @@ SCENE_RUN(HatchingThePlan)
     wait_for_tasks();
 
     desc("Zanmu's study is cold and devoid of decoration.");
+    desc("This tension makes it a perfect area to think, and make deals.");
 
-    think("Tch. The kishin are always so fickle.");
-    think("I'll need to raise that again another time, but this rate of change isn't fast enough. Hell's institutions are already faltering.");
+    think("Tch. The oni are fickle, I'll just need to try again another time.");
+    think("This rate of change isn't fast enough, though. Hell's institutions are already faltering.");
     think("Perhaps working within the Council isn't the play any more...");
+
+    show(hisami, neutral);
+    say(hisami, "Lady Zanmu~~! I have news~!");
+    say(hisami, "...");
+    say(zanmu, "... ... ...");
+    say(hisami, "Lady Zanmu?");
+    
+    say(zanmu, "Oh. Hisami, I didn't notice you. You were gone a while.");
+    say(zanmu, "What requires my attention?");
+    
+    say(hisami, "Lady Zanmu, I have news. I thought you may like to hear it.");
+    say(hisami, "I was luring more spirits into the Animal Realm, and I handed them off to a surprisingly organised band of eagles who promised to take care of them.");
+    say(hisami, "Given the animal spirits are enslaved with no time to help others, I couldn't help but find that odd!");
+    say(hisami, "I found a stalking spot, and listened for eleven and a half days. They mostly talked about how much they'd love to eat turtles some time again...");
+
+    say(zanmu, "Hisami, the point?");
+
+    say(hisami, "Um, yes! The eagle spirits are following a beast. They say she's more powerful than the oni. It may well be most of the eagles are under her wing by now.");
+
+    think("I can't always trust Hisami, but she wouldn't lie about something like this.");
+    think("Hah! Is this the chance I've been waiting for?");
+    say(zanmu, "That is wonderful news. You've done well, Hisami.");
+
+    say(hisami, "Ehehe~");
+
+    say(zanmu, "Go back to the Animal Realm, and spread rumours of that beast's power. Return to me in two days.");
+
+    // TODO
 
     script.SetNextScene(Scenes::LobbyingYuugi);
     end;

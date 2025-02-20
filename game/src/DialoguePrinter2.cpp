@@ -37,8 +37,8 @@ inline constexpr u16 c_lineIndent = 1;
 inline constexpr u8 c_arrowSpeed = 15; // Number of frames between arrow flashes.
 inline constexpr s8 c_framesUntilNextCharacter = 2; // Number of frames between characters being drawn on screen. Equivalent to number of updates too
 inline constexpr s8 c_extraFramesWaitedOnComma = 10; // Delay for ,
-inline constexpr s8 c_extraFramesWaitedOnFullStop = 20; // Delay for . ! ?
-inline constexpr s8 c_extraFramesWaitedOnEllipsis = 40; // Delay for ... ..! ..?
+inline constexpr s8 c_extraFramesWaitedOnFullStop = 20; // Delay for . ! ? ~
+inline constexpr s8 c_extraFramesWaitedOnEllipsis = 40; // Delay for ... ..! ..? ..~
 
 //------------------------------------------------------------------------------
 DialoguePrinter2::DialoguePrinter2
@@ -443,7 +443,7 @@ bool DialoguePrinter2::DrawChar
 		{
 			m_timer = -c_extraFramesWaitedOnComma;
 		}
-		else if (curChar == '.' || curChar == '!' || curChar == '?')
+		else if (curChar == '.' || curChar == '!' || curChar == '?' || curChar == '~')
 		{
 			if (m_curTextIndex > 2 && m_curText[m_curTextIndex - 1] == '.' && m_curText[m_curTextIndex - 2] == '.')
 			{
