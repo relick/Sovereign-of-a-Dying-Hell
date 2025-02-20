@@ -523,6 +523,15 @@ void VNWorld::TimedChoice
 }
 
 //------------------------------------------------------------------------------
+void VNWorld::ClearMode
+(
+	Game& io_game
+)
+{
+	TransitionTo(io_game, SceneMode::None);
+}
+
+//------------------------------------------------------------------------------
 void VNWorld::TransitionTo
 (
 	Game& io_game,

@@ -79,7 +79,9 @@ public:
 	void Choice(Game& io_game, std::span<char const* const> i_choices);
 	void TimedChoice(Game& io_game, std::span<char const* const> i_choices, f16 i_timeInSeconds);
 	std::optional<u8> GetChoiceResult() const { return m_choiceMade; }
+	void ClearMode(Game& io_game);
 
+private:
 	SceneMode CurrentMode() const { return static_cast<SceneMode>(m_sceneMode.index()); }
 	void TransitionTo(Game& io_game, SceneMode i_sceneMode);
 

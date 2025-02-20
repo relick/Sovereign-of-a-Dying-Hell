@@ -143,8 +143,14 @@ void Script::UpdateVN
 {
 	if (m_nextScene)
 	{
+		// Save data first
 		io_game.SetVar<Scenes>(Variables::SceneNum, *m_nextScene);
 		io_game.SaveVariables();
+
+		// Tidy up visuals
+		io_vn.ClearMode(io_game);
+		io_vn.HideCharacterVisual(io_game, false);
+		io_vn.BlackBG(io_game);
 
 		m_currentScene = CreateScene(*m_nextScene);
 		m_nextScene = std::nullopt;
