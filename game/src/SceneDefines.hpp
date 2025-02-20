@@ -20,8 +20,8 @@
 #define portrait(CHARA, POSE)
 #define hide_portrait()
 
-#define show(CHARA, POSE) io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose)
-#define hide() io_vn.HideCharacterVisual(io_game, false)
+#define show(CHARA, POSE) io_vn.ClearMode(io_game); io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose); wait_for_tasks()
+#define hide() io_vn.ClearMode(io_game); io_vn.HideCharacterVisual(io_game, false); wait_for_tasks()
 #define face(CHARA, EXPRESSION) // TODO
 
 // TODO: special formatting
@@ -33,7 +33,7 @@
 // TODO: use ??? instead of hiding the name
 #define say_hidden(CHARA, TEXT) io_vn.SetText(io_game, nullptr, TEXT, script. CHARA ## _beeps); wait
 
-#define choice(CHOICE_SPAN) io_vn.Choice(io_game, CHOICE_SPAN); wait
+#define choice(...) static constexpr std::array _choices = { __VA_ARGS__ }; io_vn.Choice(io_game, _choices); wait
 #define get_choice_result() *(io_vn.GetChoiceResult())
 #define timed_choice(TIME_IN_SECONDS, CHOICE_SPAN) io_vn.TimedChoice(io_game, CHOICE_SPAN, FIX16(TIME_IN_SECONDS)); wait
 #define get_timed_choice_result() io_vn.GetChoiceResult()
