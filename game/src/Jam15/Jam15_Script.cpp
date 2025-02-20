@@ -73,6 +73,11 @@ void Script::UpdateTitle
 	u16 const buttons = JOY_readJoypad(JOY_1);
 	if ((buttons & BUTTON_A) != 0)
 	{
+		if (m_selection == 1)
+		{
+			m_hasLoadedData = false;
+		}
+
 		io_title.GoToVNWorld(io_game);
 		return;
 	}
@@ -132,7 +137,7 @@ void Script::InitVN
 	Scenes sceneToStart = Scenes::InitialScene;
 
 	// Set up variables
-	if (io_game.HasLoadedData(static_cast<u16>(Variables::Count)))
+	if (m_hasLoadedData)
 	{
 		// Get scene num
 		sceneToStart = io_game.ReadVar<Scenes>(Variables::SceneNum);
