@@ -176,7 +176,7 @@ void VNWorld::Run
 	}
 	case SceneMode::Dialogue:
 	{
-		if (m_ABCbuffered > 0)
+		if (!Get<SceneMode::Dialogue>().Done() && m_ABCbuffered > 0)
 		{
 			--m_ABCbuffered;
 			Get<SceneMode::Dialogue>().Next();
@@ -189,9 +189,10 @@ void VNWorld::Run
 	}
 	case SceneMode::Choice:
 	{
-		auto const updateResult = Get<SceneMode::Choice>().Update();
+		auto const updateResult = Get<SceneMode::Choice>().Update(m_ABCbuffered > 0);
 		if (updateResult)
 		{
+			--m_ABCbuffered;
 			m_choiceMade = updateResult.value();
 			choiceOccurred = true;
 		}
@@ -232,8 +233,9 @@ void VNWorld::Run
 		}
 		case ProgressMode::Dialogue:
 		{
-			if (ABCpressedThisFrame && Get<SceneMode::Dialogue>().Done())
+			if (m_ABCbuffered > 0 && Get<SceneMode::Dialogue>().Done())
 			{
+				--m_ABCbuffered;
 				m_progressMode = ProgressMode::Always;
 				m_script->UpdateVN(io_game, *this);
 			}

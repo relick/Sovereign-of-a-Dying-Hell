@@ -48,7 +48,7 @@ public:
 
 	// expected: index of choice made
 	enum class NoChoiceMade { Waiting, TimeLimitReached, };
-	std::expected<u8, NoChoiceMade> Update();
+	std::expected<u8, NoChoiceMade> Update(bool i_choosePressed);
 
 private:
 	Task RenderText();

@@ -60,7 +60,10 @@ void ChoiceSystem::SetChoices
 }
 
 //------------------------------------------------------------------------------
-std::expected<u8, ChoiceSystem::NoChoiceMade> ChoiceSystem::Update()
+std::expected<u8, ChoiceSystem::NoChoiceMade> ChoiceSystem::Update
+(
+	bool i_choosePressed
+)
 {
 	if (m_timeLimit)
 	{
@@ -77,13 +80,11 @@ std::expected<u8, ChoiceSystem::NoChoiceMade> ChoiceSystem::Update()
 	}
 
 	u16 const buttons = JOY_readJoypad(JOY_1);
-	static bool upPressedPrev = false;
-	static bool downPressedPrev = false;
-	static bool choosePressedPrev = false;
+	static bool upPressedPrev = true;
+	static bool downPressedPrev = true;
 
 	bool upPressed = false;
 	bool downPressed = false;
-	bool choosePressed = false;
 
 	if ((buttons & BUTTON_UP) != 0)
 	{
@@ -111,19 +112,6 @@ std::expected<u8, ChoiceSystem::NoChoiceMade> ChoiceSystem::Update()
 		downPressedPrev = false;
 	}
 
-	if ((buttons & (BUTTON_A | BUTTON_B | BUTTON_C)) != 0)
-	{
-		if (!choosePressedPrev)
-		{
-			choosePressed = true;
-		}
-		choosePressedPrev = true;
-	}
-	else
-	{
-		choosePressedPrev = false;
-	}
-
 	if (upPressed)
 	{
 		if (m_highlightedChoice > 0)
@@ -148,7 +136,7 @@ std::expected<u8, ChoiceSystem::NoChoiceMade> ChoiceSystem::Update()
 		}
 	}
 
-	if (choosePressed)
+	if (i_choosePressed)
 	{
 		return m_highlightedChoice;
 	}

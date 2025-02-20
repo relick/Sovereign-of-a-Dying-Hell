@@ -34,7 +34,7 @@
 #define say_hidden(CHARA, TEXT) io_vn.SetText(io_game, nullptr, TEXT, script. CHARA ## _beeps); wait
 
 #define choice(...) static constexpr std::array _choices = { __VA_ARGS__ }; io_vn.Choice(io_game, _choices); wait
-#define get_choice_result() *(io_vn.GetChoiceResult())
+#define get_choice_result() *(io_vn.GetChoiceResult()); wait_for_tasks()
 #define timed_choice(TIME_IN_SECONDS, CHOICE_SPAN) io_vn.TimedChoice(io_game, CHOICE_SPAN, FIX16(TIME_IN_SECONDS)); wait
 #define get_timed_choice_result() io_vn.GetChoiceResult()
 
