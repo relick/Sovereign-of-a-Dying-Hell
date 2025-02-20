@@ -26,6 +26,8 @@ enum class Scenes : u8
 	Ending_RulingDecay,
 	Ending_NewHell,
 	Ending_AdministratingCollapse,
+
+	InitialScene = SuikaApproaches,
 };
 
 

@@ -89,7 +89,7 @@ public:
 	void QueueLambdaTask(T_Lambda&& i_lambda, TaskPriority i_priority, T_Args&&... i_args);
 	bool TasksInProgress() const;
 
-	void SetVariableCount(u16 i_count) { m_gameVariables.resize(i_count); }
+	void SetVariableCount(u16 i_count) { m_loadedData = false; m_gameVariables.clear(); m_gameVariables.resize(i_count); }
 	template<typename T, typename T_Index = u16>
 	void SetVar(T_Index i_varIndex, T i_value) requires(sizeof(T) == sizeof(u16)) { m_gameVariables[static_cast<u16>(i_varIndex)] = std::bit_cast<u16>(i_value); }
 	template<typename T, typename T_Index = u8>
@@ -105,7 +105,7 @@ public:
 
 	void SaveVariables();
 	bool LoadVariables();
-	bool HasLoadedData() const { return m_loadedData; }
+	bool HasLoadedData(u16 i_expectedVarCount) const { return m_loadedData && m_gameVariables.size() == i_expectedVarCount; }
 
 private:
 	static void VIntCallback();
