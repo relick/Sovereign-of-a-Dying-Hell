@@ -122,7 +122,7 @@ enum class WipeDir
 };
 
 //------------------------------------------------------------------------------
-template<WipeDir t_Dir, u16 t_Speed = 3>
+template<WipeDir t_Dir, u16 t_Speed = 2>
 inline Game::Task SetMap_Wipe
 (
 	u16 i_planeAddr,
