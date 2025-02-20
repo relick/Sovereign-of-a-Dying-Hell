@@ -34,7 +34,7 @@ inline constexpr s16 c_textPosDown = -5;
 inline constexpr u16 c_lineSeparation = 2;
 inline constexpr u16 c_lineIndent = 1;
 
-inline constexpr u8 c_arrowSpeed = 2; // Number of updates between arrow flashes i.e. higher number = longer.
+inline constexpr u8 c_arrowSpeed = 15; // Number of frames between arrow flashes.
 inline constexpr s8 c_framesUntilNextCharacter = 2; // Number of frames between characters being drawn on screen. Equivalent to number of updates too
 inline constexpr s8 c_extraFramesWaitedOnComma = 10; // Delay for ,
 inline constexpr s8 c_extraFramesWaitedOnFullStop = 20; // Delay for . ! ?
@@ -326,7 +326,7 @@ void DialoguePrinter2::Update()
 
 	if (showArrow)
 	{
-		++m_arrowTimer;
+		m_arrowTimer += c_framesUntilNextCharacter;
 		if (m_arrowTimer >= c_arrowSpeed)
 		{
 			EditableSpriteData arrowSpr = m_game->Sprites().EditSpriteData(m_nextArrow);

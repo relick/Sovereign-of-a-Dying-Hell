@@ -56,7 +56,9 @@ class VNWorld
 	ProgressMode m_progressMode{ ProgressMode::Always };
 
 	// Buttons
-	bool m_ABCpressed{ false };
+	bool m_ABCpressed{ false }; // Used to force letting go before pressing again
+	u8 m_ABCbuffered{ 0 }; // Used to receive input to be processed on a task free frame. 0 = no press, >0 = number of presses
+	u8 m_ABCbufferTimer{ 0 }; // Cuts buffered input early if this time hits 0.
 
 	// Choice data
 	std::optional<u8> m_choiceMade;

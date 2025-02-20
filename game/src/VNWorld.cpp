@@ -18,6 +18,8 @@ namespace Game
 {
 
 constexpr Palettes::RGB3Colour c_tintColour{ 0, 2, 1 }; // TODO: customisable by player/scene/character?
+constexpr u8 c_inputBufferingTimer = 30; // Number of frames an input can be buffered before being discarded if unprocessed
+
 
 static u16 const* s_bgNormalPal{ palette_black };
 static u16 const* s_bgNamePal{ palette_black };
@@ -150,6 +152,20 @@ void VNWorld::Run
 		return false;
 	}();
 
+	if (m_ABCbufferTimer > 0)
+	{
+		--m_ABCbufferTimer;
+		if (m_ABCbufferTimer == 0)
+		{
+			m_ABCbuffered = 0;
+		}
+	}
+	if (ABCpressedThisFrame)
+	{
+		m_ABCbufferTimer = c_inputBufferingTimer;
+		++m_ABCbuffered;
+	}
+
 	bool choiceOccurred = false;
 
 	switch (CurrentMode())
@@ -160,8 +176,9 @@ void VNWorld::Run
 	}
 	case SceneMode::Dialogue:
 	{
-		if (ABCpressedThisFrame)
+		if (m_ABCbuffered > 0)
 		{
+			--m_ABCbuffered;
 			Get<SceneMode::Dialogue>().Next();
 		}
 		else

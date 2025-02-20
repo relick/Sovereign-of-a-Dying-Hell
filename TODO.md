@@ -28,4 +28,3 @@ Stretch:
 
 
 Known Bugs:
-- Unresponsiveness when pressing buttons on 'blocked' frames where progression isn't allowed. Should be reasonable to just buffer the input for a few frames.
