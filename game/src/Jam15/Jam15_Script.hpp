@@ -34,6 +34,7 @@ class Script
 
 	Game::SpriteID m_arrowSpr;
 	s16 m_selection{ 0 };
+	bool m_hasLoadedData{ false };
 
 	std::unique_ptr<Game::Scene> m_currentScene;
 	Game::SceneRoutine m_currentSceneRoutine;

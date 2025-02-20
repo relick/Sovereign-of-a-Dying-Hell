@@ -47,11 +47,19 @@ void Script::InitTitle
 		co_return;
 	});
 
+	io_game.LoadVariables();
+	m_hasLoadedData = io_game.HasLoadedData(static_cast<u16>(Variables::Count));
+	if (!m_hasLoadedData)
+	{
+		m_selection = 1;
+	}
+
 	u16 const arrowTiles = io_game.Sprites().InsertMiscTiles(misc_spr);
 	auto [arrowID, spr] = io_game.Sprites().AddSprite(Game::SpriteSize::r1c1, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, arrowTiles + 1));
 	m_arrowSpr = arrowID;
 	spr.SetX(8 * 5);
-	spr.SetY(8 * 21);
+	spr.SetY(8 * 21 + m_selection * 24);
+
 }
 
 void Script::UpdateTitle
@@ -65,15 +73,10 @@ void Script::UpdateTitle
 	u16 const buttons = JOY_readJoypad(JOY_1);
 	if ((buttons & BUTTON_A) != 0)
 	{
-		if (m_selection == 0)
-		{
-			io_game.LoadVariables();
-		}
-
 		io_title.GoToVNWorld(io_game);
 		return;
 	}
-	else if ((buttons & BUTTON_DOWN) != 0)
+	else if (m_hasLoadedData && (buttons & BUTTON_DOWN) != 0)
 	{
 		if (!pressed)
 		{
@@ -88,7 +91,7 @@ void Script::UpdateTitle
 		}
 		pressed = true;
 	}
-	else if ((buttons & BUTTON_UP) != 0)
+	else if (m_hasLoadedData && (buttons & BUTTON_UP) != 0)
 	{
 		if (!pressed)
 		{
