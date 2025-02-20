@@ -1,1 +1,1 @@
-XGM test "music/lost emotion.vgm"
+XGM faron "music/faron study.vgm"

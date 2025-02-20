@@ -19,6 +19,7 @@ SCENE_RUN(FirstVoteProposal)
     SCENE_SETUP();
 
     scene(kishin_council);
+    //play_music(faron, 0.0, true);
     wait_for_tasks();
 
     desc("The musky chamber is packed with oni, of low and high rank alike.");
