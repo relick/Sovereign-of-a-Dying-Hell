@@ -25,6 +25,7 @@ SCENE_RUN(FirstVoteProposal)
     desc("The musky chamber is packed with oni, of low and high rank alike.");
     desc("Those of the highest rank sit in the centre, in irreverent, informal seiza.");
     desc("The oni make up the Council, and the kishin lead its ferocious debates.");
+    desc("It's once again your turn to speak.");
 
     show(zanmu, neutral);
     say(zanmu, "Council, allow me my third proposal for today.");
@@ -281,7 +282,7 @@ SCENE_RUN(SuikaApproaches)
     scene(zanmu_study);
     wait_for_tasks();
 
-    desc("The study is cold and sterile. Just how Zanmu likes it.");
+    desc("The study is cold and sterile. Just how you like it.");
     desc("An oni with towering horns gently pushes open the shoji door.");
 
     say(zanmu, "Suika? What a pleasant surprise.");
@@ -302,10 +303,13 @@ SCENE_RUN(SuikaApproaches)
     think("I need to think over carefully if she can be trusted.");
 
     say(zanmu, "Straight to the point, huh?");
-    
+
+    // Default false
+    io_game.SetVar<bool>(Variables::SuikaDissuaded, false);
+
     {
         choice(
-            "Share your plans with her",
+            "Share your plans with Suika",
             "Keep the plans secret",
         );
         auto const res = get_choice_result();
@@ -313,7 +317,17 @@ SCENE_RUN(SuikaApproaches)
         {
         case 0:
         {
-            // TODO
+            say(zanmu, "You're very observant. It's true, I'm scheming~");
+            
+            say(suika, "Woohoo! I knew it! What're you doing?");
+
+            say(zanmu, "I'm going to take over Hell, and make it run smoothly again.");
+
+            face(suika, neutral);
+            say(suika, "...Huh?");
+            say(suika, "What do you mean you're going to take over?");
+
+            think("Suika's surprised, but I can tell she isn't horrified. I should be able to satisfy her curiosity without making an enemy.");
             break;
         }
         case 1:
@@ -322,12 +336,22 @@ SCENE_RUN(SuikaApproaches)
 
             face(suika, pout);
             say(suika, "Ehhhh...");
-            say(suika, "Fine! But if I find out you just lied, I don't care what it is. I'll fight it down.");
+            say(suika, "Fine! But if I find out you just lied, I don't care what it is. I'll fight you down.");
 
-            think("Oh dear. Suika has considerable influence with the other kishin. This could become a problem...");
-            break;
+            think("Oh dear. Suika has considerable rapport with the other kishin. This could pose a problem...");
+
+            script.SetNextScene(Scenes::DelegatingToHisami);
+            end;
         }
         }
+    }
+
+    {
+        choice(
+            "",
+            "",
+        );
+        auto const res = get_choice_result();
     }
 
     script.SetNextScene(Scenes::DelegatingToHisami);
@@ -605,7 +629,7 @@ SCENE_RUN(VotingForExecutive)
 
     show(zanmu, neutral);
     say(zanmu, "Illustrious Council! Before we attend to any further matters, I have an urgent proposal to make.");
-    say(councilR, "Go ahead, Nippaku.");
+    say(speaker, "Go ahead, Nippaku.");
     say(zanmu, "I have spent the last few days surveying the realms again, as I often do. I've seen decay, paralysis, and overpopulation. This council has... struggled to respond over the years.");
     say(zanmu, "But it's reaching a breaking point. If this goes on much longer, the Yama will turn elsewhere to send damned souls.");
     say(zanmu, "I see no other choice but this: we must empower one of us as an executive that can lead Hell out of its rot.");
@@ -620,8 +644,8 @@ SCENE_RUN(VotingForExecutive)
 
     think("They're taking it about as well as I expected.");
 
-    say(councilR, "...QUIET!");
-    say(councilR, "Nippaku, your proposal is acknolwedged, let's get it out the way first. Hopefully a productive meeting can follow.");
+    say(speaker, "...QUIET!");
+    say(speaker, "Nippaku, your proposal is acknowledged, let's get it out of the way. Hopefully a *productive* meeting can follow.");
 
     // TODO-VOTE
     bool const voteSucceeded = {};

@@ -15,6 +15,7 @@ enum class Variables : u8
 {
 	SceneNum,
 	PunishmentVotePasses,
+	SuikaDissuaded,
 	PriceIncreaseVoteFails,
 
 	Count,
