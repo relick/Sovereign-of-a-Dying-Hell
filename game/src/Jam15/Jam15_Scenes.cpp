@@ -62,8 +62,8 @@ SCENE_RUN(HatchingThePlan)
     scene(zanmu_study);
     wait_for_tasks();
 
-    desc("Zanmu's study is cold and devoid of decoration.");
-    desc("This tension makes it a perfect area to think, and make deals.");
+    desc("Your study is cold and devoid of decoration.");
+    desc("The tension makes it a perfect area to think, and make deals.");
 
     think("Tch. The oni are fickle, I'll just need to try again another time.");
     think("This rate of change isn't fast enough, though. Hell's institutions are already faltering.");
@@ -83,9 +83,9 @@ SCENE_RUN(HatchingThePlan)
     say(hisami, "Given the animal spirits are enslaved with no time to help others, I couldn't help but find that odd!");
     say(hisami, "I found a stalking spot, and listened for eleven and a half days. They mostly talked about how much they'd love to eat turtles some time again...");
 
-    say(zanmu, "Hisami, can you get to the point?");
+    say(zanmu, "Please get to the point!");
 
-    say(hisami, "Um, yes! The eagle spirits are following a beast. They say she's more powerful than the oni. It may well be most of the eagles are under her wing by now.");
+    say(hisami, "Um, yes! The eagle spirits are following a beast. They think she's more powerful than even the oni. Clearly they exaggerate, no-one is stronger than you, Lady Zanmu~!");
 
     think("I can't always trust Hisami, but she wouldn't lie about something like this.");
     think("..Hah! Is this the chance I've been waiting for?");
