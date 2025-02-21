@@ -61,6 +61,12 @@ void Game::Run()
 		}
 		else
 		{
+			// Let any tasks in progress finish before shutting down
+			while (TasksInProgress())
+			{
+				PostWorldFrame();
+			}
+
 			if (m_curWorld)
 			{
 				m_currentWorldRoutine = m_curWorld->Shutdown(*this);
