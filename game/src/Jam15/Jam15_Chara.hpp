@@ -126,12 +126,12 @@ inline constexpr Game::Character c_yuuma = {
 /// Various without images
 //------------------------------------------------------------------------------
 // A generic councillor on the left
-inline constexpr Game::Character c_councilL = {
+inline constexpr Game::Character c_lcouncil = {
 	"KISHIN", true,
 	{},
 };
 // A generic councillor on the right
-inline constexpr Game::Character c_councilR = {
+inline constexpr Game::Character c_rcouncil = {
 	"KISHIN", false,
 	{},
 };

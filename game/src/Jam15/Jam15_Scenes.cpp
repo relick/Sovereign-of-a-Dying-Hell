@@ -30,17 +30,17 @@ SCENE_RUN(FirstVoteProposal)
     show(zanmu, neutral);
     say(zanmu, "Council, allow me my third proposal for today.");
     say(zanmu, "This one, I consider of critical importance.");
-    say(councilR, "Nippaku, you always say that.");
+    say(rcouncil, "Nippaku, you always say that.");
     say(zanmu, "It's always true~");
-    say(councilR, "Get on with it, then.");
+    say(rcouncil, "Get on with it, then.");
     say(zanmu, "The earth spirits are idle, and have been since the completion of the most recent oni palace.");
     say(zanmu, "They must be given work, and Hell has plenty of it to give out.");
     say(zanmu, "We've been short on labour for maintaining the torture chambers for decades now. My suggestion is to put them all to work there.");
-    say(councilR, "Nippaku, you persist with the earth spirits? You know they've been earmarked for the blood pools development.");
-    say(councilL, "That's right, we really shouldn't disrupt a plan in progress. Finding others to do the work would delay it by decades.");
+    say(rcouncil, "Nippaku, you persist with the earth spirits? You know they've been earmarked for the blood pools development.");
+    say(lcouncil, "That's right, we really shouldn't disrupt a plan in progress. Finding others to do the work would delay it by decades.");
     say(zanmu, "Ridiculous! 27.9\% of the torture chambers have already been forced to close due to malfunction, and our income is suffering for it.");
     say(zanmu, "There's no money for the vanity projects if we refuse to grease the wheels of the economy.");
-    say(councilR, "We'll just need to find others to do the work...");
+    say(rcouncil, "We'll just need to find others to do the work...");
     play_sfx(gavel);
     say(speaker, "That's enough back and forth. Let's not waste time here.");
     say(speaker, "Council, declare your votes!");
@@ -232,7 +232,9 @@ SCENE_RUN(LobbyingYuugi)
         }
     }
 
-    if (opinion > 0)
+    bool const hasYuugiInfluence = opinion > 0;
+    io_game.SetVar<Variables::HasYuugiInfluence>(hasYuugiInfluence);
+    if (hasYuugiInfluence)
     {
         say(yuugi, "I think this has a chance to work.");
 
@@ -268,7 +270,30 @@ SCENE_RUN(VotingForAnimalRights)
     scene(kishin_council);
     wait_for_tasks();
 
-    // TODO
+    show(zanmu, neutral);
+    say(zanmu, "Wise Council, allow me to discuss something that's come to my attention.");
+    say(zanmu, "We've not paid much mind to the Animal Realm recently, given the problems everywhere else have been greater.");
+    say(zanmu, "But even there, since a few decades ago, productivity is way down. Income is far outstripped by the costs to keep the animal spirits in check.");
+    say(zanmu, "This I have pinpointed to the usage of solitary confinements, primarily. The spirit of the animal spirits is broken, and they're deliberately avoiding work by seeking the punishments!");
+    say(zanmu, "We should end the use of such a destructive punishment. But furthermore, we need to add some motivation so they don't find another trick. We should invest money in food for all spirits.");
+    say(zanmu, "This may sound unorthodox, but let me tell you, every time we've increased punishments, the situation has become worse. Trying the opposite is surely worth a try?");
+
+    say(speaker, "An interesting proposal. Any opinions?");
+
+    // TODO: has yuugi's influence
+    if (io_game.ReadVar<Variables::HasYuugiInfluence>())
+    {
+        show(yuugi, neutral);
+        face(yuugi, rage);
+        say(yuugi, "We gotta do this! I'm not sure I agree with ");
+    }
+    else
+    {
+        think("I see Hoshiguma's staying quiet.");
+    }
+
+    // TODO-VOTE: with influence from yuugi
+    // Winning = further influence boost
 
     script.SetNextScene(Scenes::SuikaApproaches);
     end;
@@ -306,7 +331,7 @@ SCENE_RUN(SuikaApproaches)
     say(zanmu, "Straight to the point, huh?");
 
     // Default to false, is set to true if persuasion is successful
-    io_game.SetVar<bool>(Variables::SuikaDissuaded, false);
+    io_game.SetVar<Variables::SuikaDissuaded>(false);
 
     {
         choice(
@@ -435,8 +460,8 @@ SCENE_RUN(EngagingYuuma)
 
     say(zanmu, "It's Nippaku.");
 
-    bool const punishmentVotePassed = io_game.ReadVar<bool>(Variables::PunishmentVotePasses);
-    bool const priceIncreaseVoteFailed = io_game.ReadVar<bool>(Variables::PriceIncreaseVoteFails);
+    bool const punishmentVotePassed = io_game.ReadVar<Variables::PunishmentVotePasses>();
+    bool const priceIncreaseVoteFailed = io_game.ReadVar<Variables::PriceIncreaseVoteFails>();
 
     show(yuuma, neutral);
     say_hidden(yuuma, "Nippaku...");
@@ -657,11 +682,11 @@ SCENE_RUN(VotingForExecutive)
     say(zanmu, "They must be untethered by the debates of this council.");
     say(zanmu, "They must have a singular strong vision, to end this slow death by committee.");
 
-    say(councilL, "What?");
-    say(councilR, "Preposterous!");
-    say(councilL, "She has a point, we barely achieve anything.");
-    say(councilR, "None of us deserve to rule without restriction.");
-    say(councilL, "Exactly! This is a power move!");
+    say(lcouncil, "What?");
+    say(rcouncil, "Preposterous!");
+    say(lcouncil, "She has a point, we barely achieve anything.");
+    say(rcouncil, "None of us deserve to rule without restriction.");
+    say(lcouncil, "Exactly! This is a power move!");
 
     think("They're taking it about as well as I expected.");
 
