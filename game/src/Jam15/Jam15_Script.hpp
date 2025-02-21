@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Declare.hpp"
+#include "Game.hpp"
 #include "Script.hpp"
 #include "Scene.hpp"
 #include "Jam15_Scenes.hpp"
@@ -14,12 +15,30 @@ namespace Jam15
 enum class Variables : u8
 {
 	SceneNum,
+	HasYuugiInfluence,
 	PunishmentVotePasses,
 	SuikaDissuaded,
 	PriceIncreaseVoteFails,
 
 	Count,
 };
+inline constexpr u16 c_saveVersion = static_cast<u16>(Variables::Count); // Just hacking it as count for now while in dev
+
+}
+
+template<>
+struct Game::VariablesTypeTuple<Jam15::Variables> {
+	using Tuple = std::tuple<
+		Jam15::Scenes, // SceneNum
+		bool, // HasYuugiInfluence
+		bool, // PunishmentVotePasses
+		bool, // SuikaDissuaded
+		bool // PriceIncreaseVoteFails
+	>;
+};
+
+namespace Jam15
+{
 
 class Script
 	: public Game::Script
@@ -48,8 +67,8 @@ public:
 	Game::SFXID suika_beeps;
 	Game::SFXID yuugi_beeps;
 	Game::SFXID yuuma_beeps;
-	Game::SFXID councilL_beeps;
-	Game::SFXID councilR_beeps;
+	Game::SFXID lcouncil_beeps;
+	Game::SFXID rcouncil_beeps;
 	Game::SFXID speaker_beeps;
 	Game::SFXID kishin_beeps;
 };

@@ -1,7 +1,6 @@
 #include "Jam15_Script.hpp"
 
 #include "FadeOps.hpp"
-#include "Game.hpp"
 #include "GameRoutines.hpp"
 #include "TileOps.hpp"
 #include "TitleWorld.hpp"
@@ -47,8 +46,8 @@ void Script::InitTitle
 		co_return;
 	});
 
-	io_game.LoadVariables();
-	m_hasLoadedData = io_game.HasLoadedData(static_cast<u16>(Variables::Count));
+	io_game.LoadVariables(c_saveVersion);
+	m_hasLoadedData = io_game.HasLoadedData();
 	if (!m_hasLoadedData)
 	{
 		m_selection = 1;
@@ -128,8 +127,8 @@ void Script::InitVN
 	suika_beeps = zanmu_beeps;
 	yuugi_beeps = zanmu_beeps;
 	yuuma_beeps = zanmu_beeps;
-	councilL_beeps = zanmu_beeps;
-	councilR_beeps = zanmu_beeps;
+	lcouncil_beeps = zanmu_beeps;
+	rcouncil_beeps = zanmu_beeps;
 	speaker_beeps = zanmu_beeps;
 	kishin_beeps = zanmu_beeps;
 
@@ -140,11 +139,11 @@ void Script::InitVN
 	if (m_hasLoadedData)
 	{
 		// Get scene num
-		sceneToStart = io_game.ReadVar<Scenes>(Variables::SceneNum);
+		sceneToStart = io_game.ReadVar<Variables::SceneNum>();
 	}
 	else
 	{
-		io_game.SetVariableCount(static_cast<u16>(Variables::Count));
+		io_game.ResetVariables<Variables>();
 	}
 
 	m_nextScene = sceneToStart;
@@ -160,8 +159,8 @@ void Script::UpdateVN
 	if (m_nextScene)
 	{
 		// Save data first
-		io_game.SetVar<Scenes>(Variables::SceneNum, *m_nextScene);
-		io_game.SaveVariables();
+		io_game.SetVar<Variables::SceneNum>(*m_nextScene);
+		io_game.SaveVariables(c_saveVersion);
 
 		// Tidy up visuals
 		io_vn.HideCharacterVisual(io_game, false);

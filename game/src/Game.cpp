@@ -160,7 +160,10 @@ static constexpr std::array<u16, 4> c_magicString = {
 };
 
 //------------------------------------------------------------------------------
-void Game::SaveVariables()
+void Game::SaveVariables
+(
+	u16 i_currentSaveVersion
+)
 {
 	SRAM_enable();
 
@@ -177,6 +180,7 @@ void Game::SaveVariables()
 		fnWriteWord(magic);
 	}
 
+	fnWriteWord(i_currentSaveVersion);
 	fnWriteWord(m_gameVariables.size());
 	for (u16 var : m_gameVariables)
 	{
@@ -187,7 +191,10 @@ void Game::SaveVariables()
 }
 
 //------------------------------------------------------------------------------
-bool Game::LoadVariables()
+bool Game::LoadVariables
+(
+	u16 i_expectedSaveVersion
+)
 {
 	SRAM_enableRO();
 
@@ -223,6 +230,13 @@ bool Game::LoadVariables()
 
 		SRAM_disable();
 
+		m_loadedData = false;
+		return m_loadedData;
+	}
+
+	u16 const actualSaveVersion = fnReadWord();
+	if(actualSaveVersion != i_expectedSaveVersion)
+	{
 		m_loadedData = false;
 		return m_loadedData;
 	}

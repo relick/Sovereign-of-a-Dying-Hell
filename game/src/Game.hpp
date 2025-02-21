@@ -32,6 +32,28 @@ struct LambdaHolder
 	T_Lambda m_lambda;
 };
 
+template<typename T>
+concept IsEnum = std::is_enum_v<T>;
+
+// Specialise with using Tuple = std::tuple<types, for, variables>;
+template<IsEnum T>
+struct VariablesTypeTuple {};
+
+template<typename T>
+concept VariablesEnum = IsEnum<T> && requires
+{
+	typename VariablesTypeTuple<T>::Tuple;
+	{ T::Count } -> std::same_as<T>;
+	// Implicitly requires std::tuple
+	requires std::tuple_size_v<typename VariablesTypeTuple<T>::Tuple> == static_cast<size_t>(T::Count);
+};
+
+template<typename T, T t_Index>
+concept ValidVarIndex = VariablesEnum<T> && (t_Index >= static_cast<T>(0)) && (t_Index < T::Count);
+
+template<auto t_Index> requires ValidVarIndex<decltype(t_Index), t_Index>
+using TypeOfVar = std::tuple_element_t<static_cast<size_t>(t_Index), typename VariablesTypeTuple<decltype(t_Index)>::Tuple>;
+
 class Game
 {
 	std::unique_ptr<World> m_curWorld;
@@ -89,23 +111,36 @@ public:
 	void QueueLambdaTask(T_Lambda&& i_lambda, TaskPriority i_priority, T_Args&&... i_args);
 	bool TasksInProgress() const;
 
-	void SetVariableCount(u16 i_count) { m_loadedData = false; m_gameVariables.clear(); m_gameVariables.resize(i_count); }
-	template<typename T, typename T_Index = u16>
-	void SetVar(T_Index i_varIndex, T i_value) requires(sizeof(T) == sizeof(u16)) { m_gameVariables[static_cast<u16>(i_varIndex)] = std::bit_cast<u16>(i_value); }
-	template<typename T, typename T_Index = u8>
-	void SetVar(T_Index i_varIndex, T i_value) requires(sizeof(T) == sizeof(u8)) { m_gameVariables[static_cast<u16>(i_varIndex)] = std::bit_cast<u8>(i_value); }
-	template<typename T_Index = u16>
-	void SetVar(T_Index i_varIndex, bool i_value) { m_gameVariables[static_cast<u16>(i_varIndex)] = i_value ? 1 : 0; }
-	template<typename T, typename T_Index = u16>
-	T ReadVar(T_Index i_varIndex) const requires(sizeof(T) == sizeof(u16)) { return std::bit_cast<T>(m_gameVariables[static_cast<u16>(i_varIndex)]); }
-	template<typename T, typename T_Index = u8>
-	T ReadVar(T_Index i_varIndex) const requires(sizeof(T) == sizeof(u8)) { return std::bit_cast<T>(static_cast<u8>(m_gameVariables[static_cast<u16>(i_varIndex)])); }
-	template<typename T_Index = u16>
-	bool ReadVar(T_Index i_varIndex) const { return m_gameVariables[static_cast<u16>(i_varIndex)] == 1; }
+	template<VariablesEnum T>
+	void ResetVariables() { m_loadedData = false; m_gameVariables.clear(); m_gameVariables.resize(static_cast<u16>(T::Count)); }
+	template<auto t_Index>
+	void SetVar(TypeOfVar<t_Index> i_value)
+		requires(sizeof(TypeOfVar<t_Index>) == sizeof(u16))
+	{ m_gameVariables[static_cast<u16>(t_Index)] = std::bit_cast<u16>(i_value); }
+	template<auto t_Index>
+	void SetVar(TypeOfVar<t_Index> i_value)
+		requires(sizeof(TypeOfVar<t_Index>) == sizeof(u8)) && (!std::same_as<TypeOfVar<t_Index>, bool>)
+	{ m_gameVariables[static_cast<u16>(t_Index)] = std::bit_cast<u8>(i_value); }
+	template<auto t_Index>
+	void SetVar(bool i_value)
+		requires std::same_as<TypeOfVar<t_Index>, bool>
+	{ m_gameVariables[static_cast<u16>(t_Index)] = i_value ? 1 : 0; }
+	template<auto t_Index>
+	TypeOfVar<t_Index> ReadVar() const
+		requires(sizeof(TypeOfVar<t_Index>) == sizeof(u16))
+	{ return std::bit_cast<TypeOfVar<t_Index>>(m_gameVariables[static_cast<u16>(t_Index)]); }
+	template<auto t_Index>
+	TypeOfVar<t_Index> ReadVar() const
+		requires(sizeof(TypeOfVar<t_Index>) == sizeof(u8)) && (!std::same_as<TypeOfVar<t_Index>, bool>)
+	{ return std::bit_cast<TypeOfVar<t_Index>>(static_cast<u8>(m_gameVariables[static_cast<u16>(t_Index)])); }
+	template<auto t_Index>
+	bool ReadVar() const
+		requires std::same_as<TypeOfVar<t_Index>, bool>
+	{ return m_gameVariables[static_cast<u16>(t_Index)] == 1; }
 
-	void SaveVariables();
-	bool LoadVariables();
-	bool HasLoadedData(u16 i_expectedVarCount) const { return m_loadedData && m_gameVariables.size() == i_expectedVarCount; }
+	void SaveVariables(u16 i_currentSaveVersion);
+	bool LoadVariables(u16 i_expectedSaveVersion);
+	bool HasLoadedData() const { return m_loadedData; }
 
 private:
 	static void VIntCallback();
