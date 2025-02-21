@@ -28,6 +28,8 @@ class VNWorld
 	std::array<u16, 32> m_namePals{};
 	std::array<u16, 32> m_textPals{};
 
+	TileSet const* m_existingEndTileSet{ nullptr }; // Usually a character's tiles, but should be set based on any source
+
 	u8 m_waitingForTasksStack{ 0 };
 
 	// Mostly changes which subsystem is active/allows transitions - should be mutually exclusive

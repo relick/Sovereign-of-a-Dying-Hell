@@ -14,6 +14,7 @@ enum class TaskPriority : u8
 	Animations,
 	Sprites,
 };
+#define AwaitTask(TASK_VAR) while(TASK_VAR) { TASK_VAR(); if (TASK_VAR) { co_yield{}; } }
 
 using WorldRoutine = Coroutine<struct WorldRoutineCoroTag, std::suspend_always>;
 

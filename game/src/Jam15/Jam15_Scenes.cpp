@@ -320,7 +320,7 @@ SCENE_RUN(VotingForAnimalRights)
             face(yuugi, dejected);
             say(yuugi, "Damn it... I really thought we had a chance. Have you lost your touch, Nippaku?");
             
-            say(zanmu, "")
+            say(zanmu, "An oni doesn't give up at the first loss. I'll get my way eventually.");
         }
     }
 

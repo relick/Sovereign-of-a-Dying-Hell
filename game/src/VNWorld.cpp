@@ -415,6 +415,8 @@ void VNWorld::SetCharacterVisual
 )
 {
 	HideCharacterVisual(io_game, false);
+
+	// One big mega task, since various things are run as conditional sub tasks
 	io_game.QueueLambdaTask([this, &i_pose] -> Task {
 		m_charaSrcPal = i_pose.m_palette->data;
 
@@ -437,23 +439,37 @@ void VNWorld::SetCharacterVisual
 			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_textPals.begin() + 16);
 		}
 
-		co_return;
-	});
-	u16 const tileIndex = c_tilesEnd - i_pose.m_tileset->numTile;
-	u16 const baseTile = TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex);
-	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(
-		i_pose.m_tileset,
-		tileIndex
-	));
-	io_game.QueueFunctionTask(Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
-		VDP_BG_A,
-		i_pose.m_animation[0].m_tilemap->tilemap,
-		i_pose.m_animation[0].m_tilemap->w,
-		i_pose.m_animation[0].m_tilemap->h,
-		baseTile
-	));
-	io_game.QueueLambdaTask([this, &i_pose, baseTile] -> Task {
+		u16 const tileIndex = c_tilesEnd - i_pose.m_tileset->numTile;
+		u16 const baseTile = TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, tileIndex);
+
+		if (m_existingEndTileSet != i_pose.m_tileset)
+		{
+			{
+				Task load = Tiles::LoadTiles_Chunked(
+					i_pose.m_tileset,
+					tileIndex
+				);
+				AwaitTask(load);
+			}
+
+			co_yield{};
+
+			{
+				Task wipe = Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
+					VDP_BG_A,
+					i_pose.m_animation[0].m_tilemap->tilemap,
+					i_pose.m_animation[0].m_tilemap->w,
+					i_pose.m_animation[0].m_tilemap->h,
+					baseTile
+				);
+				AwaitTask(wipe);
+			}
+		}
+
+		m_existingEndTileSet = i_pose.m_tileset;
+
 		m_animator.StartAnimation(i_pose, baseTile);
+
 		co_return;
 	});
 }
