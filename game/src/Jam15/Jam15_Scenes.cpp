@@ -63,7 +63,7 @@ SCENE_RUN(HatchingThePlan)
     wait_for_tasks();
 
     desc("Your study is cold and devoid of decoration.");
-    desc("The tension makes it a perfect area to think, and make deals.");
+    desc("The tension of the decor makes it the perfect place to think.");
 
     think("Tch. The oni are fickle, I'll just need to try again another time.");
     think("This rate of change isn't fast enough, though. Hell's institutions are already faltering.");
@@ -71,7 +71,8 @@ SCENE_RUN(HatchingThePlan)
 
     show(hisami, neutral);
     say(hisami, "Lady Zanmu~~! I have news~! You're sure to like it~!");
-    say(hisami, "...");
+    say(zanmu, "...");
+    say(hisami, "... ...");
     say(zanmu, "... ... ...");
     say(hisami, "Lady Zanmu?");
     
