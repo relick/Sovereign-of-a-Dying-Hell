@@ -17,7 +17,7 @@
 namespace Game
 {
 
-constexpr Palettes::RGB3Colour c_tintColour{ 0, 2, 1 }; // TODO: customisable by player/scene/character?
+constexpr Palettes::RGB3Colour c_tintColour{ 0, 0, 0 }; // TODO: customisable by player/scene/character?
 constexpr u8 c_inputBufferingTimer = 30; // Number of frames an input can be buffered before being discarded if unprocessed
 
 
