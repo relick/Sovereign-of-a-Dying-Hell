@@ -305,7 +305,7 @@ SCENE_RUN(SuikaApproaches)
 
     say(zanmu, "Straight to the point, huh?");
 
-    // Default false
+    // Default to false, is set to true if persuasion is successful
     io_game.SetVar<bool>(Variables::SuikaDissuaded, false);
 
     {
@@ -314,24 +314,7 @@ SCENE_RUN(SuikaApproaches)
             "Keep the plans secret",
         );
         auto const res = get_choice_result();
-        switch(res)
-        {
-        case 0:
-        {
-            say(zanmu, "You're very observant. It's true, I'm scheming~");
-            
-            say(suika, "Woohoo! I knew it! What're you doing?");
-
-            say(zanmu, "I'm going to take over Hell, and make it run smoothly again.");
-
-            face(suika, neutral);
-            say(suika, "...Huh?");
-            say(suika, "What do you mean you're going to take over?");
-
-            think("Suika's surprised, but I can tell she isn't horrified. I should be able to satisfy her curiosity without making an enemy.");
-            break;
-        }
-        case 1:
+        if (res == 1)
         {
             say(zanmu, "I'm not scheming anything. Has it become wrong to propose improvements to Hell?");
 
@@ -339,22 +322,58 @@ SCENE_RUN(SuikaApproaches)
             say(suika, "Ehhhh...");
             say(suika, "Fine! But if I find out you just lied, I don't care what it is. I'll fight you down.");
 
-            think("Oh dear. Suika has considerable rapport with the other kishin. This could pose a problem...");
+            think("Oh dear. Suika has considerable rapport with the other kishin. Votes might be harder to secure...");
 
             script.SetNextScene(Scenes::DelegatingToHisami);
             end;
         }
-        }
     }
 
+    say(zanmu, "You're very observant. It's true, I'm scheming~");
+    
+    say(suika, "Woohoo! I knew it! What're you doing?");
+
+    say(zanmu, "I'm going to take over Hell, and make it run smoothly again.");
+
+    face(suika, neutral);
+    say(suika, "...Huh?");
+    say(suika, "What do you mean you're going to take over?");
+
+    think("Ack. Suika's horrified. I need to ");
+    
     {
         // TODO
         choice(
-            "",
-            "",
+            "\"I'll be a true administrator.\"",
+            "\"I'll be Hell's king.\"",
+            "\"I'll control the Council as my puppets.\"",
         );
         auto const res = get_choice_result();
+        switch(res)
+        {
+        case 0:
+        {
+            break;
+        }
+        case 1:
+        case 2:
+        {
+            say(suika, "You can't be serious!");
+
+            say(zanmu, "It's a serious situation.");
+
+            say(suika, "Damn! I thought you were just trying to poke fun at the Council. But this'll be going too far, Zanmu!");
+            say(suika, "I need to warn the oni!");
+            hide();
+
+            think("Hm. It's within tolerance, but I won't deny she's going to make things harder.");
+            end;
+        }
+        }
     }
+    
+    say(suika, "I see. You've always been good at that, I suppose.");
+    say(suika, "How're you gonna do it?");
 
     script.SetNextScene(Scenes::DelegatingToHisami);
     end;
