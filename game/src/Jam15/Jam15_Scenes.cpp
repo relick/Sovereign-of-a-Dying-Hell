@@ -63,7 +63,7 @@ SCENE_RUN(HatchingThePlan)
     wait_for_tasks();
 
     desc("Your study is cold and devoid of decoration.");
-    desc("The tension of the decor makes it the perfect place to think.");
+    desc("The tension makes it the perfect place to think.");
 
     think("Tch. The oni are fickle, I'll just need to try again another time.");
     think("This rate of change isn't fast enough, though. Hell's institutions are already faltering.");
@@ -285,7 +285,7 @@ SCENE_RUN(VotingForAnimalRights)
     {
         show(yuugi, neutral);
         face(yuugi, rage);
-        say(yuugi, "We gotta do this! I'm not sure I agree with ");
+        say(yuugi, "We gotta do this! The animal spirits need some relief!");
     }
     else
     {
@@ -293,7 +293,36 @@ SCENE_RUN(VotingForAnimalRights)
     }
 
     // TODO-VOTE: with influence from yuugi
-    // Winning = further influence boost
+
+    show(zanmu, neutral);
+    if (io_game.ReadVar<Variables::PunishmentVotePasses>())
+    {
+        say(zanmu, "Wonderful!");
+        say(zanmu, "I'll take this into my hands and notify the guards of the Animal Realm right away. I promise, this won't be a mistake.");
+        think("This is perfect. My plan is well under way now.");
+        // TODO-INFLUENCE: further influence boost
+        
+        if (io_game.ReadVar<Variables::HasYuugiInfluence>())
+        {
+            show(yuugi, neutral);
+            say(yuugi, "Thank you, Nippaku. I couldn't have done that by myself. I'm certain, this is the right thing to have done.");
+
+            think("The right thing to guarantee an uprising, sure!");
+            say(zanmu, "It is as you say~");
+        }
+    }
+    else
+    {
+        say(zanmu, "*sigh*, what a pity.");
+        if (io_game.ReadVar<Variables::HasYuugiInfluence>())
+        {
+            show(yuugi, neutral);
+            face(yuugi, dejected);
+            say(yuugi, "Damn it... I really thought we had a chance. Have you lost your touch, Nippaku?");
+            
+            say(zanmu, "")
+        }
+    }
 
     script.SetNextScene(Scenes::SuikaApproaches);
     end;
@@ -308,8 +337,12 @@ SCENE_RUN(SuikaApproaches)
     scene(zanmu_study);
     wait_for_tasks();
 
-    desc("The study is cold and sterile. Just how you like it.");
-    desc("An oni with towering horns gently pushes open the shoji door.");
+    desc("Your study feels sterile, yet stale, at the same time.");
+
+    think("With that out the way, I need to work on the next step.");
+    think("I'll speak to Hisami about it tomorrow-");
+
+    desc("An oni with towering horns firmly pushes aside the shoji door.");
 
     say(zanmu, "Suika? What a pleasant surprise.");
 
