@@ -45,7 +45,7 @@ SCENE_RUN(FirstVoteProposal)
     say(speaker, "That's enough back and forth. Let's not waste time here.");
     say(speaker, "Council, declare your votes!");
 
-    // TODO VOTE (always lost)
+    // TODO-VOTE (always lost)
 
     say(speaker, "A decisive defeat. No more proposals from you today, Nippaku, please.");
     say(zanmu, "The lack of wisdom in this Council once again astounds.");
@@ -240,7 +240,7 @@ SCENE_RUN(LobbyingYuugi)
         say(yuugi, "Hahaha! How quick your arrogance returns now I'm on board!");
         say(yuugi, "If you're holding the vote tomorrow, I'll make the rounds today.");
         say(yuugi, "It was a nice chat. Later, Nippaku.");
-        // TODO INFLUENCE
+        // TODO-INFLUENCE
     }
     else
     {
@@ -347,6 +347,7 @@ SCENE_RUN(SuikaApproaches)
     }
 
     {
+        // TODO
         choice(
             "",
             "",
@@ -652,7 +653,6 @@ SCENE_RUN(VotingForExecutive)
 
     if (voteSucceeded)
     {
-        // TODO
         script.SetNextScene(Scenes::Ending_RulingDecay);
         end;
     }
@@ -767,6 +767,8 @@ SCENE_RUN(VotingToRelocateHell)
     scene(kishin_council);
     wait_for_tasks();
 
+    // TODO
+
     end;
 }
 
@@ -775,6 +777,8 @@ SCENE_RUN(Ending_RulingDecay)
 {
     SCENE_SETUP();
 
+    // TODO
+
     end;
 }
 
@@ -782,12 +786,16 @@ SCENE_RUN(Ending_NewHell)
 {
     SCENE_SETUP();
 
+    // TODO
+
     end;
 }
 
 SCENE_RUN(Ending_AdministratingCollapse)
 {
     SCENE_SETUP();
+
+    // TODO
 
     end;
 }
