@@ -29,8 +29,7 @@
 #define think(TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")", std::nullopt); wait
 
 #define say(CHARA, TEXT) io_vn.SetText(io_game, &c_ ## CHARA, TEXT, script. CHARA ## _beeps); wait
-// TODO: use ??? instead of hiding the name
-#define say_hidden(CHARA, TEXT) io_vn.SetText(io_game, nullptr, TEXT, script. CHARA ## _beeps); wait
+#define say_hidden(CHARA, TEXT) io_vn.SetText(io_game, (c_ ## CHARA).m_showOnLeft ? &Game::c_charaLHidden : &Game::c_charaRHidden, TEXT, script. CHARA ## _beeps); wait
 
 #define choice(...) static constexpr std::array _choices = { __VA_ARGS__ }; io_vn.Choice(io_game, _choices); wait
 #define get_choice_result() *(io_vn.GetChoiceResult()); wait_for_tasks()

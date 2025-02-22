@@ -229,13 +229,16 @@ void DialoguePrinter2::SetName
 			break; // done
 		}
 
-		if (curChar >= 'A' && curChar <= 'Z')
+#if DEBUG
+		if (!((curChar >= 'A' && curChar <= 'Z') || curChar == '?' || curChar == ' '))
 		{
-			auto const [upperTile, lowerTile] = m_fonts->GetVNNameFontTiles(curChar);
-
-			m_tiles[c_textTileCount + (limit++)] = *upperTile;
-			m_tiles[c_textTileCount + limit] = *lowerTile;
+			Error("Character '%s' has invalid name", m_curName);
 		}
+#endif
+		auto const [upperTile, lowerTile] = m_fonts->GetVNNameFontTiles(curChar);
+
+		m_tiles[c_textTileCount + (limit++)] = *upperTile;
+		m_tiles[c_textTileCount + limit] = *lowerTile;
 
 		++i_name;
 	}

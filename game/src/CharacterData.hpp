@@ -72,4 +72,7 @@ struct Character
 	std::span<Pose const> m_poses;
 };
 
+inline constexpr Character c_charaLHidden = { "?????", true, {}, };
+inline constexpr Character c_charaRHidden = { "?????", false, {}, };
+
 }
