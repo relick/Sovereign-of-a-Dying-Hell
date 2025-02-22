@@ -88,7 +88,6 @@ WorldRoutine VNWorld::Init
 	s_charaTextPal = m_textPals.data() + 16;
 	HInt_TextArea_SetName();
 	VDP_setHIntCounter(1);
-	VDP_setHInterrupt(true);
 
 	std::array<u16, 64> blackWithTextPal = { 0 };
 	std::copy(text_font_pal.data, text_font_pal.data + 16, blackWithTextPal.begin() + 48);
@@ -648,8 +647,7 @@ void VNWorld::Choice
 {
 	TransitionTo(io_game, SceneMode::Choice);
 
-	io_game.QueueLambdaTask([this, i_choices] -> Task
-	{
+	io_game.QueueLambdaTask([this, i_choices] -> Task {
 		Get<SceneMode::Choice>().SetChoices(i_choices);
 		co_return;
 	});
@@ -665,8 +663,7 @@ void VNWorld::TimedChoice
 {
 	TransitionTo(io_game, SceneMode::Choice);
 
-	io_game.QueueLambdaTask([this, i_choices, i_timeInSeconds] -> Task
-	{
+	io_game.QueueLambdaTask([this, i_choices, i_timeInSeconds] -> Task {
 		Get<SceneMode::Choice>().SetChoices(i_choices, i_timeInSeconds);
 		co_return;
 	});
@@ -738,6 +735,8 @@ void VNWorld::TransitionTo
 				fadeOp3b.DoFadeStep();
 				co_yield{};
 			}
+
+			VDP_setHInterrupt(false);
 		});
 		WaitForTasks(io_game);
 
@@ -748,6 +747,8 @@ void VNWorld::TransitionTo
 	case SceneMode::Dialogue:
 	{
 		io_game.QueueLambdaTask([this] -> Task {
+			VDP_setHInterrupt(true);
+
 			std::array<u16, 32> namePal;
 			std::array<u16, 32> textPal;
 
@@ -797,6 +798,8 @@ void VNWorld::TransitionTo
 				fadeOp3.DoFadeStep();
 				co_yield{};
 			}
+
+			VDP_setHInterrupt(false);
 		});
 		WaitForTasks(io_game);
 
@@ -825,6 +828,8 @@ void VNWorld::TransitionTo
 				fadeOp3.DoFadeStep();
 				co_yield{};
 			}
+
+			VDP_setHInterrupt(false);
 		});
 		WaitForTasks(io_game);
 
