@@ -98,6 +98,7 @@ SCENE_RUN(HatchingThePlan)
     say(zanmu, "It's time to make a mockery of the Council, and rule Hell myself.");
     say(zanmu, "Go back to the Animal Realm, and spread more rumours of that beast's power. Add fuel to the fire! Return to me in two days.");
     
+    show(hisami, joy);
     say(hisami, "As you wish, Lady Zanmu~!");
     hide();
 

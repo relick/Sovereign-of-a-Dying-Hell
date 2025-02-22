@@ -39,15 +39,19 @@ void CharacterAnimator::Update
 				m_context->m_currentFrameIndex = 0;
 			}
 
-			m_context->m_ticks = 0;
-			m_context->m_currentFrameTicks = m_context->m_pose->m_animation[m_context->m_currentFrameIndex].m_duration.Get();
+			AnimFrame const& animFrame = m_context->m_pose->m_animation[m_context->m_currentFrameIndex];
 
-			io_game.QueueFunctionTask(Tiles::SetMap_Full(
+			m_context->m_ticks = 0;
+			m_context->m_currentFrameTicks = animFrame.m_duration.Get();
+
+			io_game.QueueFunctionTask(Tiles::SetMap_SubFull(
 				VDP_BG_A,
-				m_context->m_pose->m_animation[m_context->m_currentFrameIndex].m_tilemap->tilemap,
-				m_context->m_pose->m_animation[m_context->m_currentFrameIndex].m_tilemap->w,
-				m_context->m_pose->m_animation[m_context->m_currentFrameIndex].m_tilemap->h,
-				m_context->m_baseTile
+				animFrame.m_tilemap->tilemap,
+				animFrame.m_tilemap->w,
+				animFrame.m_tilemap->h,
+				m_context->m_baseTile,
+				animFrame.m_xOffset,
+				animFrame.m_yOffset
 			), TaskPriority::Animations);
 		}
 	}

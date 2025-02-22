@@ -129,7 +129,9 @@ inline Game::Task SetMap_Wipe
 	u16 const* i_tilemap,
 	u16 i_mapWidth,
 	u16 i_mapHeight,
-	u16 i_basetile
+	u16 i_basetile,
+	u16 i_xOffset = 0,
+	u16 i_yOffset = 0
 )
 {
 	//AutoProfileScope profile("SetMap_Wipe: %lu");
@@ -145,6 +147,15 @@ inline Game::Task SetMap_Wipe
 	//SYS_disableInts();
 
 	u16 addr = i_planeAddr;
+
+	// Clamp offsets
+	i_xOffset = std::min<u16>(i_xOffset, planeWidth - i_mapWidth);
+	i_yOffset = std::min<u16>(i_yOffset, planeHeight - i_mapHeight);
+	
+	// Initial move forward, then it should be correctly offset for the rest of the operation
+	addr += i_xOffset * 2;
+	addr += i_yOffset * planeWidth * 2;
+
 	s16 const addrInc = (t_Dir == WipeDir::Up ? -1 : 1) * planeWidth * 2;
 	s16 const baseTileSrcInc = (t_Dir == WipeDir::Up ? -1 : 0) * i_mapWidth * 2;
 	s16 const copySrcInc = (t_Dir == WipeDir::Up ? -1 : 1) * i_mapWidth;
@@ -207,6 +218,31 @@ inline Game::Task SetMap_Wipe
 	//SYS_enableInts();
 
 	co_return;
+}
+
+//------------------------------------------------------------------------------
+// Like SetMap_Full, but for maps smaller than the full screen
+//------------------------------------------------------------------------------
+inline Game::Task SetMap_SubFull
+(
+	u16 i_planeAddr,
+	u16 const* i_tilemap,
+	u16 i_mapWidth,
+	u16 i_mapHeight,
+	u16 i_basetile,
+	u16 i_xOffset,
+	u16 i_yOffset
+)
+{
+	return SetMap_Wipe<WipeDir::Down, 32>(
+		i_planeAddr,
+		i_tilemap,
+		i_mapWidth,
+		i_mapHeight,
+		i_basetile,
+		i_xOffset,
+		i_yOffset
+	);
 }
 
 //------------------------------------------------------------------------------

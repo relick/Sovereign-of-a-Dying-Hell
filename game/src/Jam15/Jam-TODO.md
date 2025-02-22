@@ -22,6 +22,7 @@ Jam-TODO:
 - Display text regarding influence
 - Show the influence that might be gained when making a choice
 - Snap transition to black at the end of a scene, and titles for each scene fading/sliding in/fading out before the overall fade in
+- Different font for desc
 
 # Sound
 - Different clicks per character

@@ -53,6 +53,8 @@ struct AnimFrame
 {
 	TileMap const* m_tilemap{ nullptr };
 	AnimFrameDuration m_duration;
+	u16 m_xOffset{ 0 };
+	u16 m_yOffset{ 0 };
 };
 
 struct Pose

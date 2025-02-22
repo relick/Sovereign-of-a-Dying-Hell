@@ -469,15 +469,33 @@ void VNWorld::SetCharacterVisual
 			co_yield{};
 
 			{
+				AnimFrame const& firstAnimFrame = i_pose.m_animation[0];
 				Task wipe = Tiles::SetMap_Wipe<Tiles::WipeDir::Up>(
 					VDP_BG_A,
-					i_pose.m_animation[0].m_tilemap->tilemap,
-					i_pose.m_animation[0].m_tilemap->w,
-					i_pose.m_animation[0].m_tilemap->h,
-					baseTile
+					firstAnimFrame.m_tilemap->tilemap,
+					firstAnimFrame.m_tilemap->w,
+					firstAnimFrame.m_tilemap->h,
+					baseTile,
+					firstAnimFrame.m_xOffset,
+					firstAnimFrame.m_yOffset
 				);
 				AwaitTask(wipe);
 			}
+		}
+		else
+		{
+			// If using same tilemap, need to set first frame still
+			AnimFrame const& firstAnimFrame = i_pose.m_animation[0];
+			Task firstFrame = Tiles::SetMap_SubFull(
+				VDP_BG_A,
+				firstAnimFrame.m_tilemap->tilemap,
+				firstAnimFrame.m_tilemap->w,
+				firstAnimFrame.m_tilemap->h,
+				baseTile,
+				firstAnimFrame.m_xOffset,
+				firstAnimFrame.m_yOffset
+			);
+			AwaitTask(firstFrame);
 		}
 
 		m_existingEndTileSet = i_pose.m_tileset;
@@ -497,6 +515,7 @@ void VNWorld::HideCharacterVisual
 {
 	io_game.QueueLambdaTask([this] -> Task {
 		m_animator.StopAnimation();
+		m_existingEndTileSet = nullptr;
 		co_return;
 	});
 

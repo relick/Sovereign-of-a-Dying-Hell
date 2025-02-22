@@ -20,7 +20,7 @@
 #define portrait(CHARA, POSE)
 #define hide_portrait()
 
-#define show(CHARA, POSE) io_vn.ClearMode(io_game); io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose); wait_for_tasks()
+#define show(CHARA, POSE) if (!io_vn.CharacterShown()) { io_vn.ClearMode(io_game); } io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose); wait_for_tasks()
 #define hide() io_vn.ClearMode(io_game); io_vn.HideCharacterVisual(io_game, false); wait_for_tasks()
 #define face(CHARA, EXPRESSION) // TODO
 
