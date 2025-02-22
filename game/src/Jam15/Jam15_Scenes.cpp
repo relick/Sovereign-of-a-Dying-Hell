@@ -11,6 +11,9 @@
 #define SCENE_RUN(scene_name) Game::SceneRoutine scene_name::Run(Game::Game& io_game, Game::VNWorld& io_vn, Game::Script& io_script)
 #define SCENE_SETUP() [[maybe_unused]] Jam15::Script& script = static_cast<Jam15::Script&>(io_script)
 
+#define zsay(FACE, TEXT) say_face(zanmu, FACE, TEXT)
+#define zthink(FACE, TEXT) think_face(zanmu, FACE, TEXT)
+
 namespace Jam15
 {
 
@@ -484,13 +487,12 @@ SCENE_RUN(EngagingYuuma)
 
     // music(shining_law_of_the_strong_eating_the_weak, 0.0, true);
 
-    portrait(zanmu, focus);
-    think("It should be around here.");
-    think("Ah, I've been spotted.");
+    zthink(neutral, "It should be around here.");
+    zthink(pained, "Ah, I've been spotted.");
 
     say_hidden(yuuma, "Oi. Scram, oni.");
 
-    say(zanmu, "It's Nippaku.");
+    zsay(smirk, "It's Nippaku.");
 
     bool const punishmentVotePassed = io_game.ReadVar<Variables::PunishmentVotePasses>();
     bool const priceIncreaseVoteFailed = io_game.ReadVar<Variables::PriceIncreaseVoteFails>();
@@ -520,8 +522,8 @@ SCENE_RUN(EngagingYuuma)
         {
             case 0:
             {
-                portrait(zanmu, pained);
                 say_hidden(yuuma, "Whatever.");
+                zthink(pained, "...");
                 break;
             }
             case 1:
@@ -538,8 +540,7 @@ SCENE_RUN(EngagingYuuma)
     show(yuuma, neutral);
     say(yuuma, "I'm Yuuma. What do you want?");
 
-    portrait(zanmu, neutral);
-    say(zanmu, "I wanted to see who was acting as a leader to the eagle spirits. I'm keen to see them prosper.");
+    zsay(neutral, "I wanted to see who was acting as a leader to the eagle spirits. I'm keen to see them prosper.");
 
     think("A taotie is their leader? She might turn out to be a loose cannon. Still, I need to get on her good side...");
     

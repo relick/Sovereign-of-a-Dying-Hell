@@ -18,7 +18,7 @@ Jam-TODO:
 4. Add graphics for the vote bar
 4a. Add graphic for the timer
 5. Add graphic for influence
-6. Add sprite portrait for Zanmu
+6. ~~Add sprite portrait for Zanmu~~
 7. ~~????? for say_hidden~~
 8. Set up the jam page
 

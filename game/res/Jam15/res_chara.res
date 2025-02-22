@@ -6,13 +6,14 @@ TILEMAP zanmu_neutral_3 "chara/zanmu/neutral_3.png" zanmu_tileset
 TILEMAP zanmu_neutral_4 "chara/zanmu/neutral_4.png" zanmu_tileset
 TILEMAP zanmu_neutral_5 "chara/zanmu/neutral_5.png" zanmu_tileset
 
-IMAGE zanmu_face_gloat "chara/zanmu/gloat.png"
-IMAGE zanmu_face_neutral "chara/zanmu/neutral.png"
-IMAGE zanmu_face_pained "chara/zanmu/pained.png"
-IMAGE zanmu_face_pleasant "chara/zanmu/pleasant.png"
-IMAGE zanmu_face_smirk "chara/zanmu/smirk.png"
-IMAGE zanmu_face_unamused "chara/zanmu/unamused.png"
-IMAGE zanmu_face_unamused_sweat "chara/zanmu/unamused_sweat.png"
+PALETTE zanmu_face_pal "chara/zanmu/gloat.png"
+TILESET zanmu_face_gloat "chara/zanmu/gloat.png" NONE NONE COLUMN
+TILESET zanmu_face_neutral "chara/zanmu/neutral.png" NONE NONE COLUMN
+TILESET zanmu_face_pained "chara/zanmu/pained.png" NONE NONE COLUMN
+TILESET zanmu_face_pleasant "chara/zanmu/pleasant.png" NONE NONE COLUMN
+TILESET zanmu_face_smirk "chara/zanmu/smirk.png" NONE NONE COLUMN
+TILESET zanmu_face_unamused "chara/zanmu/unamused.png" NONE NONE COLUMN
+TILESET zanmu_face_unamused_sweat "chara/zanmu/unamused_sweat.png" NONE NONE COLUMN
 
 TILESET hisami_tileset "chara/hisami/hisami_tileset.png"
 PALETTE hisami_pal "chara/hisami/hisami_tileset.png"

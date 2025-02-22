@@ -8,8 +8,12 @@ inline constexpr u16 c_screenHeightTiles = 28;
 inline constexpr u16 c_screenWidthPx = c_screenWidthTiles << 3;
 inline constexpr u16 c_screenHeightPx = c_screenHeightTiles << 3;
 
-inline constexpr u16 c_reservedTileCount = 1;
-inline constexpr u16 c_reservedClearTile = 2047;
+inline constexpr u16 c_vramEndTile = 2048;
+inline constexpr u16 c_reservedClearTile = c_vramEndTile - 1;
+inline constexpr u16 c_portraitSizeTiles = 4;
+inline constexpr u16 c_portraitSizePx = c_portraitSizeTiles << 3;
+inline constexpr u16 c_reservedPortraitTileStart = c_reservedClearTile - (c_portraitSizeTiles * c_portraitSizeTiles);
+inline constexpr u16 c_reservedTileCount = c_vramEndTile - c_reservedPortraitTileStart;
 
 // Large tile space (1536 tiles)
 inline constexpr u16 c_tilesStart = 0;

@@ -211,6 +211,11 @@ u16 SpriteManager::InsertMiscTiles
     {
         // start overwriting from the start!
         m_miscSpriteTilesIndex = 0;
+
+        if (i_tileset.numTile > c_maxMiscTiles)
+        {
+            Error("Too many tiles in misc tiles request to fit into end area");
+        }
     }
 
     u16 const tileIndex = m_miscSpriteTilesIndex + c_miscTilesBaseIndex;

@@ -75,4 +75,10 @@ struct Character
 inline constexpr Character c_charaLHidden = { "?????", true, {}, };
 inline constexpr Character c_charaRHidden = { "?????", false, {}, };
 
+struct PortraitFace
+{
+	TileSet const* m_tiles{ nullptr };
+	Palette const* m_pal{ nullptr };
+};
+
 }

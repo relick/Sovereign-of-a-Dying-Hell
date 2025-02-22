@@ -15,7 +15,9 @@ namespace Game
 {
 
 inline constexpr u16 c_lineCount = 3;
-inline constexpr u16 c_lineWidth = 34;
+inline constexpr u16 c_fullLineWidth = 34;
+inline constexpr u16 c_portraitLineWidth = c_fullLineWidth - c_portraitSizeTiles - 2;
+inline constexpr u16 c_lineWidth = c_portraitLineWidth; // Using portrait for this game
 inline constexpr u16 c_pixelsPerTile = 8;
 
 inline constexpr u16 c_textTileCount = c_lineCount * c_lineWidth;
@@ -29,7 +31,7 @@ inline constexpr u16 c_nameTilesAddress = c_nameTilesIndex * 32;
 inline constexpr u16 c_namePosSide = 10;
 inline constexpr s16 c_namePosDown = -10;
 
-inline constexpr u16 c_textPosSide = 24;
+inline constexpr u16 c_textPosSide = ((c_screenWidthTiles - c_lineWidth) * 8) / 2;
 inline constexpr s16 c_textPosDown = -5;
 inline constexpr u16 c_lineSeparation = 2;
 inline constexpr u16 c_lineIndent = 1;
@@ -149,7 +151,7 @@ void DialoguePrinter2::SetupSprites
 	// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-101
 
 	// Name sprites
-	s8 z = -128;
+	s8 z = -64;
 
 	u16 nameIndex = c_nameTilesIndex;
 	u8 const curNameLenLimited = m_curName ? static_cast<u8>(std::min<u16>(13, std::strlen(m_curName))) : 0;

@@ -103,6 +103,17 @@ WorldRoutine VNWorld::Init
 		co_yield{};
 	}
 
+	// Create portrait sprite
+	{
+		auto [id, spr] = io_game.Sprites().AddSprite(SpriteSize::r4c4, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, c_reservedPortraitTileStart));
+		m_portraitSprite = id;
+		spr.SetVisible(false);
+		// Position 10x10 in from corner
+		spr.SetX(10);
+		spr.SetY(c_screenHeightPx - c_portraitSizePx - 8);
+		spr.SetZ(-128);
+	}
+
 	m_script->InitVN(io_game, *this);
 
 	co_return;
@@ -114,6 +125,8 @@ WorldRoutine VNWorld::Shutdown
 	Game& io_game
 )
 {
+	io_game.Sprites().RemoveSprite(m_portraitSprite);
+
 	StopMusic(0);
 
 	SYS_setHIntCallback(nullptr);
@@ -570,7 +583,7 @@ void VNWorld::SetText
 )
 {
 	TransitionTo(io_game, SceneMode::Dialogue);
-	
+
 	if (i_char)
 	{
 		Get<SceneMode::Dialogue>().SetName(i_char->m_displayName, i_char->m_showOnLeft);
@@ -581,6 +594,49 @@ void VNWorld::SetText
 	}
 
 	Get<SceneMode::Dialogue>().SetText(i_text, i_beeps);
+}
+
+//------------------------------------------------------------------------------
+void VNWorld::SetPortrait
+(
+	Game& io_game,
+	PortraitFace const& i_face
+)
+{
+	io_game.QueueLambdaTask([this, &io_game, &i_face] -> Task {
+		{
+			auto spr = io_game.Sprites().EditSpriteData(m_portraitSprite);
+			spr.SetVisible(false);
+		}
+
+		PAL_setColors(16 * PAL2, i_face.m_pal->data, 16, DMA_QUEUE);
+
+		// Should load the whole chunk in one go, may not even yield!
+		auto load = Tiles::LoadTiles_Chunked(i_face.m_tiles, c_reservedPortraitTileStart);
+		AwaitTask(load);
+
+		// May have yielded, so need to request again as iter may be invalidated
+		{
+			auto spr = io_game.Sprites().EditSpriteData(m_portraitSprite);
+			spr.SetVisible(true);
+		}
+
+		co_return;
+	});
+}
+
+//------------------------------------------------------------------------------
+void VNWorld::HidePortrait
+(
+	Game& io_game
+)
+{
+	io_game.QueueLambdaTask([this, &io_game] -> Task {
+		auto spr = io_game.Sprites().EditSpriteData(m_portraitSprite);
+		spr.SetVisible(false);
+
+		co_return;
+	});
 }
 
 //------------------------------------------------------------------------------
@@ -638,6 +694,8 @@ void VNWorld::TransitionTo
 	{
 	case SceneMode::None:
 	{
+		HidePortrait(io_game);
+
 		io_game.QueueLambdaTask([this] -> Task {
 			Palettes::FadeOp<16> fadeOp1a = Palettes::CreateFade<16>(m_mainPals.data(), m_bgSrcPal, FramesPerSecond() >> 1);
 			Palettes::FadeOp<16> fadeOp1b = Palettes::CreateFade<16>(m_mainPals.data() + 16, m_charaSrcPal, FramesPerSecond() >> 1);
@@ -696,6 +754,8 @@ void VNWorld::TransitionTo
 	}
 	case SceneMode::Choice:
 	{
+		HidePortrait(io_game);
+
 		io_game.QueueLambdaTask([this] -> Task {
 			std::array<u16, 32> darkPal;
 
@@ -722,6 +782,8 @@ void VNWorld::TransitionTo
 	case SceneMode::Voting:
 	{
 		HideCharacterVisual(io_game, false);
+		HidePortrait(io_game);
+
 		io_game.QueueLambdaTask([this] -> Task {
 			// Just tint the background, chara will be gone
 			std::array<u16, 16> darkPal;

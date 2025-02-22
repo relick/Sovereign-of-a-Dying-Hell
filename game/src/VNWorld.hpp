@@ -65,6 +65,9 @@ class VNWorld
 	// Choice data
 	std::optional<u8> m_choiceMade;
 
+	// Portrait
+	SpriteID m_portraitSprite{};
+
 public:
 	VNWorld(std::unique_ptr<Script> i_script);
 
@@ -79,6 +82,8 @@ public:
 	void BlackBG(Game& io_game);
 	void SetCharacterVisual(Game& io_game, Pose const& i_pose);
 	void HideCharacterVisual(Game& io_game, bool i_fast);
+	void SetPortrait(Game& io_game, PortraitFace const& i_face);
+	void HidePortrait(Game& io_game);
 	bool CharacterShown() const { return m_existingEndTileSet != nullptr; }
 	void SetText(Game& io_game, Character const* i_char, char const* i_text, std::optional<SFXID> i_beeps); // null char = hide name
 	void Choice(Game& io_game, std::span<char const* const> i_choices);

@@ -79,7 +79,7 @@ public:
     void SetVisible(bool i_visible) { m_spriteManager->m_visibilitiesChanged = (m_sprite->m_visible != i_visible); m_sprite->m_visible = i_visible; }
     void SetX(s16 i_x) { m_vramSprite->m_xPlus128 = std::min(static_cast<u16>(i_x + 128), u16{ 511 }); }
     void SetY(s16 i_y) { m_vramSprite->m_yPlus128 = std::min(static_cast<u16>(i_y + 128), u16{ 511 }); }
-    void SetZ(s16 m_z) { m_spriteManager->m_orderingChanged = (m_sprite->m_z != m_z); m_sprite->m_z = m_z; }
+    void SetZ(s8 m_z) { m_spriteManager->m_orderingChanged = (m_sprite->m_z != m_z); m_sprite->m_z = m_z; }
     void SetFirstTileIndex(u16 i_index) { m_vramSprite->m_tileAttr = (m_vramSprite->m_tileAttr & ~TILE_INDEX_MASK) | (i_index & TILE_INDEX_MASK); }
     void SetSize(SpriteSize i_size) { m_vramSprite->m_size = i_size; }
     void SetPriority(bool i_high) { m_vramSprite->m_tileAttr = (m_vramSprite->m_tileAttr & ~TILE_ATTR_PRIORITY_MASK) | (u16{ i_high } << TILE_ATTR_PRIORITY_SFT); }
