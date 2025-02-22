@@ -27,7 +27,7 @@ enum class Scenes : u8
 	Ending_NewHell,
 	Ending_AdministratingCollapse,
 
-	InitialScene = SuikaApproaches,
+	InitialScene = EngagingYuuma,
 };
 
 
