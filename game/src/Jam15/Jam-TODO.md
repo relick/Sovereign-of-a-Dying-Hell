@@ -11,6 +11,7 @@ Jam-TODO:
 
 # Saturday
 1. ~~Skip reloading tiles between animations if they share a tileset (makes animations work)~~
+1a. ~~Make half-width sprites work~~
 2. Set up all the sprites
 2a. Go through script and set all the poses
 3. Create voting mode with basic mash gameplay, calibratable sliding meter, and influence spending
