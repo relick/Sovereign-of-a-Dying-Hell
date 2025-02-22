@@ -71,8 +71,10 @@ public:
 	Game::SFXID suika_beeps;
 	Game::SFXID yuugi_beeps;
 	Game::SFXID yuuma_beeps;
-	Game::SFXID lcouncil_beeps;
-	Game::SFXID rcouncil_beeps;
+	Game::SFXID acouncil_beeps;
+	Game::SFXID bcouncil_beeps;
+	Game::SFXID ccouncil_beeps;
+	Game::SFXID dcouncil_beeps;
 	Game::SFXID speaker_beeps;
 	Game::SFXID kishin_beeps;
 };

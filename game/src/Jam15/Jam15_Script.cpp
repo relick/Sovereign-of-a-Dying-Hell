@@ -128,8 +128,10 @@ void Script::InitVN
 	suika_beeps = desc_beeps;
 	yuugi_beeps = desc_beeps;
 	yuuma_beeps = desc_beeps;
-	lcouncil_beeps = desc_beeps;
-	rcouncil_beeps = desc_beeps;
+	acouncil_beeps = desc_beeps;
+	bcouncil_beeps = desc_beeps;
+	ccouncil_beeps = desc_beeps;
+	dcouncil_beeps = desc_beeps;
 	speaker_beeps = desc_beeps;
 	kishin_beeps = desc_beeps;
 

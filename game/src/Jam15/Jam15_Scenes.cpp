@@ -34,17 +34,17 @@ SCENE_RUN(FirstVoteProposal)
     show(zanmu, neutral);
     say(zanmu, "Council, allow me my third proposal for today.");
     say(zanmu, "This one, I consider of critical importance.");
-    say(rcouncil, "Nippaku, you always say that.");
+    say(acouncil, "Nippaku, you always say that.");
     say(zanmu, "It's always true~");
-    say(rcouncil, "Get on with it, then.");
+    say(acouncil, "Get on with it, then.");
     say(zanmu, "The earth spirits are idle, and have been since the completion of the most recent oni palace.");
     say(zanmu, "They must be given work, and Hell has plenty of it to give out.");
     say(zanmu, "We've been short on labour for maintaining the torture chambers for decades now. My suggestion is to put them all to work there.");
-    say(rcouncil, "Nippaku, you persist with the earth spirits? You know they've been earmarked for the blood pools development.");
-    say(lcouncil, "That's right, we really shouldn't disrupt a plan in progress. Finding others to do the work would delay it by decades.");
+    say(bcouncil, "Nippaku, you persist with the earth spirits? You know they've been earmarked for the blood pools development.");
+    say(acouncil, "That's right, we really shouldn't disrupt a plan in progress. Finding others to do the work would delay it by decades.");
     say(zanmu, "Ridiculous! 27.9\% of the torture chambers have already been forced to close due to malfunction, and our income is suffering for it.");
     say(zanmu, "There's no money for the vanity projects if we refuse to grease the wheels of the economy.");
-    say(rcouncil, "We'll just need to find others to do the work...");
+    say(ccouncil, "We'll simply need to find others to do the maintenance...");
     play_sfx(gavel);
     say(speaker, "That's enough back and forth. Let's not waste time here.");
     say(speaker, "Council, declare your votes!");
@@ -738,11 +738,11 @@ SCENE_RUN(VotingForExecutive)
     say(zanmu, "They must be untethered by the debates of this council.");
     say(zanmu, "They must have a singular strong vision, to end this slow death by committee.");
 
-    say(lcouncil, "What?");
-    say(rcouncil, "Preposterous!");
-    say(lcouncil, "She has a point, we barely achieve anything.");
-    say(rcouncil, "None of us deserve to rule without restriction.");
-    say(lcouncil, "Exactly! This is a power move!");
+    say(acouncil, "What?");
+    say(bcouncil, "Preposterous!");
+    say(ccouncil, "She has a point, we barely achieve anything.");
+    say(dcouncil, "None of us deserve to rule without restriction.");
+    say(bcouncil, "Exactly! This is a power move!");
 
     think("They're taking it about as well as I expected.");
 
