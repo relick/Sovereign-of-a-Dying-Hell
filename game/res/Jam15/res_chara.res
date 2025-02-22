@@ -26,23 +26,37 @@ TILEMAP hisami_joy_3 "chara/hisami/joy_3.png" hisami_tileset
 
 TILESET suika_tileset "chara/suika/suika_tileset.png"
 PALETTE suika_pal "chara/suika/suika_tileset.png"
-TILEMAP suika_bigjoy_1 "chara/suika/Bigjoy_1.png" suika_tileset
-TILEMAP suika_bigjoy_2 "chara/suika/Bigjoy_2.png" suika_tileset
-TILEMAP suika_bigjoy_3 "chara/suika/Bigjoy_3.png" suika_tileset
 TILEMAP suika_neutral_1 "chara/suika/Neutral_1.png" suika_tileset
 TILEMAP suika_neutral_2 "chara/suika/Neutral_2.png" suika_tileset
 TILEMAP suika_neutral_3 "chara/suika/Neutral_3.png" suika_tileset
 TILEMAP suika_neutral_4 "chara/suika/Neutral_4.png" suika_tileset
 TILEMAP suika_neutral_5 "chara/suika/Neutral_5.png" suika_tileset
 TILEMAP suika_neutral_6 "chara/suika/Neutral_6.png" suika_tileset
+TILEMAP suika_bigjoy_1 "chara/suika/Bigjoy_1.png" suika_tileset
+TILEMAP suika_bigjoy_2 "chara/suika/Bigjoy_2.png" suika_tileset
+TILEMAP suika_bigjoy_3 "chara/suika/Bigjoy_3.png" suika_tileset
 TILEMAP suika_pout_1 "chara/suika/Pout_1.png" suika_tileset
 TILEMAP suika_pout_2 "chara/suika/Pout_2.png" suika_tileset
 TILEMAP suika_pout_3 "chara/suika/Pout_3.png" suika_tileset
 TILEMAP suika_pout_4 "chara/suika/Pout_4.png" suika_tileset
 
-TILESET yuugi_tileset "chara/yuugi/yuugi_placeholder.png"
-PALETTE yuugi_pal "chara/yuugi/yuugi_placeholder.png"
-TILEMAP yuugi_placeholder "chara/yuugi/yuugi_placeholder.png" yuugi_tileset
+TILESET yuugi_tileset "chara/yuugi/yuugi_tileset.png"
+PALETTE yuugi_pal "chara/yuugi/yuugi_tileset.png"
+TILEMAP yuugi_neutral_1 "chara/yuugi/neutral_1.png" yuugi_tileset
+TILEMAP yuugi_neutral_2 "chara/yuugi/neutral_2.png" yuugi_tileset
+TILEMAP yuugi_neutral_3 "chara/yuugi/neutral_3.png" yuugi_tileset
+TILEMAP yuugi_neutral_4 "chara/yuugi/neutral_4.png" yuugi_tileset
+TILEMAP yuugi_neutral_5 "chara/yuugi/neutral_5.png" yuugi_tileset
+TILEMAP yuugi_angry_1 "chara/yuugi/angry_1.png" yuugi_tileset
+TILEMAP yuugi_angry_2 "chara/yuugi/angry_2.png" yuugi_tileset
+TILEMAP yuugi_angry_3 "chara/yuugi/angry_3.png" yuugi_tileset
+TILEMAP yuugi_angry_4 "chara/yuugi/angry_4.png" yuugi_tileset
+TILEMAP yuugi_dejected_1 "chara/yuugi/dejected_1.png" yuugi_tileset
+TILEMAP yuugi_dejected_2 "chara/yuugi/dejected_2.png" yuugi_tileset
+TILEMAP yuugi_dejected_3 "chara/yuugi/dejected_3.png" yuugi_tileset
+TILEMAP yuugi_dejected_4 "chara/yuugi/dejected_4.png" yuugi_tileset
+TILEMAP yuugi_dejected_5 "chara/yuugi/dejected_5.png" yuugi_tileset
+TILEMAP yuugi_dejected_6 "chara/yuugi/dejected_6.png" yuugi_tileset
 
 TILESET yuuma_tileset "chara/yuuma/yuuma_placeholder.png"
 PALETTE yuuma_pal "chara/yuuma/yuuma_placeholder.png"

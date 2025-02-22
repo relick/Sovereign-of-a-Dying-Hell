@@ -149,18 +149,52 @@ inline constexpr Game::Character c_suika = {
 //------------------------------------------------------------------------------
 /// Yuugi
 //------------------------------------------------------------------------------
-inline constexpr Game::AnimFrames<1> c_yuugi_placeholder = { {
-	{ &yuugi_placeholder, Game::AnimFrameDuration::Infinite(), },
+inline constexpr Game::AnimFrames<5> c_yuugi_neutral = { {
+	{ &yuugi_neutral_1, Game::AnimFrameDuration::Variable(60, 300), c_halfWidthChar, },
+	{ &yuugi_neutral_2, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &yuugi_neutral_3, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
+	{ &yuugi_neutral_4, Game::AnimFrameDuration::Fixed(2), c_halfWidthChar, },
+	{ &yuugi_neutral_5, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
 } };
 
 inline constexpr Game::Pose c_yuugi_neutral_pose = {
 	&yuugi_tileset,
 	&yuugi_pal,
-	c_yuugi_placeholder
+	c_yuugi_neutral
 };
 
-inline constexpr Game::Poses<1> c_yuugi_poses = {
+inline constexpr Game::AnimFrames<4> c_yuugi_angry = { {
+	{ &yuugi_angry_1, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &yuugi_angry_2, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
+	{ &yuugi_angry_3, Game::AnimFrameDuration::Fixed(2), c_halfWidthChar, },
+	{ &yuugi_angry_4, Game::AnimFrameDuration::Infinite(), c_halfWidthChar, },
+} };
+
+inline constexpr Game::Pose c_yuugi_angry_pose = {
+	&yuugi_tileset,
+	&yuugi_pal,
+	c_yuugi_angry
+};
+
+inline constexpr Game::AnimFrames<6> c_yuugi_dejected = { {
+	{ &yuugi_dejected_1, Game::AnimFrameDuration::Fixed(2), c_halfWidthChar, },
+	{ &yuugi_dejected_2, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &yuugi_dejected_3, Game::AnimFrameDuration::Fixed(5), c_halfWidthChar, },
+	{ &yuugi_dejected_4, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &yuugi_dejected_5, Game::AnimFrameDuration::Fixed(2), c_halfWidthChar, },
+	{ &yuugi_dejected_6, Game::AnimFrameDuration::Infinite(), c_halfWidthChar, },
+} };
+
+inline constexpr Game::Pose c_yuugi_dejected_pose = {
+	&yuugi_tileset,
+	&yuugi_pal,
+	c_yuugi_dejected
+};
+
+inline constexpr Game::Poses<3> c_yuugi_poses = {
 	c_yuugi_neutral_pose,
+	c_yuugi_angry_pose,
+	c_yuugi_dejected_pose,
 };
 
 inline constexpr Game::Character c_yuugi = {

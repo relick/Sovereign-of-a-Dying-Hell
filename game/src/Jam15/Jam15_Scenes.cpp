@@ -285,8 +285,7 @@ SCENE_RUN(VotingForAnimalRights)
     // TODO: has yuugi's influence
     if (io_game.ReadVar<Variables::HasYuugiInfluence>())
     {
-        show(yuugi, neutral);
-        face(yuugi, rage);
+        show(yuugi, angry);
         say(yuugi, "We gotta do this! The animal spirits need some relief!");
     }
     else
@@ -318,8 +317,7 @@ SCENE_RUN(VotingForAnimalRights)
         say(zanmu, "*sigh*, what a pity.");
         if (io_game.ReadVar<Variables::HasYuugiInfluence>())
         {
-            show(yuugi, neutral);
-            face(yuugi, dejected);
+            show(yuugi, dejected);
             say(yuugi, "Damn it... I really thought we had a chance. Have you lost your touch, Nippaku?");
             
             say(zanmu, "An oni doesn't give up at the first loss. I'll get my way eventually.");
