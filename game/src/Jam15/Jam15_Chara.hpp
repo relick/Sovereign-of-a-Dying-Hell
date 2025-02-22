@@ -9,7 +9,7 @@ namespace Jam15
 {
 
 inline constexpr u16 c_halfCharOffset = 10;
-inline constexpr u16 c_zanmu_offset = c_halfCharOffset - 3;
+inline constexpr u16 c_zanmu_offset = c_halfCharOffset - 5;
 inline constexpr u16 c_hisami_offset = c_halfCharOffset + 3;
 inline constexpr u16 c_suika_offset = c_halfCharOffset + 0;
 inline constexpr u16 c_yuugi_offset = c_halfCharOffset + 2;

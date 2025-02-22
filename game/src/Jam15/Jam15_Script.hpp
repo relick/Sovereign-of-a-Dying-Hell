@@ -15,6 +15,7 @@ namespace Jam15
 enum class Variables : u8
 {
 	SceneNum,
+	Influence,
 	HasYuugiInfluence,
 	PunishmentVotePasses,
 	SuikaDissuaded,
@@ -30,6 +31,7 @@ template<>
 struct Game::VariablesTypeTuple<Jam15::Variables> {
 	using Tuple = std::tuple<
 		Jam15::Scenes, // SceneNum
+		u16, // Influence
 		bool, // HasYuugiInfluence
 		bool, // PunishmentVotePasses
 		bool, // SuikaDissuaded

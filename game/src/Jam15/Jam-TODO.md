@@ -8,13 +8,13 @@ Jam-TODO:
 4. Finish Suika scenes
 5. Finish Yuugi scenes
 6. Add descs for all scenes
+7. Go through script and set all the poses
 
 # Saturday
 1. ~~Skip reloading tiles between animations if they share a tileset (makes animations work)~~
 1a. ~~Make half-width sprites work~~
 2. ~~Set up all the sprites~~
-2a. Go through script and set all the poses
-3. Create voting mode with basic mash gameplay, calibratable sliding meter, and influence spending
+3. ~~Create voting mode with basic mash gameplay, calibratable sliding meter, and influence spending~~
 4. Add graphics for the vote bar
 4a. Add graphic for the timer
 5. Add graphic for influence

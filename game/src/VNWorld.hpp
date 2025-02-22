@@ -76,20 +76,30 @@ public:
 	void Run(Game &io_game) override;
 
 	void WaitForTasks(Game& io_game);
+
 	void StartMusic(u8 const* i_bgm, u16 i_fadeInFrames, bool i_loop);
 	void StopMusic(u16 i_fadeOutFrames);
+
 	void SetBG(Game& io_game, Image const& i_bg);
 	void BlackBG(Game& io_game);
+
 	void SetCharacterVisual(Game& io_game, Pose const& i_pose);
 	void HideCharacterVisual(Game& io_game, bool i_fast);
+	bool CharacterShown() const { return m_existingEndTileSet != nullptr; }
+
 	void SetPortrait(Game& io_game, PortraitFace const& i_face);
 	void HidePortrait(Game& io_game);
-	bool CharacterShown() const { return m_existingEndTileSet != nullptr; }
+	
 	void SetText(Game& io_game, Character const* i_char, char const* i_text, std::optional<SFXID> i_beeps); // null char = hide name
+
 	void Choice(Game& io_game, std::span<char const* const> i_choices);
 	void TimedChoice(Game& io_game, std::span<char const* const> i_choices, f16 i_timeInSeconds);
 	std::optional<u8> GetChoiceResult() const { return m_choiceMade; }
+
 	void ClearMode(Game& io_game);
+
+	void StartVote(Game& io_game, VoteModeParams const& i_params);
+	VoteResult GetVoteResult() const { return Get<SceneMode::Voting>().VotingResult(); }
 
 private:
 	SceneMode CurrentMode() const { return static_cast<SceneMode>(m_sceneMode.index()); }
@@ -97,6 +107,12 @@ private:
 
 	template<SceneMode t_SceneMode>
 	auto Get() -> decltype(std::get<static_cast<u8>(t_SceneMode)>(m_sceneMode))
+	{
+		return std::get<static_cast<u8>(t_SceneMode)>(m_sceneMode);
+	}
+
+	template<SceneMode t_SceneMode>
+	auto Get() const -> decltype(std::get<static_cast<u8>(t_SceneMode)>(m_sceneMode))
 	{
 		return std::get<static_cast<u8>(t_SceneMode)>(m_sceneMode);
 	}

@@ -674,6 +674,22 @@ void VNWorld::ClearMode
 }
 
 //------------------------------------------------------------------------------
+void VNWorld::StartVote
+(
+	Game& io_game,
+	VoteModeParams const& i_params
+)
+{
+	TransitionTo(io_game, SceneMode::Voting);
+
+	io_game.QueueLambdaTask([this, i_params] -> Task
+	{
+		Get<SceneMode::Voting>().Start(std::move(i_params));
+		co_return;
+	});
+}
+
+//------------------------------------------------------------------------------
 void VNWorld::TransitionTo
 (
 	Game& io_game,

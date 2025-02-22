@@ -2,6 +2,8 @@
 
 #include "Declare.hpp"
 
+#include <vector>
+
 namespace Game
 {
 
@@ -12,25 +14,46 @@ enum class AttackPattern
 	Variable, // Attacks hit with a mix of big and small, with varying delays
 };
 
+struct VoteModeParams
+{
+	f16 m_votingTime{};
+	u16 m_startingPlayerInfluence{};
+	u16 m_attackSize{};
+	AttackPattern m_attackPattern{};
+	bool m_playerWantsToLose{};
+};
+
+struct AttackEvent
+{
+	u16 m_frame{};
+	u16 m_size{};
+};
+
+struct VoteResult
+{
+	bool m_playerWon{ false };
+	u16 m_remainingInfluence{ 0 };
+};
+
 class VoteMode
 {
 	Game* m_game{};
 	FontData const* m_fontData{};
 
 	// Initial data
-	f16 m_votingTime{};
-	u16 m_startingPlayerInfluence{};
-	u16 m_attackSize{};
-	AttackPattern m_attackPattern{};
-	bool m_playerWantsToLose{};
+	VoteModeParams m_params;
 
 	// Running data
+	bool m_votingStarted{ false };
 	bool m_votingComplete{ false };
+	s16 m_votePosition{ 0 };
 	
-	f16 m_timeLeft{};
+	u16 m_framesLeft{};
 	u16 m_remainingInfluence{};
-	u16 m_remainingAttack{};
-	bool m_playerWon{};
+	bool m_playerWon{ false };
+
+	std::vector<AttackEvent> m_attackEvents;
+	bool m_ABCpressed{ false };
 
 	// Graphic data
 	
@@ -46,21 +69,17 @@ public:
 	// The total it will move to the left by the end of voting time is i_attackSize
 	// i_attackPattern determines how the attacks are delivered through the time.
 	// i_playerWantsToLose flips left and right graphically but otherwise is treated the same
-	void Start(
-		f16 i_votingTime,
-		u16 i_startingPlayerInfluence,
-		u16 i_attackSize,
-		AttackPattern i_attackPattern,
-		bool i_playerWantsToLose
-	);
+	void Start(VoteModeParams i_params);
 
 	// The voting mode takes over from VNWorld entirely (besides using the background)
 	// Check VotingDone() to know when everything's done and results can be extracted.
 	void Update();
 
 	bool VotingDone() const { return m_votingComplete; }
-	bool GetVoteWonByPlayer() const { return m_playerWon; }
-	u16 GetRemainingInfluence() const { return m_remainingInfluence; }
+	VoteResult VotingResult() const { return { m_playerWon, m_remainingInfluence, }; }
+
+private:
+	void GenerateAttackEvents();
 };
 
 }

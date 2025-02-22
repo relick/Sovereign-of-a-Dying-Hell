@@ -2,6 +2,7 @@
 #include "Jam15_Script.hpp"
 #include "Jam15_Chara.hpp"
 #include "IntroWorld.hpp"
+#include "VoteMode.hpp"
 
 #include "SceneDefines.hpp"
 
@@ -48,7 +49,29 @@ SCENE_RUN(FirstVoteProposal)
     say(speaker, "That's enough back and forth. Let's not waste time here.");
     say(speaker, "Council, declare your votes!");
 
-    // TODO-VOTE (always lost)
+    io_game.SetVar<Variables::Influence>(128);
+
+    // It should be impossible to win this
+    Game::VoteModeParams const vote = {
+        .m_votingTime = FIX16(7),
+        .m_startingPlayerInfluence = io_game.ReadVar<Variables::Influence>(),
+        .m_attackSize = 256,
+        .m_attackPattern = Game::AttackPattern::FastBitty,
+        .m_playerWantsToLose = false,
+    };
+    start_vote(vote);
+    Game::VoteResult const result = get_vote_result();
+
+    if (result.m_playerWon)
+    {
+        show(zanmu, neutral);
+        say(zanmu, "I won!");
+    }
+    else
+    {
+        show(zanmu, neutral);
+        say(zanmu, "I lost!");
+    }
 
     say(speaker, "A decisive defeat. No more proposals from you today, Nippaku, please.");
     say(zanmu, "The lack of wisdom in this Council once again astounds.");
