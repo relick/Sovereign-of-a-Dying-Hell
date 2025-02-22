@@ -116,6 +116,10 @@ private:
 	{
 		return std::get<static_cast<u8>(t_SceneMode)>(m_sceneMode);
 	}
+
+	// The mid-screen h-int palette swaps can be toggled off with those.
+	// Note does not disable h-int, which is still used to set the overall palette off the bottom of the screen
+	void EnableMidScreenPaletteSwaps(bool i_enable);
 };
 
 }

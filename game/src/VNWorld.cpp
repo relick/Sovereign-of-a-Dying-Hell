@@ -58,6 +58,14 @@ void HInt_TextArea_Reset()
 	//SYS_setHIntCallback(&HInt_TextFrameDMA2<PAL0, PAL1, true, c_textFramePos * 8 + 8, &HInt_TextArea_SetName>);
 }
 
+void HInt_TextArea_Reset_Only()
+{
+	Palettes::SetBGTextFramePalette(s_bgNormalPal);
+	Palettes::SetCharTextFramePalette(s_charaNormalPal);
+
+	SYS_setHIntCallback(&Palettes::HInt_TextFrameDMA2<PAL0, PAL1, true, (c_textFramePos + c_textFrameHeight) * 8 + 1, &HInt_TextArea_Reset_Only>);
+}
+
 //------------------------------------------------------------------------------
 VNWorld::VNWorld
 (
@@ -86,8 +94,9 @@ WorldRoutine VNWorld::Init
 	s_charaNormalPal = m_mainPals.data() + 16;
 	s_charaNamePal = m_namePals.data() + 16;
 	s_charaTextPal = m_textPals.data() + 16;
-	HInt_TextArea_SetName();
+	HInt_TextArea_Reset_Only();
 	VDP_setHIntCounter(1);
+	VDP_setHInterrupt(true);
 
 	std::array<u16, 64> blackWithTextPal = { 0 };
 	std::copy(text_font_pal.data, text_font_pal.data + 16, blackWithTextPal.begin() + 48);
@@ -736,7 +745,7 @@ void VNWorld::TransitionTo
 				co_yield{};
 			}
 
-			VDP_setHInterrupt(false);
+			EnableMidScreenPaletteSwaps(false);
 		});
 		WaitForTasks(io_game);
 
@@ -747,7 +756,7 @@ void VNWorld::TransitionTo
 	case SceneMode::Dialogue:
 	{
 		io_game.QueueLambdaTask([this] -> Task {
-			VDP_setHInterrupt(true);
+			EnableMidScreenPaletteSwaps(true);
 
 			std::array<u16, 32> namePal;
 			std::array<u16, 32> textPal;
@@ -799,7 +808,7 @@ void VNWorld::TransitionTo
 				co_yield{};
 			}
 
-			VDP_setHInterrupt(false);
+			EnableMidScreenPaletteSwaps(false);
 		});
 		WaitForTasks(io_game);
 
@@ -829,7 +838,7 @@ void VNWorld::TransitionTo
 				co_yield{};
 			}
 
-			VDP_setHInterrupt(false);
+			EnableMidScreenPaletteSwaps(false);
 		});
 		WaitForTasks(io_game);
 
@@ -837,6 +846,22 @@ void VNWorld::TransitionTo
 		m_progressMode = ProgressMode::Scene;
 		break;
 	}
+	}
+}
+
+//------------------------------------------------------------------------------
+void VNWorld::EnableMidScreenPaletteSwaps
+(
+	bool i_enable
+)
+{
+	if (i_enable)
+	{
+		HInt_TextArea_SetName();
+	}
+	else
+	{
+		HInt_TextArea_Reset_Only();
 	}
 }
 
