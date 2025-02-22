@@ -414,10 +414,24 @@ void VNWorld::SetCharacterVisual
 	Pose const& i_pose
 )
 {
-	HideCharacterVisual(io_game, false);
-
 	// One big mega task, since various things are run as conditional sub tasks
+	// Includes hiding existing character, if necessary
 	io_game.QueueLambdaTask([this, &i_pose] -> Task {
+		m_animator.StopAnimation();
+
+		if (m_existingEndTileSet != i_pose.m_tileset)
+		{
+			Task wipeAway = Tiles::SetMap_Wipe<Tiles::WipeDir::Down>(
+				VDP_BG_A,
+				Tiles::c_emptyPlane_Highlight.data(),
+				40,
+				28,
+				0
+			);
+			AwaitTask(wipeAway);
+			co_yield{};
+		}
+
 		m_charaSrcPal = i_pose.m_palette->data;
 
 		if (CurrentMode() == SceneMode::Dialogue)
