@@ -55,6 +55,7 @@ struct AnimFrame
 	AnimFrameDuration m_duration;
 	u16 m_xOffset{ 0 };
 	u16 m_yOffset{ 0 };
+	u16 m_nextIndex{ UINT16_MAX };
 };
 
 struct Pose

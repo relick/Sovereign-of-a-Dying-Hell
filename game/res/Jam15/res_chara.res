@@ -58,6 +58,20 @@ TILEMAP yuugi_dejected_4 "chara/yuugi/dejected_4.png" yuugi_tileset
 TILEMAP yuugi_dejected_5 "chara/yuugi/dejected_5.png" yuugi_tileset
 TILEMAP yuugi_dejected_6 "chara/yuugi/dejected_6.png" yuugi_tileset
 
-TILESET yuuma_tileset "chara/yuuma/yuuma_placeholder.png"
-PALETTE yuuma_pal "chara/yuuma/yuuma_placeholder.png"
-TILEMAP yuuma_placeholder "chara/yuuma/yuuma_placeholder.png" yuuma_tileset
+TILESET yuuma_tileset "chara/yuuma/yuuma_tileset.png"
+PALETTE yuuma_pal "chara/yuuma/yuuma_tileset.png"
+TILEMAP yuuma_neutral_1 "chara/yuuma/neutral_1.png" yuuma_tileset
+TILEMAP yuuma_neutral_2 "chara/yuuma/neutral_2.png" yuuma_tileset
+TILEMAP yuuma_neutral_3 "chara/yuuma/neutral_3.png" yuuma_tileset
+TILEMAP yuuma_neutral_4 "chara/yuuma/neutral_4.png" yuuma_tileset
+TILEMAP yuuma_neutral_5 "chara/yuuma/neutral_5.png" yuuma_tileset
+TILEMAP yuuma_annoy_1 "chara/yuuma/annoy_1.png" yuuma_tileset
+TILEMAP yuuma_annoy_2 "chara/yuuma/annoy_2.png" yuuma_tileset
+TILEMAP yuuma_annoy_3 "chara/yuuma/annoy_3.png" yuuma_tileset
+TILEMAP yuuma_annoy_4 "chara/yuuma/annoy_4.png" yuuma_tileset
+TILEMAP yuuma_annoy_5 "chara/yuuma/annoy_5.png" yuuma_tileset
+TILEMAP yuuma_annoy_6 "chara/yuuma/annoy_6.png" yuuma_tileset
+TILEMAP yuuma_annoy_7 "chara/yuuma/annoy_7.png" yuuma_tileset
+TILEMAP yuuma_pleased_1 "chara/yuuma/pleased_1.png" yuuma_tileset
+TILEMAP yuuma_pleased_2 "chara/yuuma/pleased_2.png" yuuma_tileset
+TILEMAP yuuma_pleased_3 "chara/yuuma/pleased_3.png" yuuma_tileset
