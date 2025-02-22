@@ -19,6 +19,7 @@ Jam-TODO:
 4a. Add graphic for the timer
 5. Add graphic for influence
 6. Add sprite portrait for Zanmu
+7. ???? for say_hidden
 
 # Code stretch
 - Add sprites flying in on each mash, and 'effects' on the line

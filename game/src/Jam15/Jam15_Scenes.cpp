@@ -502,13 +502,13 @@ SCENE_RUN(EngagingYuuma)
     if (punishmentVotePassed)
     {
         ++flattery;
-        face(yuuma, pleased);
+        show(yuuma, pleased);
         say_hidden(yuuma, "Ah! You're the one who cut back our punishments.");
         say_hidden(yuuma, "Hehehe. You must be scheming something good.");
     }
     else
     {
-        face(yuuma, annoyed);
+        show(yuuma, annoyed);
         say_hidden(yuuma, "The bleeding heart making symbolic votes over our conditions?");
 
         choice(
@@ -535,7 +535,7 @@ SCENE_RUN(EngagingYuuma)
         }
     }
 
-    face(yuuma, neutral);
+    show(yuuma, neutral);
     say(yuuma, "I'm Yuuma. What do you want?");
 
     portrait(zanmu, neutral);
@@ -591,11 +591,11 @@ SCENE_RUN(EngagingYuuma)
         }
         else
         {
-            face(yuuma, annoyed);
+            show(yuuma, annoyed);
             say(yuuma, "For one, you managed to get the Sanzu's prices raised on your own. Why do you need me for leverage?");
         }
 
-        face(yuuma, pleased);
+        show(yuuma, pleased);
         say(yuuma, "Even if you don't deceive, there's no way you'd get that sort of power. Why wouldn't I just take control myself anyway, if a few eagles and a spork is all it takes!");
 
         think("Damn! She's feeling threatened. I'll need to make her feel in control.");

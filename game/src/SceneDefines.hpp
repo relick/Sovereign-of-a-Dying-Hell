@@ -22,7 +22,6 @@
 
 #define show(CHARA, POSE) if (!io_vn.CharacterShown()) { io_vn.ClearMode(io_game); } io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose); wait_for_tasks()
 #define hide() io_vn.ClearMode(io_game); io_vn.HideCharacterVisual(io_game, false); wait_for_tasks()
-#define face(CHARA, EXPRESSION) // TODO
 
 // TODO: special formatting
 #define desc(TEXT) io_vn.SetText(io_game, nullptr, TEXT, std::nullopt); wait

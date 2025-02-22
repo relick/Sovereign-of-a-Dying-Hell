@@ -236,7 +236,7 @@ inline constexpr Game::Pose c_yuuma_double_pose = {
 	c_yuuma_double
 };
 
-inline constexpr Game::AnimFrames<7> c_yuuma_annoy = { {
+inline constexpr Game::AnimFrames<7> c_yuuma_annoyed = { {
 	{ &yuuma_annoy_1, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
 	{ &yuuma_annoy_2, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
 	{ &yuuma_annoy_3, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
@@ -246,10 +246,10 @@ inline constexpr Game::AnimFrames<7> c_yuuma_annoy = { {
 	{ .m_tilemap = &yuuma_annoy_7, .m_duration = Game::AnimFrameDuration::Fixed(6), .m_xOffset = c_halfWidthChar, .m_nextIndex = 4 },
 } };
 
-inline constexpr Game::Pose c_yuuma_annoy_pose = {
+inline constexpr Game::Pose c_yuuma_annoyed_pose = {
 	&yuuma_tileset,
 	&yuuma_pal,
-	c_yuuma_annoy
+	c_yuuma_annoyed
 };
 
 inline constexpr Game::AnimFrames<3> c_yuuma_pleased = { {
@@ -267,7 +267,7 @@ inline constexpr Game::Pose c_yuuma_pleased_pose = {
 inline constexpr Game::Poses<4> c_yuuma_poses = {
 	c_yuuma_neutral_pose,
 	c_yuuma_double_pose,
-	c_yuuma_annoy_pose,
+	c_yuuma_annoyed_pose,
 	c_yuuma_pleased_pose,
 };
 
