@@ -204,9 +204,9 @@ void VNWorld::Run
 		// Otherwise, still waiting
 		break;
 	}
-	case SceneMode::Settings:
+	case SceneMode::Voting:
 	{
-		// nyi
+		Get<SceneMode::Voting>().Update();
 		break;
 	}
 	}
@@ -231,24 +231,45 @@ void VNWorld::Run
 			m_script->UpdateVN(io_game, *this);
 			break;
 		}
-		case ProgressMode::Dialogue:
+		case ProgressMode::Scene:
 		{
-			if (m_ABCbuffered > 0 && Get<SceneMode::Dialogue>().Done())
+			switch (CurrentMode())
 			{
-				--m_ABCbuffered;
+			case SceneMode::None:
+			{
 				m_progressMode = ProgressMode::Always;
 				m_script->UpdateVN(io_game, *this);
+				break;
 			}
-			break;
-		}
-		case ProgressMode::Choice:
-		{
-			if (choiceOccurred)
+			case SceneMode::Dialogue:
 			{
-				// We have MADE OUR CHOICE!
-				m_progressMode = ProgressMode::Always;
-				m_script->UpdateVN(io_game, *this);
-				m_choiceMade = std::nullopt;
+				if (m_ABCbuffered > 0 && Get<SceneMode::Dialogue>().Done())
+				{
+					--m_ABCbuffered;
+					m_progressMode = ProgressMode::Always;
+					m_script->UpdateVN(io_game, *this);
+				}
+				break;
+			}
+			case SceneMode::Choice:
+			{
+				if (choiceOccurred)
+				{
+					// We have MADE OUR CHOICE!
+					m_progressMode = ProgressMode::Always;
+					m_script->UpdateVN(io_game, *this);
+					m_choiceMade = std::nullopt;
+				}
+				break;
+			}
+			case SceneMode::Voting:
+			{
+				if (Get<SceneMode::Voting>().VotingDone())
+				{
+					m_progressMode = ProgressMode::Always;
+					m_script->UpdateVN(io_game, *this);
+				}
+			}
 			}
 			break;
 		}
@@ -549,7 +570,6 @@ void VNWorld::SetText
 )
 {
 	TransitionTo(io_game, SceneMode::Dialogue);
-	m_progressMode = ProgressMode::Dialogue;
 	
 	if (i_char)
 	{
@@ -571,7 +591,6 @@ void VNWorld::Choice
 )
 {
 	TransitionTo(io_game, SceneMode::Choice);
-	m_progressMode = ProgressMode::Choice;
 
 	Get<SceneMode::Choice>().SetChoices(i_choices);
 }
@@ -585,7 +604,6 @@ void VNWorld::TimedChoice
 )
 {
 	TransitionTo(io_game, SceneMode::Choice);
-	m_progressMode = ProgressMode::Choice;
 
 	Get<SceneMode::Choice>().SetChoices(i_choices, i_timeInSeconds);
 }
@@ -608,6 +626,11 @@ void VNWorld::TransitionTo
 {
 	if (i_sceneMode == CurrentMode())
 	{
+		// Always update the progress mode even if scene does not need transitioning
+		m_progressMode = i_sceneMode == SceneMode::None
+			? ProgressMode::Always
+			: ProgressMode::Scene
+		;
 		return;
 	}
 
@@ -634,8 +657,10 @@ void VNWorld::TransitionTo
 				co_yield{};
 			}
 		});
+		WaitForTasks(io_game);
 
 		m_sceneMode.emplace<static_cast<u8>(SceneMode::None)>();
+		m_progressMode = ProgressMode::Always;
 		break;
 	}
 	case SceneMode::Dialogue:
@@ -663,8 +688,10 @@ void VNWorld::TransitionTo
 				co_yield{};
 			}
 		});
+		WaitForTasks(io_game);
 
 		m_sceneMode.emplace<static_cast<u8>(SceneMode::Dialogue)>(io_game, m_fonts);
+		m_progressMode = ProgressMode::Scene;
 		break;
 	}
 	case SceneMode::Choice:
@@ -689,11 +716,33 @@ void VNWorld::TransitionTo
 		});
 
 		m_sceneMode.emplace<static_cast<u8>(SceneMode::Choice)>(io_game, m_fonts);
+		m_progressMode = ProgressMode::Scene;
 		break;
 	}
-	case SceneMode::Settings:
+	case SceneMode::Voting:
 	{
-		m_sceneMode.emplace<static_cast<u8>(SceneMode::Settings)>();
+		HideCharacterVisual(io_game, false);
+		io_game.QueueLambdaTask([this] -> Task {
+			// Just tint the background, chara will be gone
+			std::array<u16, 16> darkPal;
+			Palettes::Tint<16>(m_bgSrcPal, darkPal.data(), c_tintColour);
+
+			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), darkPal.data(), FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), darkPal.data(), FramesPerSecond() >> 1);
+			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), darkPal.data(), FramesPerSecond() >> 1);
+
+			while (fadeOp1)
+			{
+				fadeOp1.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
+		});
+		WaitForTasks(io_game);
+
+		m_sceneMode.emplace<static_cast<u8>(SceneMode::Voting)>(io_game, m_fonts);
+		m_progressMode = ProgressMode::Scene;
 		break;
 	}
 	}

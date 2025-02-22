@@ -5,6 +5,7 @@
 #include "ChoiceSystem.hpp"
 #include "DialoguePrinter2.hpp"
 #include "FontData.hpp"
+#include "VoteMode.hpp"
 #include "Worlds.hpp"
 
 #include <array>
@@ -38,13 +39,13 @@ class VNWorld
 		None,
 		Dialogue,
 		Choice,
-		Settings,
+		Voting,
 	};
 	using SceneModeVar = std::variant<
 		std::monostate,
 		DialoguePrinter2,
 		ChoiceSystem,
-		std::monostate
+		VoteMode
 	>;
 	SceneModeVar m_sceneMode;
 
@@ -52,8 +53,7 @@ class VNWorld
 	enum class ProgressMode : u8
 	{
 		Always, // Reset to this after progress made via any way. In particular used by wait_for_tasks()
-		Dialogue, // Waits for dialogue printer to indicate progress can happen, and player to progress
-		Choice, // Waits for choice subsystem to return a choice
+		Scene, // Waits for current scene mode subsystem to indicate progress
 	};
 	ProgressMode m_progressMode{ ProgressMode::Always };
 
