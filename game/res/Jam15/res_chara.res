@@ -6,9 +6,23 @@ TILEMAP zanmu_blink_3 "chara/zanmu/zanmu3.png" zanmu_tileset
 TILEMAP zanmu_blink_4 "chara/zanmu/zanmu4.png" zanmu_tileset
 TILEMAP zanmu_blink_5 "chara/zanmu/zanmu5.png" zanmu_tileset
 
-TILESET hisami_tileset "chara/hisami/hisami_placeholder.png"
-PALETTE hisami_pal "chara/hisami/hisami_placeholder.png"
-TILEMAP hisami_placeholder "chara/hisami/hisami_placeholder.png" hisami_tileset
+TILESET hisami_tileset "chara/hisami/hisami_tileset.png"
+PALETTE hisami_pal "chara/hisami/hisami_tileset.png"
+TILEMAP hisami_neutral_1 "chara/hisami/neutral_1.png" hisami_tileset
+TILEMAP hisami_neutral_2 "chara/hisami/neutral_2.png" hisami_tileset
+TILEMAP hisami_neutral_3 "chara/hisami/neutral_3.png" hisami_tileset
+TILEMAP hisami_neutral_4 "chara/hisami/neutral_4.png" hisami_tileset
+TILEMAP hisami_neutral_5 "chara/hisami/neutral_5.png" hisami_tileset
+TILEMAP hisami_flush_1 "chara/hisami/flush_1.png" hisami_tileset
+TILEMAP hisami_flush_2 "chara/hisami/flush_2.png" hisami_tileset
+TILEMAP hisami_flush_3 "chara/hisami/flush_3.png" hisami_tileset
+TILEMAP hisami_flush_4 "chara/hisami/flush_4.png" hisami_tileset
+TILEMAP hisami_flush_5 "chara/hisami/flush_5.png" hisami_tileset
+TILEMAP hisami_flush_6 "chara/hisami/flush_6.png" hisami_tileset
+TILEMAP hisami_flush_7 "chara/hisami/flush_7.png" hisami_tileset
+TILEMAP hisami_joy_1 "chara/hisami/joy_1.png" hisami_tileset
+TILEMAP hisami_joy_2 "chara/hisami/joy_2.png" hisami_tileset
+TILEMAP hisami_joy_3 "chara/hisami/joy_3.png" hisami_tileset
 
 TILESET suika_tileset "chara/suika/suika_placeholder.png"
 PALETTE suika_pal "chara/suika/suika_placeholder.png"

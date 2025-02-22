@@ -1,0 +1,15 @@
+blinking:
+neutral_1 (??? frames) > neutral_2 (4 frames) > neutral_3 (5 frames) > neutral 4 (4 frames) > neutral_5 (4 frames) > neutral_6 (5 frames) > neutral_1 (??? frames)
+
+big joy transition:
+Bigjoy_1 (5 frames) > Bigjoy_2 (4 frames) > Bigjoy_3 (hold until next expression)
+
+
+pout transition:
+Pout_1 (5 frames) > Pout_2 (3 frames) > Pout_3 (2 frames) > Pout_4 (hold until next expression)
+
+
+
+
+notes:
+- Wanted to make it clear Suika's drunk so she has a permanent flush. Also why her 'blink' has a bit of lag between the two eyes.

@@ -1,0 +1,15 @@
+blink
+neutral_1 (??? frames) > neutral_2 (4 frames) > neutral_3 (3 frames) > neutral_4 (2 frames) > neutral_5 (4 frames) > neutral_1 (reset)
+
+double_blink
+neutral_1 (??? frames) > neutral_2 (4 frames) > neutral_3 (4 frames) > neutral_4 (4 frames) > neutral_2 (3 frames) > neutral_3 (3 frames) > neutral_4 (2 frames) > neutral_5 (4 frames) > neutral_1 (reset)
+
+flush
+flush_1 (5 frames) > flush_2 (20 frames) > flush_3 (5 frames) > flush_4 (4 frames) flush_5 (2 frames) > flush_6 (4 frames) > flush_7 (hold until next expression)
+
+joy
+joy_1 (5 frames) > joy_2 (4 frames) > joy_3 (hold until next expression)
+
+
+notes
+n/a

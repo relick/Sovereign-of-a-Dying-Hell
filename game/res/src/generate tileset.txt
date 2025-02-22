@@ -1,0 +1,4 @@
+Run command:
+magick convert +append *.png tileset.png
+
+Then re-apply palette in photoshop, as magick messes it up a bit

@@ -1,0 +1,12 @@
+blinking:
+neutral_1 (??? frames) > neutral_2 (4 frames) > neutral_3 (3 frames) > neutral_4 (2 frames) > neutral_5 (4 frames) > neutral_1 (reset)
+
+double_blink
+neutral_1 (??? frames) > neutral_2 (4 frames) > neutral_3 (4 frames) > neutral_4 (4 frames) > neutral_2 (3 frames) > neutral_3 (3 frames) > neutral_4 (2 frames) > neutral_5 (4 frames) > neutral_1 (reset)
+
+angry shout transition:
+angry_1 (4 frames) > angry_2 (3 frames) > angry_3 (2 frames) > angry_4 (hold until next expression)
+
+
+dejected transition:
+dejected_1 (2 frames) > dejected_2 (4 frames) > dejected_3 (5 frames) > dejected_4 (4 frames) > dejected_5 (2 frames) > dejected_6 (hold until next expression)

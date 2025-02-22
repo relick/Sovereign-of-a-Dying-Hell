@@ -69,11 +69,12 @@ SCENE_RUN(HatchingThePlan)
     think("This rate of change isn't fast enough, though. Hell's institutions are already faltering.");
     think("Perhaps working within the Council isn't the play any more...");
 
-    show(hisami, neutral);
+    show(hisami, joy);
     say(hisami, "Lady Zanmu~~! I have news~! You're sure to like it~!");
     say(zanmu, "...");
     say(hisami, "... ...");
     say(zanmu, "... ... ...");
+    show(hisami, neutral);
     say(hisami, "Lady Zanmu?");
     
     say(zanmu, "Oh. Hisami, I didn't notice you.");

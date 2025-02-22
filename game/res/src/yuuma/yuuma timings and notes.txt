@@ -1,0 +1,14 @@
+blinking:
+neutral_1 (??? frames) > neutral_2 (4 frames) > neutral_3 (3 frames) > neutral_4 (2 frames) > neutral_5 (4 frames) > neutral_1 (reset)
+
+double_blink
+neutral_1 (??? frames) > neutral_2 (4 frames) > neutral_3 (4 frames) > neutral_4 (4 frames) > neutral_2 (3 frames) > neutral_3 (3 frames) > neutral_4 (2 frames) > neutral_5 (4 frames) > neutral_1 (reset)
+
+annoyed:
+annoy_1 (3 frames) > annoy_2 (3 frames) > annoy_3 (3 frames) > annoy_4 (3 frames) > annoy_5 (6 frames) > annoy_6 (5 frames) > annoy_7 (6 frames) > loop annoy_5, 6, 7 until next animation
+
+pleased:
+pleased_1 (6 frames) > pleased_2 (6 frames) > pleased_3 (hold until next animation)
+
+notes:
+-probably going to be the only character who uses looping idle animations

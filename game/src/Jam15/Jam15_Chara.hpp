@@ -37,18 +37,52 @@ inline constexpr Game::Character c_zanmu = {
 //------------------------------------------------------------------------------
 /// Hisami
 //------------------------------------------------------------------------------
-inline constexpr Game::AnimFrames<1> c_hisami_placeholder = { {
-	{ &hisami_placeholder, Game::AnimFrameDuration::Infinite(), },
+inline constexpr Game::AnimFrames<5> c_hisami_neutral = { {
+	{ &hisami_neutral_1, Game::AnimFrameDuration::Variable(60, 300), },
+	{ &hisami_neutral_2, Game::AnimFrameDuration::Fixed(4), },
+	{ &hisami_neutral_3, Game::AnimFrameDuration::Fixed(3), },
+	{ &hisami_neutral_4, Game::AnimFrameDuration::Fixed(2), },
+	{ &hisami_neutral_5, Game::AnimFrameDuration::Fixed(4), },
 } };
 
 inline constexpr Game::Pose c_hisami_neutral_pose = {
 	&hisami_tileset,
 	&hisami_pal,
-	c_hisami_placeholder
+	c_hisami_neutral
 };
 
-inline constexpr Game::Poses<1> c_hisami_poses = {
+inline constexpr Game::AnimFrames<7> c_hisami_flush = { {
+	{ &hisami_flush_1, Game::AnimFrameDuration::Fixed(5), },
+	{ &hisami_flush_2, Game::AnimFrameDuration::Fixed(20), },
+	{ &hisami_flush_3, Game::AnimFrameDuration::Fixed(5), },
+	{ &hisami_flush_4, Game::AnimFrameDuration::Fixed(4), },
+	{ &hisami_flush_5, Game::AnimFrameDuration::Fixed(2), },
+	{ &hisami_flush_6, Game::AnimFrameDuration::Fixed(4), },
+	{ &hisami_flush_7, Game::AnimFrameDuration::Infinite(), },
+} };
+
+inline constexpr Game::Pose c_hisami_flush_pose = {
+	&hisami_tileset,
+	&hisami_pal,
+	c_hisami_flush
+};
+
+inline constexpr Game::AnimFrames<3> c_hisami_joy = { {
+	{ &hisami_joy_1, Game::AnimFrameDuration::Fixed(5), },
+	{ &hisami_joy_2, Game::AnimFrameDuration::Fixed(4), },
+	{ &hisami_joy_3, Game::AnimFrameDuration::Infinite(), },
+} };
+
+inline constexpr Game::Pose c_hisami_joy_pose = {
+	&hisami_tileset,
+	&hisami_pal,
+	c_hisami_joy
+};
+
+inline constexpr Game::Poses<3> c_hisami_poses = {
 	c_hisami_neutral_pose,
+	c_hisami_flush_pose,
+	c_hisami_joy_pose,
 };
 
 inline constexpr Game::Character c_hisami = {
