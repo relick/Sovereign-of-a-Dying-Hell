@@ -65,6 +65,12 @@ std::expected<u8, ChoiceSystem::NoChoiceMade> ChoiceSystem::Update
 	bool i_choosePressed
 )
 {
+	if (m_choices.empty())
+	{
+		// Not yet started
+		return std::unexpected(NoChoiceMade::Waiting);
+	}
+
 	if (m_timeLimit)
 	{
 		*m_timeLimit -= FrameStep();

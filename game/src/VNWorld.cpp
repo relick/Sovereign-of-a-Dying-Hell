@@ -648,7 +648,11 @@ void VNWorld::Choice
 {
 	TransitionTo(io_game, SceneMode::Choice);
 
-	Get<SceneMode::Choice>().SetChoices(i_choices);
+	io_game.QueueLambdaTask([this, i_choices] -> Task
+	{
+		Get<SceneMode::Choice>().SetChoices(i_choices);
+		co_return;
+	});
 }
 
 //------------------------------------------------------------------------------
@@ -661,7 +665,11 @@ void VNWorld::TimedChoice
 {
 	TransitionTo(io_game, SceneMode::Choice);
 
-	Get<SceneMode::Choice>().SetChoices(i_choices, i_timeInSeconds);
+	io_game.QueueLambdaTask([this, i_choices, i_timeInSeconds] -> Task
+	{
+		Get<SceneMode::Choice>().SetChoices(i_choices, i_timeInSeconds);
+		co_return;
+	});
 }
 
 //------------------------------------------------------------------------------
@@ -790,6 +798,7 @@ void VNWorld::TransitionTo
 				co_yield{};
 			}
 		});
+		WaitForTasks(io_game);
 
 		m_sceneMode.emplace<static_cast<u8>(SceneMode::Choice)>(io_game, m_fonts);
 		m_progressMode = ProgressMode::Scene;
