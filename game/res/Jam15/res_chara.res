@@ -24,9 +24,21 @@ TILEMAP hisami_joy_1 "chara/hisami/joy_1.png" hisami_tileset
 TILEMAP hisami_joy_2 "chara/hisami/joy_2.png" hisami_tileset
 TILEMAP hisami_joy_3 "chara/hisami/joy_3.png" hisami_tileset
 
-TILESET suika_tileset "chara/suika/suika_placeholder.png"
-PALETTE suika_pal "chara/suika/suika_placeholder.png"
-TILEMAP suika_placeholder "chara/suika/suika_placeholder.png" suika_tileset
+TILESET suika_tileset "chara/suika/suika_tileset.png"
+PALETTE suika_pal "chara/suika/suika_tileset.png"
+TILEMAP suika_bigjoy_1 "chara/suika/Bigjoy_1.png" suika_tileset
+TILEMAP suika_bigjoy_2 "chara/suika/Bigjoy_2.png" suika_tileset
+TILEMAP suika_bigjoy_3 "chara/suika/Bigjoy_3.png" suika_tileset
+TILEMAP suika_neutral_1 "chara/suika/Neutral_1.png" suika_tileset
+TILEMAP suika_neutral_2 "chara/suika/Neutral_2.png" suika_tileset
+TILEMAP suika_neutral_3 "chara/suika/Neutral_3.png" suika_tileset
+TILEMAP suika_neutral_4 "chara/suika/Neutral_4.png" suika_tileset
+TILEMAP suika_neutral_5 "chara/suika/Neutral_5.png" suika_tileset
+TILEMAP suika_neutral_6 "chara/suika/Neutral_6.png" suika_tileset
+TILEMAP suika_pout_1 "chara/suika/Pout_1.png" suika_tileset
+TILEMAP suika_pout_2 "chara/suika/Pout_2.png" suika_tileset
+TILEMAP suika_pout_3 "chara/suika/Pout_3.png" suika_tileset
+TILEMAP suika_pout_4 "chara/suika/Pout_4.png" suika_tileset
 
 TILESET yuugi_tileset "chara/yuugi/yuugi_placeholder.png"
 PALETTE yuugi_pal "chara/yuugi/yuugi_placeholder.png"

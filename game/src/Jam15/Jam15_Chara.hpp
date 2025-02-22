@@ -95,18 +95,50 @@ inline constexpr Game::Character c_hisami = {
 //------------------------------------------------------------------------------
 /// Suika
 //------------------------------------------------------------------------------
-inline constexpr Game::AnimFrames<1> c_suika_placeholder = { {
-	{ &suika_placeholder, Game::AnimFrameDuration::Infinite(), },
+inline constexpr Game::AnimFrames<6> c_suika_neutral = { {
+	{ &suika_neutral_1, Game::AnimFrameDuration::Variable(60, 300), c_halfWidthChar, },
+	{ &suika_neutral_2, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &suika_neutral_3, Game::AnimFrameDuration::Fixed(5), c_halfWidthChar, },
+	{ &suika_neutral_4, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &suika_neutral_5, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &suika_neutral_6, Game::AnimFrameDuration::Fixed(5), c_halfWidthChar, },
 } };
 
 inline constexpr Game::Pose c_suika_neutral_pose = {
 	&suika_tileset,
 	&suika_pal,
-	c_suika_placeholder
+	c_suika_neutral
 };
 
-inline constexpr Game::Poses<1> c_suika_poses = {
+inline constexpr Game::AnimFrames<3> c_suika_bigjoy = { {
+	{ &suika_bigjoy_1, Game::AnimFrameDuration::Fixed(5), c_halfWidthChar, },
+	{ &suika_bigjoy_2, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &suika_bigjoy_3, Game::AnimFrameDuration::Infinite(), c_halfWidthChar, },
+} };
+
+inline constexpr Game::Pose c_suika_bigjoy_pose = {
+	&suika_tileset,
+	&suika_pal,
+	c_suika_bigjoy
+};
+
+inline constexpr Game::AnimFrames<4> c_suika_pout = { {
+	{ &suika_pout_1, Game::AnimFrameDuration::Fixed(5), },
+	{ &suika_pout_2, Game::AnimFrameDuration::Fixed(3), },
+	{ &suika_pout_3, Game::AnimFrameDuration::Fixed(2), },
+	{ &suika_pout_4, Game::AnimFrameDuration::Infinite(), },
+} };
+
+inline constexpr Game::Pose c_suika_pout_pose = {
+	&suika_tileset,
+	&suika_pal,
+	c_suika_pout
+};
+
+inline constexpr Game::Poses<3> c_suika_poses = {
 	c_suika_neutral_pose,
+	c_suika_bigjoy_pose,
+	c_suika_pout_pose,
 };
 
 inline constexpr Game::Character c_suika = {

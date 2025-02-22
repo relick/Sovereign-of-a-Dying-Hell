@@ -15,8 +15,10 @@ Jam-TODO:
 2. Set up all the sprites
 2a. Go through script and set all the poses
 3. Create voting mode with basic mash gameplay, calibratable sliding meter, and influence spending
-4. Add graphic for the vote bar
+4. Add graphics for the vote bar
+4a. Add graphic for the timer
 5. Add graphic for influence
+6. Add sprite portrait for Zanmu
 
 # Code stretch
 - Add sprites flying in on each mash, and 'effects' on the line

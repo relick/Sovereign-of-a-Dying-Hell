@@ -348,14 +348,13 @@ SCENE_RUN(SuikaApproaches)
 
     say(zanmu, "Suika? What a pleasant surprise.");
 
-    show(suika, neutral);
-    face(suika, happy);
+    show(suika, bigjoy);
     say(suika, "Zanmu!");
     say(suika, "I'm glad you're glad to see me. Is the potted plant around?");
 
     say(zanmu, "She's on an errand.");
 
-    face(suika, neutral);
+    show(suika, neutral);
     say(suika, "Good, 'cause I wanted to talk with you *extra* privately.");
     say(suika, "I was puzzling over your recent proposals in the council meetings. I reckon you're up to something.");
     say(suika, "You don't *have* to tell me, but we're friends, right? Maybe I'll even support you.");
@@ -378,7 +377,7 @@ SCENE_RUN(SuikaApproaches)
         {
             say(zanmu, "I'm not scheming anything. Has it become wrong to propose improvements to Hell?");
 
-            face(suika, pout);
+            show(suika, pout);
             say(suika, "Ehhhh...");
             say(suika, "Fine! But if I find out you just lied, I don't care what it is. I'll fight you down.");
 
@@ -395,7 +394,7 @@ SCENE_RUN(SuikaApproaches)
 
     say(zanmu, "I'm going to take over Hell, and make it run smoothly again.");
 
-    face(suika, neutral);
+    show(suika, neutral);
     say(suika, "...Huh?");
     say(suika, "What do you mean you're going to take over?");
 
