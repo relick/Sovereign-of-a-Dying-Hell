@@ -23,14 +23,13 @@
 #define show(CHARA, POSE) if (!io_vn.CharacterShown()) { io_vn.ClearMode(io_game); } io_vn.SetCharacterVisual(io_game, c_ ## CHARA ## _ ## POSE ## _pose); wait_for_tasks()
 #define hide() io_vn.ClearMode(io_game); io_vn.HideCharacterVisual(io_game, false); wait_for_tasks()
 
-// TODO: special formatting
-#define desc(TEXT) hide_face(); io_vn.SetText(io_game, nullptr, TEXT, std::nullopt); wait
+#define desc(TEXT) hide_face(); io_vn.SetText(io_game, &Game::c_special_desc, TEXT, script.desc_beeps); wait
 
 #define think(TEXT) hide_face(); io_vn.SetText(io_game, nullptr, "(" TEXT ")", std::nullopt); wait
 #define think_face(CHARA, FACE, TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")", std::nullopt); face(CHARA, FACE); wait
 
 #define say(CHARA, TEXT) hide_face(); io_vn.SetText(io_game, &c_ ## CHARA, TEXT, script. CHARA ## _beeps); wait
-#define say_hidden(CHARA, TEXT) hide_face(); io_vn.SetText(io_game, (c_ ## CHARA).m_showOnLeft ? &Game::c_charaLHidden : &Game::c_charaRHidden, TEXT, script. CHARA ## _beeps); wait
+#define say_hidden(CHARA, TEXT) hide_face(); io_vn.SetText(io_game, (c_ ## CHARA).m_showOnLeft ? &Game::c_special_l_hidden : &Game::c_special_r_hidden, TEXT, script. CHARA ## _beeps); wait
 #define say_face(CHARA, FACE, TEXT) io_vn.SetText(io_game, &c_ ## CHARA, TEXT, script. CHARA ## _beeps); face(CHARA, FACE); wait
 
 #define choice(...) static constexpr std::array _choices = { __VA_ARGS__ }; io_vn.Choice(io_game, _choices); wait

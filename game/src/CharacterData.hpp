@@ -62,18 +62,20 @@ struct Pose
 {
 	TileSet const* m_tileset{ nullptr };
 	Palette const* m_palette{ nullptr };
-	std::span<AnimFrame const> m_animation;
+	std::span<AnimFrame const> m_animation{};
 };
 
 struct Character
 {
 	char const* m_displayName{ nullptr };
 	bool m_showOnLeft{ false };
-	std::span<Pose const> m_poses;
+	std::span<Pose const> m_poses{};
+	bool m_useDescFont{ false };
 };
 
-inline constexpr Character c_charaLHidden = { "?????", true, {}, };
-inline constexpr Character c_charaRHidden = { "?????", false, {}, };
+inline constexpr Character c_special_desc = { .m_displayName = "", .m_useDescFont = true, };
+inline constexpr Character c_special_l_hidden = { .m_displayName = "?????", .m_showOnLeft = true, };
+inline constexpr Character c_special_r_hidden = { .m_displayName = "?????", .m_showOnLeft = false, };
 
 struct PortraitFace
 {

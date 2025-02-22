@@ -64,6 +64,8 @@ class Script
 public:
 	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
 
+	Game::SFXID desc_beeps;
+
 	Game::SFXID zanmu_beeps;
 	Game::SFXID hisami_beeps;
 	Game::SFXID suika_beeps;

@@ -85,7 +85,7 @@ WorldRoutine VNWorld::Init
 	// Enable shadow effects on text
 	VDP_setHilightShadow(1);
 
-	m_fonts.Init(vn_font, name_font);
+	m_fonts.Init(vn_font, vn_desc_font, name_font);
 
 	// Show palette-based text frame
 	s_bgNormalPal = m_mainPals.data();
@@ -601,7 +601,7 @@ void VNWorld::SetText
 		Get<SceneMode::Dialogue>().SetName(nullptr, true);
 	}
 
-	Get<SceneMode::Dialogue>().SetText(i_text, i_beeps);
+	Get<SceneMode::Dialogue>().SetText(i_text, i_beeps, i_char ? i_char->m_useDescFont : false);
 }
 
 //------------------------------------------------------------------------------

@@ -122,15 +122,16 @@ void Script::InitVN
 )
 {
 	// Set up data
-	zanmu_beeps = io_game.SFX().AddSFX(zanmu_beep, std::size(zanmu_beep), Game::Channel::TextBeeps);
-	hisami_beeps = zanmu_beeps;
-	suika_beeps = zanmu_beeps;
-	yuugi_beeps = zanmu_beeps;
-	yuuma_beeps = zanmu_beeps;
-	lcouncil_beeps = zanmu_beeps;
-	rcouncil_beeps = zanmu_beeps;
-	speaker_beeps = zanmu_beeps;
-	kishin_beeps = zanmu_beeps;
+	desc_beeps = io_game.SFX().AddSFX(zanmu_beep, std::size(zanmu_beep), Game::Channel::TextBeeps);
+	zanmu_beeps = desc_beeps;
+	hisami_beeps = desc_beeps;
+	suika_beeps = desc_beeps;
+	yuugi_beeps = desc_beeps;
+	yuuma_beeps = desc_beeps;
+	lcouncil_beeps = desc_beeps;
+	rcouncil_beeps = desc_beeps;
+	speaker_beeps = desc_beeps;
+	kishin_beeps = desc_beeps;
 
 	// First scene
 	Scenes sceneToStart = Scenes::InitialScene;

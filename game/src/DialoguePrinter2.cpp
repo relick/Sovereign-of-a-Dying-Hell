@@ -285,7 +285,8 @@ void DialoguePrinter2::SetName
 void DialoguePrinter2::SetText
 (
 	char const* i_text,
-	std::optional<SFXID> i_beeps
+	std::optional<SFXID> i_beeps,
+	bool i_useDescFont
 )
 {
 	if (m_spritesInitialised)
@@ -294,6 +295,7 @@ void DialoguePrinter2::SetText
 	}
 
 	m_beeps = i_beeps;
+	m_textUsesDescFont = i_useDescFont;
 	m_doneAllText = false;
 	m_curText = i_text;
 	m_curTextLen = std::strlen(i_text);
@@ -437,7 +439,7 @@ bool DialoguePrinter2::DrawChar
 		u16 wordLen = 0;
 		while (*word != ' ' && *word != '\n' && *word != '\0')
 		{
-			wordLen += m_fonts->GetVNTextFontCharWidth(*word++);
+			wordLen += m_textUsesDescFont ? m_fonts->GetVNDescFontCharWidth(*word++) : m_fonts->GetVNTextFontCharWidth(*word++);
 		}
 
 		if(m_x + wordLen >= c_lineWidth * c_pixelsPerTile)
@@ -496,8 +498,8 @@ bool DialoguePrinter2::DrawChar
 	// Blit!
 	if (curChar != ' ')
 	{
-		u32 const* curCharTileRows = m_fonts->GetVNTextFontTile(curChar)->AsRawRows();
-		u8 const curCharWidth = m_fonts->GetVNTextFontCharWidth(curChar);
+		u32 const* curCharTileRows = m_textUsesDescFont ? m_fonts->GetVNDescFontTile(curChar)->AsRawRows() : m_fonts->GetVNTextFontTile(curChar)->AsRawRows();
+		u8 const curCharWidth = m_textUsesDescFont ? m_fonts->GetVNDescFontCharWidth(curChar) : m_fonts->GetVNTextFontCharWidth(curChar);
 
 		// Whilst we have 8 pixel tall text that aligns with the tiles, a character spans 2 tiles generally. So we'll do left tile, then right tile
 		u16 const tileInd = (m_y * c_lineWidth) + (m_x >> 3);

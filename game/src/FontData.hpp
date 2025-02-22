@@ -20,9 +20,12 @@ class FontData
 	{
 		u8 m_charWidth{8};
 	};
+	using VNFontAuxData = std::array<VariableWidthCharData, 96>;
 
 	TileSet const* m_vnTextFont{nullptr};
-	std::array<VariableWidthCharData, 96> m_vnTextFontAuxData{};
+	VNFontAuxData m_vnTextFontAuxData{};
+	TileSet const* m_vnDescFont{ nullptr };
+	VNFontAuxData m_vnDescFontAuxData{};
 
 	TileSet const* m_vnNameFont{nullptr};
 
@@ -30,11 +33,14 @@ public:
 	// Processes fonts
 	void Init(
 		TileSet const& i_vnTextFont,
+		TileSet const& i_vnDescFont,
 		TileSet const& i_vnNameFont
 	);
 
 	Tiles::Tile const* GetVNTextFontTile(char i_asciiChar) const { return Tiles::AsTiles(m_vnTextFont->tiles) + (i_asciiChar - 32); }
 	u8 GetVNTextFontCharWidth(char i_asciiChar) const { return m_vnTextFontAuxData[i_asciiChar - 32].m_charWidth; }
+	Tiles::Tile const* GetVNDescFontTile(char i_asciiChar) const { return Tiles::AsTiles(m_vnDescFont->tiles) + (i_asciiChar - 32); }
+	u8 GetVNDescFontCharWidth(char i_asciiChar) const { return m_vnDescFontAuxData[i_asciiChar - 32].m_charWidth; }
 	
 	// Returns upper and lower tile
 	std::pair<Tiles::Tile const*, Tiles::Tile const*> GetVNNameFontTiles(char i_asciiChar) const {
