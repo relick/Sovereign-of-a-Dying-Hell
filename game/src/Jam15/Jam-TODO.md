@@ -12,7 +12,7 @@ Jam-TODO:
 # Saturday
 1. ~~Skip reloading tiles between animations if they share a tileset (makes animations work)~~
 1a. ~~Make half-width sprites work~~
-2. Set up all the sprites
+2. ~~Set up all the sprites~~
 2a. Go through script and set all the poses
 3. Create voting mode with basic mash gameplay, calibratable sliding meter, and influence spending
 4. Add graphics for the vote bar
@@ -20,6 +20,7 @@ Jam-TODO:
 5. Add graphic for influence
 6. Add sprite portrait for Zanmu
 7. ???? for say_hidden
+8. Set up the jam page
 
 # Code stretch
 - Add sprites flying in on each mash, and 'effects' on the line

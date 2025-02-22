@@ -53,6 +53,23 @@ inline constexpr Game::Pose c_hisami_neutral_pose = {
 	c_hisami_neutral
 };
 
+inline constexpr Game::AnimFrames<8> c_hisami_double = { {
+	{ &hisami_neutral_1, Game::AnimFrameDuration::Variable(60, 300), c_halfWidthChar, },
+	{ &hisami_neutral_2, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &hisami_neutral_3, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &hisami_neutral_4, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &hisami_neutral_2, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
+	{ &hisami_neutral_3, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
+	{ &hisami_neutral_4, Game::AnimFrameDuration::Fixed(2), c_halfWidthChar, },
+	{ &hisami_neutral_5, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+} };
+
+inline constexpr Game::Pose c_hisami_double_pose = {
+	&hisami_tileset,
+	&hisami_pal,
+	c_hisami_double
+};
+
 inline constexpr Game::AnimFrames<7> c_hisami_flush = { {
 	{ &hisami_flush_1, Game::AnimFrameDuration::Fixed(5), c_halfWidthChar, },
 	{ &hisami_flush_2, Game::AnimFrameDuration::Fixed(20), c_halfWidthChar, },
@@ -81,8 +98,9 @@ inline constexpr Game::Pose c_hisami_joy_pose = {
 	c_hisami_joy
 };
 
-inline constexpr Game::Poses<3> c_hisami_poses = {
+inline constexpr Game::Poses<4> c_hisami_poses = {
 	c_hisami_neutral_pose,
+	c_hisami_double_pose,
 	c_hisami_flush_pose,
 	c_hisami_joy_pose,
 };
@@ -163,6 +181,23 @@ inline constexpr Game::Pose c_yuugi_neutral_pose = {
 	c_yuugi_neutral
 };
 
+inline constexpr Game::AnimFrames<8> c_yuugi_double = { {
+	{ &yuugi_neutral_1, Game::AnimFrameDuration::Variable(60, 300), c_halfWidthChar, },
+	{ &yuugi_neutral_2, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &yuugi_neutral_3, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &yuugi_neutral_4, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+	{ &yuugi_neutral_2, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
+	{ &yuugi_neutral_3, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
+	{ &yuugi_neutral_4, Game::AnimFrameDuration::Fixed(2), c_halfWidthChar, },
+	{ &yuugi_neutral_5, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
+} };
+
+inline constexpr Game::Pose c_yuugi_double_pose = {
+	&yuugi_tileset,
+	&yuugi_pal,
+	c_yuugi_double
+};
+
 inline constexpr Game::AnimFrames<4> c_yuugi_angry = { {
 	{ &yuugi_angry_1, Game::AnimFrameDuration::Fixed(4), c_halfWidthChar, },
 	{ &yuugi_angry_2, Game::AnimFrameDuration::Fixed(3), c_halfWidthChar, },
@@ -191,8 +226,9 @@ inline constexpr Game::Pose c_yuugi_dejected_pose = {
 	c_yuugi_dejected
 };
 
-inline constexpr Game::Poses<3> c_yuugi_poses = {
+inline constexpr Game::Poses<4> c_yuugi_poses = {
 	c_yuugi_neutral_pose,
+	c_yuugi_double_pose,
 	c_yuugi_angry_pose,
 	c_yuugi_dejected_pose,
 };
