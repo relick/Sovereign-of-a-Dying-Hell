@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <style type="text/css">
+        * {margin: 0;padding: 0}
+        body {display: flex;align-items:center;justify-content:center;}
+        div[data-timer], div[data-timer2] {display: none !important}
+    </style>
+</head>
+<body>
+<script type="module">
+    import { Nostalgist } from 'https://esm.run/nostalgist'
+
+    Nostalgist.configure({
+        resolveRom(rom) {
+            return `${rom}`
+        }
+    })
+    // Ref
+    /* await Nostalgist.launch({
+        rom: './rom.bin',
+        core: 'genesis_plus_gx',
+        retroarchConfig: {
+            //aspect_ratio_index: 21, // Force 1:1 PAR
+            aspect_ratio_index: 22, // Use core
+            //aspect_ratio_index: 23, // Custom:
+            //video_aspect_ratio: 1.0,
+            video_crop_overscan: true,
+            //video_scale_integer: true,
+            input_player1_a: 'c', // MD C button
+            input_player1_b: 'x', // MD B button
+            input_player1_y: 'z', // MD A button
+        },
+        retroarchCoreConfig: {
+            genesis_plus_gx_blargg_ntsc_filter: 'svideo',
+            //genesis_plus_gx_overscan: 'full',
+            //genesis_plus_gx_overscan: 'left/right',
+            //genesis_plus_gx_aspect_ratio: 'PAL PAR',
+        },
+        size: {width: 320 * 3, height: 224 * 3, },
+    })*/
+
+    let useFilter = true;
+    if (useFilter)
+    {
+        // FYI, using the genesis_plus_gx filter looks nice but the scaling is garbo
+        // Whereas using the shaders, you can only use the ones that have one shader per preset, with the same name ~_~
+        await Nostalgist.launch({
+            rom: './rom.bin',
+            core: 'genesis_plus_gx',
+            shader: "crt/fakelottes-geom-mini", // Nicest, probably
+            //shader: "crt/crt-mattias",
+            //shader: "crt/fakelottes-geom",
+            //shader: "crt/fakelottes",
+            //shader: "vhs/mudlord-pal-vhs",
+            retroarchConfig: {
+                aspect_ratio_index: 21, // Force 1:1 PAR
+                video_crop_overscan: true,
+                video_scale_integer: true,
+                input_player1_a: 'c', // MD C button
+                input_player1_b: 'x', // MD B button
+                input_player1_y: 'z', // MD A button
+            },
+            size: {width: 320 * 3, height: 224 * 3, },
+        })
+    }
+    else
+    {
+        await Nostalgist.launch({
+            rom: './rom.bin',
+            core: 'genesis_plus_gx',
+            retroarchConfig: {
+                aspect_ratio_index: 21, // Force 1:1 PAR
+                video_crop_overscan: true,
+                video_scale_integer: true,
+                input_player1_a: 'c', // MD C button
+                input_player1_b: 'x', // MD B button
+                input_player1_y: 'z', // MD A button
+            },
+            size: {width: 320 * 3, height: 224 * 3, },
+        })
+    }
+
+</script>
+</body>
+</html>
