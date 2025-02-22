@@ -41,6 +41,21 @@ inline constexpr s8 c_extraFramesWaitedOnFullStop = 20; // Delay for . ! ? ~
 inline constexpr s8 c_extraFramesWaitedOnEllipsis = 40; // Delay for ... ..! ..? ..~
 
 //------------------------------------------------------------------------------
+inline constexpr s16 GetNameSpritePosX(
+	bool i_left,
+	u16 i_spriteI,
+	u16 i_nameLen
+)
+{
+	s16 x = c_namePosSide + i_spriteI * 32;
+	if (!i_left)
+	{
+		x += 320 - 2 * c_namePosSide - (i_nameLen * 8);
+	}
+	return x;
+}
+
+//------------------------------------------------------------------------------
 DialoguePrinter2::DialoguePrinter2
 (
 	Game& io_game,
@@ -137,6 +152,7 @@ void DialoguePrinter2::SetupSprites
 	s8 z = -128;
 
 	u16 nameIndex = c_nameTilesIndex;
+	u8 const curNameLenLimited = m_curName ? static_cast<u8>(std::min<u16>(13, std::strlen(m_curName))) : 0;
 	for (u16 i = 0; i < m_nameSprites.size(); ++i)
 	{
 		auto [id, spr] = m_game->Sprites().AddSprite(
@@ -144,7 +160,7 @@ void DialoguePrinter2::SetupSprites
 			TILE_ATTR_FULL(PAL3, true, false, false, nameIndex)
 		);
 
-		spr.SetX(c_namePosSide + i * 32);
+		spr.SetX(GetNameSpritePosX(m_nameOnLeft, i, curNameLenLimited));
 		spr.SetY(c_namePosDown + (c_textFramePos - 1) * 8);
 		spr.SetZ(z++);
 
@@ -214,14 +230,22 @@ void DialoguePrinter2::SetName
 
 	QueueNameDMA();
 
-	if (!i_name || std::strlen(i_name) == 0)
+	if (!i_name)
 	{
 		return;
 	}
 
+	u8 const nameLen = static_cast<u8>(std::min<u16>(13, std::strlen(i_name)));
+
+	if (nameLen == 0)
+	{
+		return;
+	}
+
+	u8 const limit = nameLen * 2;
+
 	// Fill new name
-	u8 limit = 0;
-	for (; limit < 26; ++limit)
+	for (u8 tileI = 0; tileI < limit; ++tileI, ++i_name)
 	{
 		char const curChar = *i_name;
 		if (curChar == '\0')
@@ -237,28 +261,22 @@ void DialoguePrinter2::SetName
 #endif
 		auto const [upperTile, lowerTile] = m_fonts->GetVNNameFontTiles(curChar);
 
-		m_tiles[c_textTileCount + (limit++)] = *upperTile;
-		m_tiles[c_textTileCount + limit] = *lowerTile;
-
-		++i_name;
+		m_tiles[c_textTileCount + (tileI++)] = *upperTile;
+		m_tiles[c_textTileCount + tileI] = *lowerTile;
 	}
 
-	// Update sprites
-	if (m_nameOnLeft != i_left)
+	// Update sprite positions if side has changed
+	if (m_spritesInitialised && m_nameOnLeft != i_left)
 	{
 		for (u16 i = 0; i < m_nameSprites.size(); ++i)
 		{
-			s16 x = c_namePosSide + i * 32;
-			if(!i_left)
-			{
-				x += 320 - 2 * c_namePosSide - ((limit >> 1) * 8);
-			}
-
-			m_game->Sprites().EditSpriteData(m_nameSprites[i]).SetX(x);
+			m_game->Sprites().EditSpriteData(m_nameSprites[i]).SetX(
+				GetNameSpritePosX(i_left, i, nameLen)
+			);
 		}
-
-		m_nameOnLeft = i_left;
 	}
+
+	m_nameOnLeft = i_left;
 }
 
 //------------------------------------------------------------------------------
@@ -268,6 +286,11 @@ void DialoguePrinter2::SetText
 	std::optional<SFXID> i_beeps
 )
 {
+	if (m_spritesInitialised)
+	{
+		m_game->Sprites().EditSpriteData(m_nextArrow).SetVisible(false);
+	}
+
 	m_beeps = i_beeps;
 	m_doneAllText = false;
 	m_curText = i_text;
@@ -358,6 +381,7 @@ void DialoguePrinter2::Next()
 
 	if(!DrawChar())
 	{
+		if (m_spritesInitialised)
 		{
 			m_game->Sprites().EditSpriteData(m_nextArrow).SetVisible(false);
 		}
