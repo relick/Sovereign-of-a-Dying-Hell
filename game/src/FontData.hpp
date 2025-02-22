@@ -9,7 +9,7 @@ namespace Game
 {
 
 inline constexpr u16 c_vnNameFontCharaCount = 26 /* upper alphabet */ + 1 /* question mark */ + 1 /* space */;
-inline constexpr u16 c_vnNameFontLowerTileOffset = c_vnNameFontCharaCount;
+inline constexpr u16 c_vnNameFontLowerTileOffset = 1; // They're now arranged column-wise
 
 //------------------------------------------------------------------------------
 /// Preprocesses and stores data about fonts for use by text rendering systems
@@ -46,15 +46,15 @@ public:
 	std::pair<Tiles::Tile const*, Tiles::Tile const*> GetVNNameFontTiles(char i_asciiChar) const {
 		if (i_asciiChar == '?')
 		{
-			Tiles::Tile const* upper = Tiles::AsTiles(m_vnNameFont->tiles) + 26;
+			Tiles::Tile const* upper = Tiles::AsTiles(m_vnNameFont->tiles) + 26 * 2;
 			return { upper, upper + c_vnNameFontLowerTileOffset, };
 		}
 		else if (i_asciiChar == ' ')
 		{
-			Tiles::Tile const* upper = Tiles::AsTiles(m_vnNameFont->tiles) + 27;
+			Tiles::Tile const* upper = Tiles::AsTiles(m_vnNameFont->tiles) + 27 * 2;
 			return { upper, upper + c_vnNameFontLowerTileOffset, };
 		}
-		Tiles::Tile const* upper = Tiles::AsTiles(m_vnNameFont->tiles) + (i_asciiChar - 'A');
+		Tiles::Tile const* upper = Tiles::AsTiles(m_vnNameFont->tiles) + ((i_asciiChar - 'A') * 2);
 		return { upper, upper + c_vnNameFontLowerTileOffset, };
 	}
 };
