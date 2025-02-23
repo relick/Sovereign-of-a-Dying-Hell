@@ -98,6 +98,7 @@ public:
 	std::optional<u8> GetChoiceResult() const { return m_choiceMade; }
 
 	void ClearMode(Game& io_game);
+	void ClearModeImmediate(Game& io_game);
 
 	void StartVote(Game& io_game, VoteModeParams const& i_params);
 	VoteResult GetVoteResult() const { return Get<SceneMode::Voting>().VotingResult(); }

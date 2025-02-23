@@ -168,7 +168,7 @@ void Script::UpdateVN
 
 		// Tidy up visuals
 		io_vn.HideCharacterVisual(io_game, false);
-		io_vn.ClearMode(io_game);
+		io_vn.ClearModeImmediate(io_game);
 		io_vn.BlackBG(io_game, true);
 
 		m_currentScene = CreateScene(*m_nextScene);

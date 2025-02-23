@@ -435,9 +435,13 @@ void VNWorld::BlackBG
 {
 	if (i_fast)
 	{
-		std::copy(palette_black, palette_black + 16, m_mainPals.begin());
-		std::copy(palette_black, palette_black + 16, m_namePals.begin());
-		std::copy(palette_black, palette_black + 16, m_textPals.begin());
+		io_game.QueueLambdaTask([this] -> Task {
+			std::copy(palette_black, palette_black + 16, m_mainPals.begin());
+			std::copy(palette_black, palette_black + 16, m_namePals.begin());
+			std::copy(palette_black, palette_black + 16, m_textPals.begin());
+
+			co_return;
+		});
 	}
 	else
 	{
@@ -477,9 +481,13 @@ void VNWorld::WhiteBG
 {
 	if (i_fast)
 	{
-		std::copy(c_palette_white.begin(), c_palette_white.end(), m_mainPals.begin());
-		std::copy(c_palette_white.begin(), c_palette_white.end(), m_namePals.begin());
-		std::copy(c_palette_white.begin(), c_palette_white.end(), m_textPals.begin());
+		io_game.QueueLambdaTask([this] -> Task {
+			std::copy(c_palette_white.begin(), c_palette_white.end(), m_mainPals.begin());
+			std::copy(c_palette_white.begin(), c_palette_white.end(), m_namePals.begin());
+			std::copy(c_palette_white.begin(), c_palette_white.end(), m_textPals.begin());
+
+			co_return;
+		});
 	}
 	else
 	{
@@ -737,6 +745,17 @@ void VNWorld::ClearMode
 )
 {
 	TransitionTo(io_game, SceneMode::None);
+}
+
+//------------------------------------------------------------------------------
+void VNWorld::ClearModeImmediate
+(
+	Game& io_game
+)
+{
+	HidePortrait(io_game);
+	m_sceneMode.emplace<static_cast<u8>(SceneMode::None)>();
+	m_progressMode = ProgressMode::Always;
 }
 
 //------------------------------------------------------------------------------
