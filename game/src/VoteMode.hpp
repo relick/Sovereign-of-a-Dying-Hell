@@ -75,10 +75,16 @@ class VoteMode
 	u16 m_passed_passed_tileIndex{};
 	u16 m_failed_vote_tileIndex{};
 	u16 m_failed_failed_tileIndex{};
+	u16 m_influenceBar_tileIndex{};
+	u16 m_influenceBarText_tileIndex{};
 
 	// 2 rows of 32 tiles
 	std::array<u16, 64> m_barTileMap{};
 	Task m_updateBarTileMap;
+
+	// 1 row of 20 tiles
+	std::array<u16, 20> m_influenceBarTileMap{};
+	Task m_updateInfluenceBarMap;
 
 	// Vote text, uses as many tiles/sprites as needed
 	std::vector<Tiles::Tile> m_voteNameTextTiles;
@@ -113,7 +119,8 @@ private:
 	void SetupGraphics();
 	Task RenderText(u16 i_tileIndex);
 	void UpdateGraphics();
-	Task UpdateBarTileMap(bool i_runOnce);
+	Task UpdateBarTileMap();
+	Task UpdateInfluenceBarTileMap();
 	u16 GetBarCornerAttr(bool i_hflip) const;
 	u16 GetBarMidAttr(u16 i_tileI) const;
 	void SetupEndGraphics();

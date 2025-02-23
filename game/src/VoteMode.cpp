@@ -344,6 +344,30 @@ void VoteMode::SetupGraphics()
 			AwaitTask(load);
 		}
 
+		// Influence bar
+		{
+			tileIndex -= voting_influence_bar.numTile;
+			m_influenceBar_tileIndex = tileIndex;
+			auto load = Tiles::LoadTiles_Chunked(&voting_influence_bar, tileIndex);
+			AwaitTask(load);
+		}
+		{
+			tileIndex -= voting_influence_bar_text_set.numTile;
+			m_influenceBarText_tileIndex = tileIndex;
+			auto load = Tiles::LoadTiles_Chunked(&voting_influence_bar_text_set, tileIndex);
+			AwaitTask(load);
+			auto map = Tiles::SetMap_SubFull(
+				VDP_BG_A,
+				voting_influence_bar_text_map.tilemap,
+				voting_influence_bar_text_map.w,
+				voting_influence_bar_text_map.h,
+				TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, tileIndex),
+				7,
+				22
+			);
+			AwaitTask(map);
+		}
+
 		// Text
 		{
 			auto text = RenderText(tileIndex);
@@ -378,32 +402,9 @@ void VoteMode::SetupGraphics()
 			spr.SetZ(z++);
 		}
 
-		// Create bar
-		{
-			// Yield first cause this is gonna be a doozy of an initial compute
-			co_yield{};
-
-			auto update = UpdateBarTileMap(true);
-
-			// Then yield to end too
-			co_yield{};
-		}
-
-		// Draw bar
-		{
-			auto map = Tiles::SetMap_SubFull(
-				VDP_BG_A,
-				m_barTileMap.data(),
-				32,
-				2,
-				0,
-				4,
-				16
-			);
-			AwaitTask(map);
-		}
-
-		m_updateBarTileMap = UpdateBarTileMap(false);
+		// Create bars
+		m_updateBarTileMap = UpdateBarTileMap();
+		m_updateInfluenceBarMap = UpdateInfluenceBarTileMap();
 
 		m_graphicsReady = true;
 	});
@@ -509,6 +510,7 @@ Task VoteMode::RenderText
 void VoteMode::UpdateGraphics()
 {
 	m_updateBarTileMap();
+	m_updateInfluenceBarMap();
 
 	auto cursor = m_game->Sprites().EditSpriteData(m_cursor);
 	cursor.SetX((c_screenWidthPx / 2) - 8 + m_votePosition);
@@ -523,7 +525,6 @@ void VoteMode::UpdateGraphics()
 //------------------------------------------------------------------------------
 Task VoteMode::UpdateBarTileMap
 (
-	bool i_runOnce
 )
 {
 	while (!m_votingComplete)
@@ -555,9 +556,43 @@ Task VoteMode::UpdateBarTileMap
 			AwaitTask(map);
 		}
 
-		if (i_runOnce)
+		co_yield{};
+	}
+
+	co_return;
+}
+//------------------------------------------------------------------------------
+Task VoteMode::UpdateInfluenceBarTileMap
+(
+)
+{
+	while (!m_votingComplete)
+	{
+		u16 const influenceSmall = m_remainingInfluence / 2;
+		u16 const tile = influenceSmall / 20;
+		for (u16 i = 0; i < tile; ++i)
 		{
-			co_return;
+			m_influenceBarTileMap[i] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex + 8);
+		}
+		u16 const offset = std::min<u16>(16, influenceSmall - (tile * 16)) / 2;
+		m_influenceBarTileMap[tile] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex + offset);
+		for (u16 i = tile + 1; i < m_influenceBarTileMap.size(); ++i)
+		{
+			m_influenceBarTileMap[i] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex);
+		}
+
+		// Draw bar
+		{
+			auto map = Tiles::SetMap_SubFull(
+				VDP_BG_A,
+				m_influenceBarTileMap.data(),
+				20,
+				1,
+				0,
+				10,
+				24
+			);
+			AwaitTask(map);
 		}
 
 		co_yield{};
