@@ -344,6 +344,12 @@ void VoteMode::SetupGraphics()
 			AwaitTask(load);
 		}
 
+		// Text
+		{
+			auto text = RenderText(tileIndex);
+			AwaitTask(text);
+		}
+
 		// Add sprites for number
 		s8 z = -64;
 		{
@@ -401,6 +407,102 @@ void VoteMode::SetupGraphics()
 
 		m_graphicsReady = true;
 	});
+}
+
+//------------------------------------------------------------------------------
+Task VoteMode::RenderText
+(
+	u16 i_tileIndex
+)
+{
+	char const* str = m_params.m_voteName;
+	if (!str)
+	{
+		co_return;
+	}
+
+	// Render tiles
+	u16 x = 0;
+	while (*str != '\0')
+	{
+		char const curChar = *str;
+		if (curChar != ' ')
+		{
+			u8 const curCharWidth = m_fontData->GetVNTextFontCharWidth(curChar);
+			if (curCharWidth + x > 256)
+			{
+				// Can't fit any more characters
+				++str;
+				continue;
+			}
+
+			u32 const* curCharTileRows = m_fontData->GetVNTextFontTile(curChar)->AsRawRows();
+
+			// Whilst we have 8 pixel tall text that aligns with the tiles, a character spans 2 tiles generally. So we'll do left tile, then right tile
+			u16 const tileInd = (x >> 3);
+			while ((tileInd + 1u) >= m_voteNameTextTiles.size())
+			{
+				m_voteNameTextTiles.insert(m_voteNameTextTiles.end(), {Tiles::Tile{}, Tiles::Tile{}, Tiles::Tile{}, Tiles::Tile{}});
+			}
+			u32* const leftTile = m_voteNameTextTiles[tileInd].AsRawRows();
+
+			// So for the left tile, we need to just shift the font data to the right by the amount of pixels m_x is in to the tile
+			u8 leftTilePixels = x & 0x7;
+			u16 const shift = leftTilePixels << 2;
+			for (u8 i = 0; i < 8; ++i)
+			{
+				leftTile[i] |= curCharTileRows[i] >> shift;
+			}
+
+			u16 const used = 8 - leftTilePixels;
+			if (used < curCharWidth)
+			{
+				u32* const rightTile = m_voteNameTextTiles[tileInd + 1].AsRawRows();
+				u16 antiShift = used << 2;
+				for (u8 i = 0; i < 8; ++i)
+				{
+					rightTile[i] |= curCharTileRows[i] << antiShift;
+				}
+			}
+
+			x += curCharWidth;
+		}
+		else if (x > 0)
+		{
+			// Default space size, but only if we're not at the start of a line
+			x += 4;
+		}
+		++str;
+	}
+
+	u16 const textTileIndex = i_tileIndex - m_voteNameTextTiles.size();
+
+	while (!DMA_queueDmaFast(
+		DMA_VRAM,
+		m_voteNameTextTiles.data(),
+		textTileIndex * 32,
+		m_voteNameTextTiles.size() * (sizeof(Tiles::Tile) >> 1),
+		2
+	))
+	{
+		co_yield{};
+	}
+
+	co_yield{};
+
+	// Add sprites
+	s8 z = -32;
+	u16 spriteX = (c_screenWidthPx - x) / 2;
+	for (u16 i = 0; i < m_voteNameTextTiles.size(); i += 4)
+	{
+		auto [id, spr] = m_game->Sprites().AddSprite(SpriteSize::r1c4, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, textTileIndex + i));
+		m_voteNameSprites.push_back(id);
+		spr.SetX(spriteX + (i * 8));
+		spr.SetY(10 * 8);
+		spr.SetZ(z++);
+	}
+
+	co_return;
 }
 
 //------------------------------------------------------------------------------
@@ -510,9 +612,9 @@ u16 VoteMode::GetBarMidAttr
 //------------------------------------------------------------------------------
 void VoteMode::SetupEndGraphics()
 {
-	m_game->Sprites().RemoveSprite(m_num[0]);
-	m_game->Sprites().RemoveSprite(m_num[1]);
+	std::ranges::for_each(m_num, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 	m_game->Sprites().RemoveSprite(m_cursor);
+	std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 
 	m_vnWorld->WhiteBG(*m_game, true);
 	m_vnWorld->HideCharacterVisual(*m_game, true);

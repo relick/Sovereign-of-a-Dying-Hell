@@ -21,13 +21,8 @@ class ChoiceSystem
 	Game* m_game{ nullptr };
 	FontData const* m_fonts{ nullptr };
 
-	bool m_vramInitialised{ false };
-	bool m_spritesInitialised{ false };
-
 	std::span<char const* const> m_choices;
 	std::optional<f16> m_timeLimit{ 0 };
-
-	VBlankCallbackID m_dmaCallbackID{};
 
 	std::array<Tiles::Tile, 128> m_tiles{};
 

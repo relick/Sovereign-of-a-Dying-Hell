@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 #include "GameRoutines.hpp"
+#include "TileData.hpp"
 #include "Worlds.hpp"
 
 #include <vector>
@@ -79,6 +80,10 @@ class VoteMode
 	std::array<u16, 64> m_barTileMap{};
 	Task m_updateBarTileMap;
 
+	// Vote text, uses as many tiles/sprites as needed
+	std::vector<Tiles::Tile> m_voteNameTextTiles;
+	std::vector<SpriteID> m_voteNameSprites;
+
 	u16 m_endTimer{};
 
 public:
@@ -106,6 +111,7 @@ private:
 	void GenerateAttackEvents();
 	std::pair<u16, u16> FindNumTileIndicesForFrameTimer() const;
 	void SetupGraphics();
+	Task RenderText(u16 i_tileIndex);
 	void UpdateGraphics();
 	Task UpdateBarTileMap(bool i_runOnce);
 	u16 GetBarCornerAttr(bool i_hflip) const;
