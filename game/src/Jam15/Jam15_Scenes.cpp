@@ -163,7 +163,7 @@ SCENE_RUN(LobbyingYuugi)
     say(yuugi, "Don't worry about it. Sometimes I feel bad seeing you work so hard whilst I merely drink and relax. Sometimes.");
     say(yuugi, "Anyway, work is why you wanted to meet, right?");
 
-    think("Hoshiguma prefers people to be direct. But let's start with flattery.");
+    zthink(pleasant, "Hoshiguma prefers people to be direct. But let's start with flattery.");
 
     say(zanmu, "Sure, but we can shoot the breeze first. I'm in no hurry.");
 
@@ -190,7 +190,7 @@ SCENE_RUN(LobbyingYuugi)
             opinion -= 1;
             say(yuugi, "Of course I wouldn't, give me a break!");
 
-            think("Oops. I need to remember not to pressure her.");
+            zthink(pained, "Oops. I need to remember not to pressure her.");
             break;
         }
         case 1:
@@ -199,7 +199,7 @@ SCENE_RUN(LobbyingYuugi)
             say(yuugi, "What the hell? That better be a joke. I've done a far sight more than you!");
 
             say(zanmu, "I... uh, yeah, a bad joke. Hahaha!");
-            think("I can't afford to insult her again.");
+            zthink(unamused_sweat, "I can't afford to insult her again.");
             break;
         }
         case 2:
@@ -296,7 +296,7 @@ SCENE_RUN(LobbyingYuugi)
         say(yuugi, "Thanks for the chat, though, I'd genuinely like that again.");
 
         say(zanmu, "Mhm. Alright then.");
-        think("Frustrating. I'll have to make do with the allies I have.");
+        zthink(unamused_sweat, "Frustrating. I'll have to make do with the allies I have.");
     }
 
     script.SetNextScene(Scenes::VotingForAnimalRights);
@@ -331,7 +331,7 @@ SCENE_RUN(VotingForAnimalRights)
     }
     else
     {
-        think("I see Hoshiguma's staying quiet.");
+        zthink(unamused_sweat, "I see Hoshiguma's staying quiet.");
     }
 
     desc("From now on, your influence is carried over between votes. Spend it wisely!");
@@ -404,8 +404,8 @@ SCENE_RUN(SuikaApproaches)
 
     desc("Your study feels sterile, yet stale, at the same time.");
 
-    think("With that out the way, I need to work on the next step.");
-    think("I'll speak to Hisami about it tomorrow-");
+    zthink(neutral, "With that out the way, I need to work on the next step.");
+    zthink(neutral, "I'll speak to Hisami about it tomorrow-");
 
     desc("An oni with towering horns firmly pushes aside the shoji door.");
 
@@ -422,8 +422,8 @@ SCENE_RUN(SuikaApproaches)
     say(suika, "I was puzzling over your recent proposals in the Council meetings. I reckon you're up to something.");
     say(suika, "You don't *have* to tell me, but we're friends, right? Maybe I'll even support you.");
 
-    think("Suika always hides her true intentions under that playful mask.");
-    think("I need to think over carefully if she can be trusted.");
+    zthink(neutral, "Suika always hides her true intentions under that playful mask.");
+    zthink(neutral, "I need to think over carefully if she can be trusted.");
 
     say(zanmu, "Straight to the point, huh?");
 
@@ -444,7 +444,7 @@ SCENE_RUN(SuikaApproaches)
             say(suika, "Ehhhh...");
             say(suika, "Fine! But if I find out you just lied, I don't care what it is. I'll fight you down.");
 
-            think("Oh dear. Suika has considerable rapport with the other kishin. Votes might be harder to secure...");
+            zthink(unamused_sweat, "Oh dear. Suika has considerable rapport with the other kishin. Votes might be harder to secure...");
 
             script.SetNextScene(Scenes::DelegatingToHisami);
             end;
@@ -461,7 +461,7 @@ SCENE_RUN(SuikaApproaches)
     say(suika, "...Huh?");
     say(suika, "What do you mean you're going to take over?");
 
-    think("Ack. Suika's horrified. I need to "); // TODO
+    zthink(pained, "Ack. Suika's horrified. I need to "); // TODO
     
     {
         // TODO
@@ -488,7 +488,7 @@ SCENE_RUN(SuikaApproaches)
             say(suika, "I need to warn the oni!");
             hide();
 
-            think("Hm. It's within tolerance, but I won't deny she's going to make things harder.");
+            zthink(unamused_sweat, "Hm. It's within tolerance, but I won't deny she's going to make things harder.");
             end;
         }
         }
@@ -703,14 +703,11 @@ SCENE_RUN(EngagingYuuma)
 
     zsay(smirk, "It's Nippaku.");
 
-    bool const punishmentVotePassed = io_game.ReadVar<Variables::PunishmentVotePasses>();
-    bool const priceIncreaseVoteFailed = io_game.ReadVar<Variables::PriceIncreaseVoteFails>();
-
     show(yuuma, neutral);
     say_hidden(yuuma, "Nippaku...");
 
     u8 flattery = 0;
-    if (punishmentVotePassed)
+    if (io_game.ReadVar<Variables::PunishmentVotePasses>())
     {
         ++flattery;
         show(yuuma, pleased);
@@ -739,7 +736,7 @@ SCENE_RUN(EngagingYuuma)
             {
                 ++flattery;
                 say_hidden(yuuma, "They are. And you're different?");
-                say(zanmu, "I see things how they really are.");
+                zsay(gloat, "I see things how they really are.");
                 say_hidden(yuuma, "Hehe. Alright then.");
                 break;
             }
@@ -751,11 +748,11 @@ SCENE_RUN(EngagingYuuma)
 
     zsay(neutral, "I wanted to see who was acting as a leader to the eagle spirits. I'm keen to see them prosper.");
 
-    think("A taotie is their leader? She might turn out to be a loose cannon. Still, I need to get on her good side...");
-    
+    zthink(pained, "A taotie is their leader? She might turn out to be a loose cannon. Still, I need to get on her good side...");
+
     // TODO: a bit more chatter to get to know Yuuma?
-    
-    think("What I say next will be very important.");
+
+    zthink(neutral, "What I say next will be very important.");
 
     bool freeAnimalRealm = false;
     {
@@ -771,31 +768,32 @@ SCENE_RUN(EngagingYuuma)
     {
         // freeAnimalRealm
 
-        say(zanmu, "There's a bigger picture than the oni can see as they squabble over tiny details. The current system isn't working.");
-        say(zanmu, "That's especially true here! The enslaved animal spirits are supposed to be the backbone of Hell's economy, but with so little freedom, they barely do any work. They have no loyalty or morale.");
+        zsay(neutral, "There's a bigger picture than the oni can see as they squabble over tiny details. The current system isn't working.");
+        zsay(smirk, "That's especially true here! The enslaved animal spirits are supposed to be the backbone of Hell's economy, but with so little freedom, they barely do any work. They have no loyalty or morale.");
 
         say(yuuma, "You don't sound so different from the other oni if all you care about is the economy?");
 
-        think("Hmm... she's not throwing me any bones.");
+        zthink(unamused, "Hmm... she's not throwing me any bones.");
 
-        say(zanmu, "Actually... I see the problem is the oni's involvement in the economy in the first place.");
-        say(zanmu, "They plan everything out, because they can't let go of even the smallest drop of their power.");
-        say(zanmu, "That's what makes them miss all the opportunities that only individuals can pursue.");
+        zsay(neutral, "Actually... I see the problem is the oni's involvement in the economy in the first place.");
+        zsay(neutral, "They plan everything out, because they can't let go of even the smallest drop of their power.");
+        zsay(neutral, "That's what makes them miss all the opportunities that only individuals can pursue.");
 
         say(yuuma, "Hah! That is more my language. What do you see as the alternative?");
 
-        say(zanmu, "The Animal Realm understands the only rule that truly matters: 'the strong eat the weak'. I see no reason not to simply put that into practice. Set the whole Realm free, no hierarchy, no slavery from above. Let beasts rule themselves.");
+        zsay(smirk, "The Animal Realm understands the only rule that truly matters: 'the strong eat the weak'. I see no reason not to simply put that into practice.");
+        zsay(gloat, "Set the whole Realm free, no hierarchy, no slavery from above. Let beasts and animals rule themselves.");
 
         say(yuuma, "The eagle spirits follow my words because they've seen my strength. The rule is as you say...");
         say(yuuma, "But tell me how you're going to convince the oni to give up their grip?");
 
-        say(zanmu, "Well, that's what I need to ask of you. I'm aware of your ambitions to carve your own territory. That's an essential bargaining chip.");
-        say(zanmu, "They will vote for my plans believing it will prevent your uprising, and in doing so I will deliver the free Animal Realm regardless.");
+        zsay(neutral, "Well, that's what I need to ask of you. I'm aware of your ambitions to take your own territory. That's an essential bargaining chip.");
+        zsay(smirk, "They will vote for my plans believing it will prevent your uprising, and in doing so I will deliver the free Animal Realm regardless.");
 
         say(yuuma, "Hahahah!");
         say(yuuma, "I don't trust you one bit!");
 
-        if (priceIncreaseVoteFailed)
+        if (io_game.ReadVar<Variables::PriceIncreaseVoteFails>())
         {
             ++flattery;
         }
@@ -808,7 +806,7 @@ SCENE_RUN(EngagingYuuma)
         show(yuuma, pleased);
         say(yuuma, "Even if you don't deceive, there's no way you'd get that sort of power. Why wouldn't I just take control myself anyway, if a few eagles and a spork is all it takes!");
 
-        think("Damn! She's feeling threatened. I'll need to make her feel in control.");
+        zthink(unamused_sweat, "Damn! She's feeling threatened. I'll need to make her feel in control.");
 
         bool failedBothFlattery = true;
         // Flattery 1
@@ -824,21 +822,21 @@ SCENE_RUN(EngagingYuuma)
             case 1:
             {
                 failedBothFlattery = false;
-                say(zanmu, "You could carve out your own niche of the Animal Realm, give it a name, and rule it as you like.");
-                say(zanmu, "But that's where it would end, there would be no more chances for more territory. The rest of Hell would resist fiercely and fight for it back.");
+                zsay(smirk, "You could carve out your own niche of the Animal Realm, give it a name, and rule it as you like.");
+                zsay(gloat, "But that's where it would end, there would be no more chances for more territory. The rest of Hell would resist fiercely and fight for it back.");
 
                 say(yuuma, "Hmph. Maybe so. Defending it for eternity sounds exhausting.");
 
-                think("Good, she liked that.");
+                zthink(smirk, "Good, she liked that.");
                 break;
             }
             default:
             {
-                say(zanmu, "You'd be crushed if you tried. Only my plan will work.");
+                zsay(smirk, "You'd be crushed if you tried. Only my plan will work.");
 
                 say(yuuma, "Why do you think calling me stupid would get you anywhere?");
 
-                think("Argh, she's more annoyed now.");
+                zthink(unamused_sweat, "Argh, she's more annoyed now.");
                 break;
             }
             }
@@ -847,7 +845,7 @@ SCENE_RUN(EngagingYuuma)
         // Flattery 2
         if (flattery > 0)
         {
-            think("Now to land the finishing blow.");
+            zthink(smirk, "Now to land the finishing blow.");
 
             // TODO
             choice(
@@ -886,11 +884,11 @@ SCENE_RUN(EngagingYuuma)
         {
             say(yuuma, "Look. If you want to help the Animal Realm then do as you please. But I'm handling things my own way.");
 
-            say(zanmu, "Hm. If you insist.");
+            zsay(unamused_sweat, "Hm. If you insist.");
 
             hide();
 
-            think("That was disappointing. Without her backing, I'll need to be on top of my game.");
+            zthink(neutral, "That was disappointing. Without her backing, I'll need to be on top of my game.");
         }
 
         // freeAnimalRealm
