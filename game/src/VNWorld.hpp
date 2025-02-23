@@ -81,7 +81,8 @@ public:
 	void StopMusic(u16 i_fadeOutFrames);
 
 	void SetBG(Game& io_game, Image const& i_bg);
-	void BlackBG(Game& io_game);
+	void BlackBG(Game& io_game, bool i_fast);
+	void WhiteBG(Game& io_game, bool i_fast);
 
 	void SetCharacterVisual(Game& io_game, Pose const& i_pose);
 	void HideCharacterVisual(Game& io_game, bool i_fast);

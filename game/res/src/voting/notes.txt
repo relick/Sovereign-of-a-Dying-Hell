@@ -1,0 +1,37 @@
+Passed:
+Vote 1, 12
+Passed 18, 12
+
+Failed:
+Vote 2, 12
+Failed 18, 12
+
+Nums will be 2 sprites, r4c3
+
+Cursor will be 1 sprite, r4c2
+It'll be able to be positioned just 8 pixels to the left of where it should be, and 8 pixels above the bar.
+
+Bar corners, amount of green on left:
+012
+3
+4
+5
+6
+7
+8/red 012, transitions to amount of red on left:
+3
+4
+5
+6
+7
+
+Bar middle, amount of green on left:
+0
+1
+2
+3
+4
+5
+6
+7
+8

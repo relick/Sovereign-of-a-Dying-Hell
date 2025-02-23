@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Declare.hpp"
+#include "GameRoutines.hpp"
+#include "Worlds.hpp"
 
 #include <vector>
 
@@ -16,6 +18,7 @@ enum class AttackPattern
 
 struct VoteModeParams
 {
+	char const* m_voteName{ nullptr };
 	f16 m_votingTime{};
 	u16 m_startingPlayerInfluence{};
 	u16 m_attackSize{};
@@ -39,6 +42,7 @@ class VoteMode
 {
 	Game* m_game{};
 	FontData const* m_fontData{};
+	VNWorld* m_vnWorld{};
 
 	// Initial data
 	VoteModeParams m_params;
@@ -50,18 +54,38 @@ class VoteMode
 	
 	u16 m_framesLeft{};
 	u16 m_remainingInfluence{};
-	bool m_playerWon{ false };
+	bool m_voteWon{ false };
 
 	std::vector<AttackEvent> m_attackEvents;
 	bool m_ABCpressed{ false };
 
 	// Graphic data
-	
+	bool m_graphicsReady{ false };
+	bool m_graphicsDone{ false }; // set to true when post-vote animation finishes
+
+	std::array<SpriteID, 2> m_num{};
+	SpriteID m_cursor{};
+
+	std::array<u16, 11> m_num_tileIndex{};
+	u16 m_barCorners_tileIndex{};
+	u16 m_barMids_tileIndex{};
+	u16 m_cursor_tileIndex{};
+	u16 m_passed_vote_tileIndex{};
+	u16 m_passed_passed_tileIndex{};
+	u16 m_failed_vote_tileIndex{};
+	u16 m_failed_failed_tileIndex{};
+
+	// 2 rows of 32 tiles
+	std::array<u16, 64> m_barTileMap{};
+	Task m_updateBarTileMap;
+
+	u16 m_endTimer{};
 
 public:
-	VoteMode(Game& io_game, FontData const& i_fontData)
-		: m_game{ &io_game }, m_fontData{ &i_fontData }
+	VoteMode(Game& io_game, FontData const& i_fontData, VNWorld& io_vnWorld)
+		: m_game{ &io_game }, m_fontData{ &i_fontData }, m_vnWorld{ &io_vnWorld }
 	{}
+	~VoteMode();
 
 	// The idea will be, for the duration of i_votingTime,
 	// the player can mash buttons, which spends their influence, to move the bar to the right.
@@ -75,11 +99,19 @@ public:
 	// Check VotingDone() to know when everything's done and results can be extracted.
 	void Update();
 
-	bool VotingDone() const { return m_votingComplete; }
-	VoteResult VotingResult() const { return { m_playerWon, m_remainingInfluence, }; }
+	bool VotingDone() const { return m_votingComplete && m_graphicsDone; }
+	VoteResult VotingResult() const { return { m_voteWon == !m_params.m_playerWantsToLose, m_remainingInfluence, }; }
 
 private:
 	void GenerateAttackEvents();
+	std::pair<u16, u16> FindNumTileIndicesForFrameTimer() const;
+	void SetupGraphics();
+	void UpdateGraphics();
+	Task UpdateBarTileMap(bool i_runOnce);
+	u16 GetBarCornerAttr(bool i_hflip) const;
+	u16 GetBarMidAttr(u16 i_tileI) const;
+	void SetupEndGraphics();
+	Task UpdateEndGraphics();
 };
 
 }

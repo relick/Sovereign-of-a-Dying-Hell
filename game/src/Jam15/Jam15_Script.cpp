@@ -77,6 +77,7 @@ void Script::UpdateTitle
 			m_hasLoadedData = false;
 		}
 
+		io_game.Sprites().RemoveSprite(m_arrowSpr);
 		io_title.GoToVNWorld(io_game);
 		return;
 	}
@@ -168,7 +169,7 @@ void Script::UpdateVN
 		// Tidy up visuals
 		io_vn.HideCharacterVisual(io_game, false);
 		io_vn.ClearMode(io_game);
-		io_vn.BlackBG(io_game);
+		io_vn.BlackBG(io_game, true);
 
 		m_currentScene = CreateScene(*m_nextScene);
 		m_nextScene = std::nullopt;

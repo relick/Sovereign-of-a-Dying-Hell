@@ -429,24 +429,76 @@ void VNWorld::SetBG
 //------------------------------------------------------------------------------
 void VNWorld::BlackBG
 (
-	Game& io_game
+	Game& io_game,
+	bool i_fast
 )
 {
-	io_game.QueueLambdaTask([this] -> Task {
-		Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), palette_black, FramesPerSecond() >> 2);
-		Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), palette_black, FramesPerSecond() >> 2);
-		Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), palette_black, FramesPerSecond() >> 2);
+	if (i_fast)
+	{
+		std::copy(palette_black, palette_black + 16, m_mainPals.begin());
+		std::copy(palette_black, palette_black + 16, m_namePals.begin());
+		std::copy(palette_black, palette_black + 16, m_textPals.begin());
+	}
+	else
+	{
+		io_game.QueueLambdaTask([this] -> Task {
+			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), palette_black, FramesPerSecond() >> 2);
+			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), palette_black, FramesPerSecond() >> 2);
+			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), palette_black, FramesPerSecond() >> 2);
 
-		while (fadeOp1)
-		{
-			fadeOp1.DoFadeStep();
-			fadeOp2.DoFadeStep();
-			fadeOp3.DoFadeStep();
-			co_yield{};
-		}
+			while (fadeOp1)
+			{
+				fadeOp1.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
 
-		co_return;
-	});
+			co_return;
+		});
+	}
+}
+
+consteval auto FillPaletteWhite()
+{
+	std::array<u16, 16> ret;
+	ret.fill(RGB3_3_3_TO_VDPCOLOR(7, 7, 7));
+	return ret;
+}
+
+inline constexpr std::array<u16, 16> c_palette_white = FillPaletteWhite();
+
+//------------------------------------------------------------------------------
+void VNWorld::WhiteBG
+(
+	Game& io_game,
+	bool i_fast
+)
+{
+	if (i_fast)
+	{
+		std::copy(c_palette_white.begin(), c_palette_white.end(), m_mainPals.begin());
+		std::copy(c_palette_white.begin(), c_palette_white.end(), m_namePals.begin());
+		std::copy(c_palette_white.begin(), c_palette_white.end(), m_textPals.begin());
+	}
+	else
+	{
+		io_game.QueueLambdaTask([this] -> Task {
+			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), c_palette_white.data(), FramesPerSecond() >> 2);
+			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), c_palette_white.data(), FramesPerSecond() >> 2);
+			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), c_palette_white.data(), FramesPerSecond() >> 2);
+
+			while (fadeOp1)
+			{
+				fadeOp1.DoFadeStep();
+				fadeOp2.DoFadeStep();
+				fadeOp3.DoFadeStep();
+				co_yield{};
+			}
+
+			co_return;
+			});
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -842,7 +894,7 @@ void VNWorld::TransitionTo
 		});
 		WaitForTasks(io_game);
 
-		m_sceneMode.emplace<static_cast<u8>(SceneMode::Voting)>(io_game, m_fonts);
+		m_sceneMode.emplace<static_cast<u8>(SceneMode::Voting)>(io_game, m_fonts, *this);
 		m_progressMode = ProgressMode::Scene;
 		break;
 	}

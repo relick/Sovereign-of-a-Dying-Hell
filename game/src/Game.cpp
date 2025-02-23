@@ -301,6 +301,8 @@ void Game::PostWorldFrame()
 
 	if (!m_tasks.empty())
 	{
+		// TODO: running only one task a frame can be problematic if we e.g. update sprites every frame
+		// The memory just fills up because it never gets through it
 		m_tasks.front().m_routine();
 	}
 
