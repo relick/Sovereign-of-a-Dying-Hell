@@ -6,7 +6,7 @@
     <title></title>
     <style type="text/css">
         * {margin: 0;padding: 0}
-        body {display: flex;align-items:center;justify-content:center;}
+        body {background-color: black; display: flex;align-items:center;justify-content:center;height:100vh;}
         div[data-timer], div[data-timer2] {display: none !important}
     </style>
 </head>
@@ -55,16 +55,19 @@
             //shader: "crt/crt-mattias",
             //shader: "crt/fakelottes-geom",
             //shader: "crt/fakelottes",
+            //shader: "crt/crt-easymode",
             //shader: "vhs/mudlord-pal-vhs",
             retroarchConfig: {
                 aspect_ratio_index: 21, // Force 1:1 PAR
                 video_crop_overscan: true,
                 video_scale_integer: true,
-                input_player1_a: 'c', // MD C button
+                input_player1_a: 'space', // MD C button
                 input_player1_b: 'x', // MD B button
                 input_player1_y: 'z', // MD A button
             },
-            size: {width: 320 * 3, height: 224 * 3, },
+            respondToGlobalEvents: false,
+            style: { 'position': 'relative', 'outline': 'none', },
+            //size: {width: 320 * 3, height: 224 * 3, },
         })
     }
     else
@@ -76,11 +79,13 @@
                 aspect_ratio_index: 21, // Force 1:1 PAR
                 video_crop_overscan: true,
                 video_scale_integer: true,
-                input_player1_a: 'c', // MD C button
+                input_player1_a: 'space', // MD C button
                 input_player1_b: 'x', // MD B button
                 input_player1_y: 'z', // MD A button
             },
-            size: {width: 320 * 3, height: 224 * 3, },
+            respondToGlobalEvents: false,
+            style: { 'position': 'relative', 'outline': 'none', },
+            //size: {width: 320 * 3, height: 224 * 3, },
         })
     }
 
