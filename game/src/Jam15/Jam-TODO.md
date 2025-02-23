@@ -1,7 +1,7 @@
 Jam-TODO:
 
 # Script
-1. Finish Hisami scenes
+1. ~~Finish Hisami scenes~~
 2. Council scenes
 3. Finish Yuuma scenes
 4. Finish Suika scenes
@@ -28,6 +28,7 @@ Jam-TODO:
 - Show the influence that might be gained when making a choice
 - ~~Snap transition to black at the end of a scene~~, and titles for each scene fading/sliding in/fading out before the overall fade in
 - ~~Different font for desc~~
+- Bouncing, up arrow with 'WIN' text beneath, at the midpoint of the vote bar
 
 # Sound
 - Different clicks per character
