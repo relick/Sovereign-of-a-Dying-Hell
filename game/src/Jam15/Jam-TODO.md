@@ -2,7 +2,7 @@ Jam-TODO:
 
 # Script
 1. ~~Finish Hisami scenes~~
-2. Council scenes
+2. ~~Council scenes~~
 3. Finish Yuuma scenes
 4. Finish Suika scenes
 4a. Shadowy Kishin?

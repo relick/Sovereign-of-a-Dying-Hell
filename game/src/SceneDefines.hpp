@@ -37,7 +37,8 @@
 #define timed_choice(TIME_IN_SECONDS, CHOICE_SPAN) io_vn.TimedChoice(io_game, CHOICE_SPAN, FIX16(TIME_IN_SECONDS)); wait
 #define get_timed_choice_result() io_vn.GetChoiceResult()
 
-#define start_vote(VOTE_PARAMS) io_vn.StartVote(io_game, VOTE_PARAMS); wait
+// Use HideCharacterVisual to quickly put away the VOTE X'D graphic
+#define start_vote(VOTE_PARAMS) io_vn.StartVote(io_game, VOTE_PARAMS); wait; io_vn.HideCharacterVisual(io_game, false)
 #define get_vote_result() io_vn.GetVoteResult()
 
 // TODO

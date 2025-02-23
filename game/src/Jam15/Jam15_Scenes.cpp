@@ -67,14 +67,14 @@ SCENE_RUN(FirstVoteProposal)
     desc("Spend influence by mashing A/B/C on the gamepad!");
 #endif
 
-    io_game.SetVar<Variables::Influence>(0);
+    set_influence(0);
 
     // It's impossible to win this
     Game::VoteModeParams const vote = {
         .m_voteName = "Use the earth spirits to maintain the torture chambers",
         .m_votingTime = FIX16(7),
-        .m_startingPlayerInfluence = 128, // Fixed influence to start with
-        .m_attackSize = 256,
+        .m_startingPlayerInfluence = 64, // Fixed influence to start with
+        .m_attackSize = 128, // More attack than influence + enough to win
         .m_attackPattern = Game::AttackPattern::FastBitty,
         .m_playerWantsToLose = false,
     };
@@ -320,14 +320,14 @@ SCENE_RUN(VotingForAnimalRights)
 
     say(speaker, "An interesting proposal. Any opinions?");
 
-    // Start on 500 or 750 now
-    set_influence(512);
+    // Start on 100 or 150 now
+    set_influence(128);
 
     if (io_game.ReadVar<Variables::HasYuugiInfluence>())
     {
         show(yuugi, angry);
         say(yuugi, "We gotta do this! The animal spirits need some relief!");
-        add_influence(256);
+        add_influence(64);
     }
     else
     {
@@ -335,12 +335,12 @@ SCENE_RUN(VotingForAnimalRights)
     }
 
     desc("From now on, your influence is carried over between votes. Spend it wisely!");
-
+    desc("The vote is about to start.");
     Game::VoteModeParams const vote = {
         .m_voteName = "End solitary punishment, and feed the animals",
         .m_votingTime = FIX16(7),
         .m_startingPlayerInfluence = get_influence(),
-        .m_attackSize = 256,
+        .m_attackSize = 64,
         .m_attackPattern = Game::AttackPattern::SlowChunky,
         .m_playerWantsToLose = false,
     };
@@ -356,7 +356,7 @@ SCENE_RUN(VotingForAnimalRights)
 
         zthink(pleasant, "That went perfectly!");
         desc("Winning the vote has secured you further influence with the Council");
-        add_influence(512);
+        add_influence(128);
 
         show(zanmu, neutral);
         say(zanmu, "Wonderful!");
@@ -608,26 +608,28 @@ SCENE_RUN(VotingForPriceIncreases)
     if (io_game.ReadVar<Variables::SpreadSeedsOfDoubt>())
     {
         desc("Hisami's work has granted you extra influence for this vote.");
-        initialInfluence += 256;
+        initialInfluence += 64;
     }
-    u16 attackSize = 512;
+    u16 attackSize = 128;
     if (io_game.ReadVar<Variables::LobbiedTheYama>())
     {
         desc("Word of the Yama's support has reached the oni, they will be harder to dissuade.");
-        attackSize += 256;
+        attackSize += 64;
     }
+    desc("The vote is about to start.");
     Game::VoteModeParams const vote = {
         .m_voteName = "Increase cost of crossing the Sanzu by 10%",
         .m_votingTime = FIX16(10),
         .m_startingPlayerInfluence = initialInfluence,
         .m_attackSize = attackSize,
-        .m_attackPattern = Game::AttackPattern::Variable,
+        .m_attackPattern = Game::AttackPattern::FastBitty,
         .m_playerWantsToLose = true,
     };
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
 
-    set_influence(result.m_remainingInfluence);
+    // Min to account for the single vote bonus
+    set_influence(std::min<u16>(get_influence(), result.m_remainingInfluence));
     io_game.SetVar<Variables::PriceIncreaseVoteFails>(result.m_playerWon);
 
     if (io_game.ReadVar<Variables::PriceIncreaseVoteFails>())
@@ -636,11 +638,11 @@ SCENE_RUN(VotingForPriceIncreases)
 
         zthink(pleasant, "Oh, I think it went swimmingly!");
         desc("Losing the vote has secured you great influence with the Council");
-        add_influence(512);
+        add_influence(128);
         if (io_game.ReadVar<Variables::LobbiedTheYama>())
         {
             desc("Losing it despite the Yama's support has earned even more influence.");
-            add_influence(512);
+            add_influence(128);
         }
 
         show(zanmu, neutral);
@@ -933,12 +935,13 @@ SCENE_RUN(VotingForExecutive)
     say(speaker, "...QUIET!");
     say(speaker, "Nippaku, your proposal is acknowledged. We'll hold a vote now, to put the matter to rest. Hopefully a *productive* meeting can follow.");
 
+    desc("The vote is about to start.");
     // This vote is nearly impossible to win, requiring all influence across the game and good mashing
     Game::VoteModeParams const vote = {
-        .m_voteName = "Create a singular ruler of Hell",
-        .m_votingTime = FIX16(10),
+        .m_voteName = "Create a ruler of Hell",
+        .m_votingTime = FIX16(8),
         .m_startingPlayerInfluence = get_influence(),
-        .m_attackSize = 1408, // Possible influence until now totals 1536 (if shadowy kishin scene exists TODO)
+        .m_attackSize = 300, // Possible influence until now totals 316
         .m_attackPattern = Game::AttackPattern::Variable,
         .m_playerWantsToLose = false,
     };
@@ -1116,14 +1119,30 @@ SCENE_RUN(VotingToRelocateHell)
     scene(kishin_council);
     wait_for_tasks();
 
-    // TODO
+    show(zanmu, neutral);
+    say(zanmu, "Council, I said I had a fresh idea. I'll keep it short. We should move out of this Hell and start a new one.");
+    say(zanmu, "Most of the problems we face are from overpopulation, overdevelopment, overspending. This would be a chance to solve all of these in one go.");
+    zthink(gloat, "It'd also solve this good for nothing Council.");
+    say(zanmu, "The vast nothingness of the underworld is ripe for use. The logistics make sense.");
 
+    say(acouncil, "Well... compared to yesterday's absurdity, this isn't such a bad idea.");
+    say(bcouncil, "I'd need time to think about it.");
+    say(ccouncil, "Why do you need time? It's clearly nonsense. Again.");
+    say(dcouncil, "Chair, can't we decide quickly with a vote again?");
+    say(bcouncil, "I wish us oni would just fight to decide things rather than all this talking.");
+    say(ccouncil, "Are we really willing to leave everything behind, just like that?");
+
+    // TODO does yuugi speak up?
+
+    say(speaker, "Our rule is to debate and vote on all proposals. Let this one be healthy.");
+
+    desc("The vote is about to start.");
     {
         Game::VoteModeParams const vote = {
             .m_voteName = "Relocate Hell",
             .m_votingTime = FIX16(8),
             .m_startingPlayerInfluence = get_influence(),
-            .m_attackSize = 1024, // Not impossible, but it can be fine if they lose this
+            .m_attackSize = 256, // Not impossible, but it can be fine if they lose this
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
         };
@@ -1137,7 +1156,7 @@ SCENE_RUN(VotingToRelocateHell)
         }
     }
 
-    if (io_game.ReadVar<Variables::YuumaPromised>())
+    if (!io_game.ReadVar<Variables::YuumaPromised>())
     {
         zthink(gloat, "I still have cards to play. I'm not giving up now!");
 
@@ -1150,7 +1169,7 @@ SCENE_RUN(VotingToRelocateHell)
 
         say(zanmu, "I don't think so. A taotie in the animal realm is about to launch a rebellion.");
 
-        say(acouncil, "A *rebellion*? With what army?");
+        say(ccouncil, "A *rebellion*? With what army?");
         say(bcouncil, "And what's the relevance?");
 
         zthink(gloat, "No point hiding anything now.");
@@ -1158,12 +1177,10 @@ SCENE_RUN(VotingToRelocateHell)
         say(zanmu, "The eagle spirits, they've secretly banded together, and they follow the taotie.");
         say(zanmu, "I've organised with them that we'll move to a new Hell by force if necessary!");
         say(zanmu, "Utter chaos will be unleashed, and anyone who does not come willingly will face a grim fate in the new Hell!");
-        say(zanmu, "So let me say again, let's hold a revote. Make this happen the orderly way.");
+        say(zanmu, "So, let's hold a revote. Make this happen the orderly way.");
 
         show(yuugi, angry);
         say(yuugi, "Nippaku! I can't stand for this, no matter what threats you have!");
-
-
 
         if (io_game.ReadVar<Variables::SuikaDissuaded>())
         {
@@ -1180,15 +1197,15 @@ SCENE_RUN(VotingToRelocateHell)
         }
         hide();
 
-        say(speaker, "... We'll have to hold the vote again.");
+        say(speaker, "... We'll have to hold the vote again, if those are the stakes.");
 
         desc("This is the final vote. Laying your cards out bare has refreshed your influence.");
 
         Game::VoteModeParams const vote2 = {
             .m_voteName = "Relocate Hell",
-            .m_votingTime = FIX16(6),
+            .m_votingTime = FIX16(5),
             .m_startingPlayerInfluence = get_influence(),
-            .m_attackSize = 512,
+            .m_attackSize = 128,
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
         };

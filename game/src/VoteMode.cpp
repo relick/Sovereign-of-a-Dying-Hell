@@ -13,7 +13,7 @@
 namespace Game
 {
 
-inline constexpr u16 c_influencePerMash = 2;
+inline constexpr u16 c_influencePerMash = 4;
 inline constexpr s16 c_maxVote = 128;
 inline constexpr s16 c_minVote = -128;
 
@@ -123,21 +123,6 @@ void VoteMode::Update
 		m_remainingInfluence -= c_influencePerMash;
 	}
 
-	if (m_votePosition >= c_maxVote)
-	{
-		m_votingComplete = true;
-		m_voteWon = true;
-		SetupEndGraphics();
-		return;
-	}
-	else if (m_votePosition <= c_minVote)
-	{
-		m_votingComplete = true;
-		m_voteWon = false;
-		SetupEndGraphics();
-		return;
-	}
-
 	if (!m_attackEvents.empty())
 	{
 		if (m_attackEvents.back().m_frame >= m_framesLeft)
@@ -145,6 +130,23 @@ void VoteMode::Update
 			m_votePosition -= static_cast<s16>(m_attackEvents.back().m_size);
 			m_attackEvents.pop_back();
 		}
+	}
+
+	if (m_votePosition >= c_maxVote)
+	{
+		m_votePosition = c_maxVote;
+		m_votingComplete = true;
+		m_voteWon = true;
+		SetupEndGraphics();
+		return;
+	}
+	else if (m_votePosition <= c_minVote)
+	{
+		m_votePosition = c_minVote;
+		m_votingComplete = true;
+		m_voteWon = false;
+		SetupEndGraphics();
+		return;
 	}
 	
 	if (m_framesLeft > 0)
@@ -238,8 +240,8 @@ void VoteMode::GenerateAttackEvents
 	}
 	case AttackPattern::Variable:
 	{
-		constexpr u16 c_attackSize = 20;
-		constexpr f16 c_attackSizeVariation = FIX16(20);
+		constexpr u16 c_attackSize = 15;
+		constexpr f16 c_attackSizeVariation = FIX16(10);
 		constexpr f16 c_attackFramesVariation = FIX16(60);
 		fnGenerateAttacksWithParams(c_attackSize, c_attackSizeVariation, c_attackFramesVariation);
 		break;
