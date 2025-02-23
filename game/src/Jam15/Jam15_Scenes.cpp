@@ -461,7 +461,7 @@ SCENE_RUN(SuikaApproaches)
     say(suika, "...Huh?");
     say(suika, "What do you mean you're going to take over?");
 
-    think("Ack. Suika's horrified. I need to ");
+    think("Ack. Suika's horrified. I need to "); // TODO
     
     {
         // TODO
