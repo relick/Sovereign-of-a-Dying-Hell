@@ -224,7 +224,7 @@ void DialoguePrinter2::SetName
 	{
 		return;
 	}
-
+	u8 const oldNameLen = m_curName ? static_cast<u8>(std::min<u16>(13, std::strlen(m_curName))) : 0;
 	m_curName = i_name;
 
 	// Clear current name
@@ -268,7 +268,7 @@ void DialoguePrinter2::SetName
 	}
 
 	// Update sprite positions if side has changed
-	if (m_spritesInitialised && m_nameOnLeft != i_left)
+	if (m_spritesInitialised && (m_nameOnLeft != i_left || oldNameLen != nameLen))
 	{
 		for (u16 i = 0; i < m_nameSprites.size(); ++i)
 		{
