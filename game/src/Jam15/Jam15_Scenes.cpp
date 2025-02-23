@@ -18,6 +18,8 @@
 #define zsay(FACE, TEXT) say_face(zanmu, FACE, TEXT)
 #define zthink(FACE, TEXT) think_face(zanmu, FACE, TEXT)
 
+#define TEST_SKIP_TO_VOTE 0
+
 namespace Jam15
 {
 
@@ -29,6 +31,7 @@ SCENE_RUN(FirstVoteProposal)
     //play_music(faron, 0.0, true);
     wait_for_tasks();
 
+#if !TEST_SKIP_TO_VOTE
     desc("The musky chamber is packed with oni, of low and high rank alike.");
     desc("Those of the highest rank sit in the centre, in irreverent, informal seiza.");
     desc("The oni make up the Council, and the kishin lead its ferocious debates.");
@@ -58,6 +61,7 @@ SCENE_RUN(FirstVoteProposal)
     play_sfx(gavel);
     say(speaker, "That's enough back and forth. Let's not waste time.");
     say(speaker, "Council, declare your votes!");
+#endif
 
     desc("You're about to start a vote.");
     desc("During votes, you will have a limited time to spend gathered influence to counteract the onslaught of debate from the opposing side.");
@@ -66,7 +70,6 @@ SCENE_RUN(FirstVoteProposal)
 #else
     desc("Spend influence by mashing A/B/C on the gamepad!");
 #endif
-
     set_influence(0);
 
     // It's impossible to win this
@@ -812,7 +815,7 @@ SCENE_RUN(EngagingYuuma)
         // Flattery 1
         {
             choice(
-                "\"The oni aren't weak. An uprising alone isn't enough.\"",
+                "\"The oni aren't weak. You'd be crushed.\"",
                 "\"It's true, an uprising could work.\"",
                 "\"This is the only way with long term success.\"",
             );
@@ -1140,7 +1143,7 @@ SCENE_RUN(VotingToRelocateHell)
             .m_voteName = "Relocate Hell",
             .m_votingTime = FIX16(8),
             .m_startingPlayerInfluence = get_influence(),
-            .m_attackSize = 256, // Not impossible, but it can be fine if they lose this
+            .m_attackSize = 160, // Not impossible, but it can be fine if they lose this
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
         };
@@ -1154,7 +1157,7 @@ SCENE_RUN(VotingToRelocateHell)
         }
     }
 
-    if (!io_game.ReadVar<Variables::YuumaPromised>())
+    if (io_game.ReadVar<Variables::YuumaPromised>())
     {
         zthink(gloat, "I still have cards to play. I'm not giving up now!");
 
@@ -1203,7 +1206,7 @@ SCENE_RUN(VotingToRelocateHell)
             .m_voteName = "Relocate Hell",
             .m_votingTime = FIX16(5),
             .m_startingPlayerInfluence = get_influence(),
-            .m_attackSize = 128,
+            .m_attackSize = 80,
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
         };
