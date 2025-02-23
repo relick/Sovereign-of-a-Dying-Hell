@@ -70,7 +70,7 @@ void Script::UpdateTitle
 	static bool pressed = false;
 
 	u16 const buttons = JOY_readJoypad(JOY_1);
-	if ((buttons & BUTTON_A) != 0)
+	if ((buttons & (BUTTON_A | BUTTON_B | BUTTON_C)) != 0)
 	{
 		if (m_selection == 1)
 		{
