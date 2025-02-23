@@ -195,7 +195,7 @@ std::unique_ptr<Game::Scene> Script::CreateScene
 	case Scenes::SuikaApproaches: return std::make_unique<SuikaApproaches>();
 	case Scenes::DelegatingToHisami: return std::make_unique<DelegatingToHisami>();
 	case Scenes::VotingForPriceIncreases: return std::make_unique<VotingForPriceIncreases>();
-	case Scenes::MeetingTheShadowyKishin: return std::make_unique<MeetingTheShadowyKishin>();
+	//case Scenes::MeetingTheShadowyKishin: return std::make_unique<MeetingTheShadowyKishin>();
 	case Scenes::EngagingYuuma: return std::make_unique<EngagingYuuma>();
 	case Scenes::VotingForExecutive: return std::make_unique<VotingForExecutive>();
 	case Scenes::FinalHisami: return std::make_unique<FinalHisami>();

@@ -19,6 +19,9 @@ enum class Variables : u8
 	HasYuugiInfluence,
 	PunishmentVotePasses,
 	SuikaDissuaded,
+	LobbiedTheYama,
+	SpreadSeedsOfDoubt,
+	KishinAlliance,
 	PriceIncreaseVoteFails,
 
 	Count,
@@ -35,6 +38,9 @@ struct Game::VariablesTypeTuple<Jam15::Variables> {
 		bool, // HasYuugiInfluence
 		bool, // PunishmentVotePasses
 		bool, // SuikaDissuaded
+		bool, // LobbiedTheYama
+		bool, // SpreadSeedsOfDoubt
+		bool, // KishinAlliance
 		bool // PriceIncreaseVoteFails
 	>;
 };

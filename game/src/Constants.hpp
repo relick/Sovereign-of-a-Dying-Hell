@@ -2,6 +2,10 @@
 
 #include "Declare.hpp"
 
+#ifndef WEB_BUILD
+#define WEB_BUILD 0
+#endif
+
 // Sys constants
 inline constexpr u16 c_screenWidthTiles = 40;
 inline constexpr u16 c_screenHeightTiles = 28;

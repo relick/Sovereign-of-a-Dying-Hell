@@ -1,11 +1,11 @@
 Jam-TODO:
 
 # Script
-1. Council scenes
-2. Finish Hisami scenes
+1. Finish Hisami scenes
+2. Council scenes
 3. Finish Yuuma scenes
-3a. Shadowy Kishin?
 4. Finish Suika scenes
+4a. Shadowy Kishin?
 5. Finish Yuugi scenes
 6. Add descs for all scenes
 7. Go through script and set all the poses

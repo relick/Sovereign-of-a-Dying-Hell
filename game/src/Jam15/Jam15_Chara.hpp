@@ -85,12 +85,12 @@ inline constexpr Game::Pose c_hisami_double_pose = {
 
 inline constexpr Game::AnimFrames<7> c_hisami_flush = { {
 	{ &hisami_flush_1, Game::AnimFrameDuration::Fixed(5), c_hisami_offset, },
-	{ &hisami_flush_2, Game::AnimFrameDuration::Fixed(20), c_hisami_offset, },
+	{ &hisami_flush_2, Game::AnimFrameDuration::Variable(20, 40), c_hisami_offset, },
 	{ &hisami_flush_3, Game::AnimFrameDuration::Fixed(5), c_hisami_offset, },
 	{ &hisami_flush_4, Game::AnimFrameDuration::Fixed(4), c_hisami_offset, },
 	{ &hisami_flush_5, Game::AnimFrameDuration::Fixed(2), c_hisami_offset, },
 	{ &hisami_flush_6, Game::AnimFrameDuration::Fixed(4), c_hisami_offset, },
-	{ &hisami_flush_7, Game::AnimFrameDuration::Infinite(), c_hisami_offset, },
+	{ .m_tilemap = &hisami_flush_7, .m_duration = Game::AnimFrameDuration::Variable(20, 40), .m_xOffset = c_hisami_offset, .m_nextIndex = 4, },
 } };
 
 inline constexpr Game::Pose c_hisami_flush_pose = {

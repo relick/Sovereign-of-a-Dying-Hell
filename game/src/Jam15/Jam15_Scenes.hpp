@@ -14,7 +14,7 @@ enum class Scenes : u8
 	SuikaApproaches,
 	DelegatingToHisami,
 	VotingForPriceIncreases,
-	MeetingTheShadowyKishin,
+	//MeetingTheShadowyKishin,
 	EngagingYuuma,
 	VotingForExecutive,
 	FinalHisami,
@@ -40,7 +40,7 @@ SCENE(VotingForAnimalRights);
 SCENE(SuikaApproaches);
 SCENE(DelegatingToHisami);
 SCENE(VotingForPriceIncreases);
-SCENE(MeetingTheShadowyKishin);
+//SCENE(MeetingTheShadowyKishin);
 SCENE(EngagingYuuma);
 SCENE(VotingForExecutive);
 SCENE(FinalHisami);

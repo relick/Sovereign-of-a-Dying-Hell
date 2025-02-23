@@ -91,46 +91,46 @@ SCENE_RUN(HatchingThePlan)
     desc("Your study is cold and devoid of decoration.");
     desc("The tension makes it the perfect place to think.");
 
-    think("Tch. The oni are fickle, I'll just need to try again another time.");
-    think("This rate of change isn't fast enough, though. Hell's institutions are already faltering.");
-    think("Perhaps working within the Council isn't the play any more...");
+    zthink(unamused, "Tch. The oni are always so weak willed. I'll need to try again another time.");
+    zthink(unamused_sweat, "This rate of change isn't fast enough, though. Hell's institutions are already faltering.");
+    zthink(neutral, "Perhaps working within the Council isn't the play any more...");
 
     show(hisami, joy);
     say(hisami, "Lady Zanmu~~! I have news~! You're sure to like it~!");
-    say(zanmu, "...");
+    zsay(neutral, "...");
     say(hisami, "... ...");
-    say(zanmu, "... ... ...");
+    zsay(neutral, "... ... ...");
     show(hisami, neutral);
     say(hisami, "Lady Zanmu?");
     
-    say(zanmu, "Oh. Hisami, I didn't notice you.");
-    say(zanmu, "You've been away for quite a while. What requires my attention?");
+    zsay(neutral, "Oh. Hisami, I didn't notice you.");
+    zsay(neutral, "You've been away for quite a while. What requires my attention?");
     
     say(hisami, "... Lady Zanmu, I have news. I thought you may like to hear it.");
     say(hisami, "I was luring more spirits into the Animal Realm, and I handed them off to a surprisingly organised band of eagles who promised to take care of them.");
     say(hisami, "Given the animal spirits are enslaved with no time to help others, I couldn't help but find that odd!");
     say(hisami, "I found a stalking spot, and listened for eleven and a half days. They mostly talked about how much they'd love to eat turtles some time again...");
 
-    say(zanmu, "Please get to the point!");
+    zsay(pained, "Please get to the point!");
 
     say(hisami, "Um, yes! The eagle spirits are following a beast. They think she's more powerful than even the oni. Clearly they exaggerate, no-one is stronger than you, Lady Zanmu~!");
 
-    think("I can't always trust Hisami, but she wouldn't lie about something like this.");
-    think("..Hah! Is this the chance I've been waiting for?");
-    say(zanmu, "That is wonderful news. You've done well, Hisami.");
+    zthink(neutral, "I can't always trust Hisami, but she wouldn't lie about something like this.");
+    zthink(gloat, "..Hah! Is this the chance I've been waiting for?");
+    zsay(pleasant, "That is wonderful news. You've done well, Hisami.");
 
     say(hisami, "Ehehe~");
 
-    say(zanmu, "It's time to make a mockery of the Council, and rule Hell myself.");
-    say(zanmu, "Go back to the Animal Realm, and spread more rumours of that beast's power. Add fuel to the fire! Return to me in two days.");
+    zsay(gloat, "It's time to make a mockery of the Council, and rule Hell myself.");
+    zsay(smirk, "Go back to the Animal Realm, and spread more rumours of that beast's power. Add fuel to the fire! Return to me in two days.");
     
     show(hisami, joy);
     say(hisami, "As you wish, Lady Zanmu~!");
     hide();
 
-    think("I need to prepare the waters...");
-    think("First, I'll make the Council weaken their own grip on the Animal Realm. That'll serve well to make them cower.");
-    think("I should talk to Hoshiguma. She's always been squeamish of the penalties dealt to the animals. That, and she has enough influence on the Council to sway it my way.");
+    zthink(smirk, "I need to prepare the waters...");
+    zthink(smirk, "First, I'll make the Council weaken their own grip on the Animal Realm. That'll serve well to make them cower.");
+    zthink(neutral, "I should talk to Hoshiguma. She's always been squeamish of the punishments wrought on the animals. That, and she has enough influence on the Council to sway it my way.");
 
     script.SetNextScene(Scenes::LobbyingYuugi);
     end;
@@ -469,7 +469,79 @@ SCENE_RUN(DelegatingToHisami)
     scene(zanmu_study);
     wait_for_tasks();
 
-    // TODO
+    desc("It's been two and a half days since the plan began.");
+
+    show(hisami, joy);
+    say(hisami, "I'm baaaaaaaack~!");
+
+    zsay(pained, "You're 11 hours late. What were you even doing?");
+
+    show(hisami, double);
+    say(hisami, "I was doing exactly as you asked, and telling every animal spirit to follow the beast.");
+    say(hisami, "Then that beast found me and beat me up...");
+
+    zsay(pained, "Huh?! Why would they oppose your actions?");
+
+    show(hisami, neutral);
+    say(hisami, "She said she wasn't interested in growing her ranks.");
+    say(hisami, "An arrogant type indeed!");
+
+    zthink(gloat, "Now that's interesting... I'll need to meet with this so-called leader myself.");
+    zthink(neutral, "But before I get round to that, I need to prepare for another step of the plan.");
+    zthink(neutral, "I've tallied the Council members, and perhaps half would be willing to side with me if given reason.");
+    zthink(smirk, "So, it's time to create that reason.");
+
+    zsay(neutral, "I'll deal with the beast later. First, we need to lose a vote.");
+
+    show(hisami, double);
+    say(hisami, "...Lose?");
+    
+    zsay(smirk, "Yep. I'll make the proposal, and it'll be the easiest proposal to pass.");
+    zsay(smirk, "And by losing it on purpose, the Council will feel for themselves the frustration of the system.");
+    zsay(gloat, "Maybe they'll even have a little empathy for me!");
+
+    show(hisami, joy);
+    say(hisami, "I see~! In that case, how can I be of service?");
+
+    zsay(neutral, "I'm going to propose that we raise the prices to cross the Sanzu by 10%.");
+    zsay(neutral, "I want you to...");
+
+    {
+        choice(
+            "\"Lobby the Yama. Get them to voice support.\"",
+            "\"Spread doubt among the lesser oni.\"",
+            "\"Reach out to a senior kishin for an alliance.\""
+        );
+        auto const res = get_choice_result();
+
+        show(hisami, neutral);
+        say(hisami, "As you command, Lady Zanmu~!");
+        hide();
+
+        io_game.SetVar<Variables::LobbiedTheYama>(res == 0);
+        io_game.SetVar<Variables::SpreadSeedsOfDoubt>(res == 1);
+        io_game.SetVar<Variables::KishinAlliance>(res == 2);
+        switch(res)
+        {
+        case 0:
+        {
+            zthink(neutral, "That will make the vote harder to lose.");
+            zthink(gloat, "But if it does, the effect on the Council will be twice as strong!");
+            break;
+        }
+        case 1:
+        {
+            zthink(neutral, "That should make this vote easier to lose.");
+            zthink(pleasant, "It's good to save influence for later.");
+            break;
+        }
+        case 2:
+        {
+            zthink(neutral, "That probably won't change anything about this next vote, but I will do well to have that alliance in the future.");
+            break;
+        }
+        }
+    }
 
     script.SetNextScene(Scenes::VotingForPriceIncreases);
     end;
@@ -484,11 +556,12 @@ SCENE_RUN(VotingForPriceIncreases)
 
     // TODO
 
-    script.SetNextScene(Scenes::MeetingTheShadowyKishin);
+    //script.SetNextScene(Scenes::MeetingTheShadowyKishin);
+    script.SetNextScene(Scenes::EngagingYuuma);
     end;
 }
 
-SCENE_RUN(MeetingTheShadowyKishin)
+/*SCENE_RUN(MeetingTheShadowyKishin)
 {
     SCENE_SETUP();
 
@@ -499,7 +572,7 @@ SCENE_RUN(MeetingTheShadowyKishin)
 
     script.SetNextScene(Scenes::EngagingYuuma);
     end;
-}
+}*/
 
 SCENE_RUN(EngagingYuuma)
 {
@@ -816,7 +889,60 @@ SCENE_RUN(FinalHisami)
     scene(zanmu_study);
     wait_for_tasks();
 
-    // TODO
+    desc("Somehow, the same old study seems a little warmer, a little cozier.");
+
+    show(hisami, neutral);
+    say(hisami, "Lady Zanmu~! What do you need~?");
+
+    zsay(pleasant, "Actually, Hisami, I thought it best to spend today relaxing.");
+
+    say(hisami, "A-and you thought to invite me?");
+
+    zsay(pained, "You're the only one who wouldn't get on my nerves right now!");
+
+    show(hisami, flush);
+    say(hisami, "Lady Zanmu...");
+
+    zsay(neutral, "Let's chat a while.");
+    zsay(neutral, "As you know, I chose to come to Hell. I've always been curious of what it's really like internally for those that don't choose.");
+    zsay(neutral, "Tell me about someone interesting you dragged to Hell.");
+
+    show(hisami, neutral);
+    say(hisami, "Oho, Lady Zanmu's interested in my work~~");
+    say(hisami, "... ... Oh! There was once a girl who seemed so confused of the situation.");
+    say(hisami, "Each time I used one of my lines, she said she didn't care. Yet, she kept following me!");
+    say(hisami, "I don't like people acting strange like that, so I told her where I was going.");
+    show(hisami, joy);
+    say(hisami, "And she said that she knew, and that she was trying to go there too!");
+    say(hisami, "She even kept saying things like \"Don't you know who I am?\" and \"Have you never seen me before?\"");
+
+    zthink(unamused_sweat, "...");
+
+    show(hisami, neutral);
+    say(hisami, "But why would I know that? I meet so many, it is hard to remember all their faces.");
+    say(hisami, "Just as we got to the gate, she stopped following. I had to ask, \"Are you not coming into Hell after all?\"");
+    say(hisami, "But she only mumbled some nonsense about having arrived to do her job!");
+
+    zsay(pleasant, "Hisami. Perhaps this girl was a chicken?");
+
+    show(hisami, joy);
+    say(hisami, "Yes~ Many are too chicken to enter hell.");
+
+    zsay(pained, "No, I meant a literal chicken.");
+
+    show(hisami, neutral);
+    say(hisami, "Oh~! Perhaps she was.");
+
+    zsay(pleasant, "Poor Niwatari. Forgotten and considered a weirdo by the one who sees her every day.");
+
+    say(hisami, "... Oho~!");
+
+    zsay(pained, "Well, it wasn't quite what I was looking for, but at least we passed the time. Thanks, Hisami.");
+
+    show(hisami, flush);
+    say(hisami, "Of course, Lady Zanmu~");
+
+    zthink(neutral, "Okay, that's enough time wasting. I should get ready for tomorrow.");
 
     script.SetNextScene(Scenes::VotingToRelocateHell);
     end;
