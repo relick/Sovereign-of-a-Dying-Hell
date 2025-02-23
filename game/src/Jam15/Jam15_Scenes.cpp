@@ -181,9 +181,9 @@ SCENE_RUN(LobbyingYuugi)
 
     {
         choice(
-            "\"You wouldn't want them to suffer much longer, right?\"",
-            "\"And you've done nothing, don't you care about them?\"",
-            "\"We should work together to ease the worst of it.\"",
+            "\"You don't want them to suffer, right?\"",
+            "\"And you've done nothing. Don't you care?\"",
+            "\"Let's work together to ease the worst of it.\"",
         );
         auto const res = get_choice_result();
         switch(res)
