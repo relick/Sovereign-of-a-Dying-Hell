@@ -24,6 +24,9 @@ inline constexpr u16 c_framesForEnd = 240;
 inline constexpr u16 SetVFlip(u16 i_attr) {
 	return (i_attr & (~TILE_ATTR_VFLIP_MASK)) | TILE_ATTR_VFLIP_MASK;
 }
+inline constexpr u16 SetHFlip(u16 i_attr) {
+	return (i_attr & (~TILE_ATTR_HFLIP_MASK)) | TILE_ATTR_HFLIP_MASK;
+}
 
 inline constexpr std::array<TileSet const*, 11> c_nums = {
 	&voting_time_0,
@@ -362,7 +365,7 @@ void VoteMode::SetupGraphics()
 				voting_influence_bar_text_map.w,
 				voting_influence_bar_text_map.h,
 				TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, tileIndex),
-				7,
+				14,
 				22
 			);
 			AwaitTask(map);
@@ -572,13 +575,18 @@ Task VoteMode::UpdateInfluenceBarTileMap
 		u16 const tile = influenceSmall / 20;
 		for (u16 i = 0; i < tile; ++i)
 		{
-			m_influenceBarTileMap[i] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex + 8);
+			m_influenceBarTileMap[i + 20] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex + 8);
 		}
 		u16 const offset = std::min<u16>(16, influenceSmall - (tile * 16)) / 2;
-		m_influenceBarTileMap[tile] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex + offset);
-		for (u16 i = tile + 1; i < m_influenceBarTileMap.size(); ++i)
+		m_influenceBarTileMap[tile + 20] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex + offset);
+		for (u16 i = tile + 1; i < 20; ++i)
 		{
-			m_influenceBarTileMap[i] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex);
+			m_influenceBarTileMap[i + 20] = TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_influenceBar_tileIndex);
+		}
+
+		for (u16 i = 0; i < 20; ++i)
+		{
+			m_influenceBarTileMap[i] = SetHFlip(m_influenceBarTileMap[39 - i]);
 		}
 
 		// Draw bar
@@ -586,10 +594,10 @@ Task VoteMode::UpdateInfluenceBarTileMap
 			auto map = Tiles::SetMap_SubFull(
 				VDP_BG_A,
 				m_influenceBarTileMap.data(),
-				20,
+				40,
 				1,
 				0,
-				10,
+				0,
 				24
 			);
 			AwaitTask(map);

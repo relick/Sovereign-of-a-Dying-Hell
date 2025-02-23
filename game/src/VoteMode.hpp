@@ -82,8 +82,8 @@ class VoteMode
 	std::array<u16, 64> m_barTileMap{};
 	Task m_updateBarTileMap;
 
-	// 1 row of 20 tiles
-	std::array<u16, 20> m_influenceBarTileMap{};
+	// 1 row of 40 tiles, mirrored from the middle
+	std::array<u16, 40> m_influenceBarTileMap{};
 	Task m_updateInfluenceBarMap;
 
 	// Vote text, uses as many tiles/sprites as needed
