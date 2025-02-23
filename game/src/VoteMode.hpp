@@ -65,11 +65,13 @@ class VoteMode
 	bool m_graphicsDone{ false }; // set to true when post-vote animation finishes
 
 	std::array<SpriteID, 2> m_num{};
+	SpriteID m_midline{};
 	SpriteID m_cursor{};
 
 	std::array<u16, 11> m_num_tileIndex{};
 	u16 m_barCorners_tileIndex{};
 	u16 m_barMids_tileIndex{};
+	u16 m_barMidLine_tileIndex{};
 	u16 m_cursor_tileIndex{};
 	u16 m_passed_vote_tileIndex{};
 	u16 m_passed_passed_tileIndex{};

@@ -17,10 +17,10 @@ Jam-TODO:
 3. ~~Create voting mode with basic mash gameplay, calibratable sliding meter, and influence spending~~
 4. ~~Add graphics for the vote bar~~
 4a. ~~Add graphic for the timer~~
-5. Add graphic for influence
+5. ~~Add graphic for influence~~
 6. ~~Add sprite portrait for Zanmu~~
 7. ~~????? for say_hidden~~
-8. Set up the jam page
+8. ~~Set up the jam page~~
 
 # Code stretch
 - Add sprites flying in on each mash, and 'effects' on the line
@@ -28,7 +28,7 @@ Jam-TODO:
 - Show the influence that might be gained when making a choice
 - ~~Snap transition to black at the end of a scene~~, and titles for each scene fading/sliding in/fading out before the overall fade in
 - ~~Different font for desc~~
-- Bouncing, up arrow with 'WIN' text beneath, at the midpoint of the vote bar
+- ~~Bouncing, up arrow with 'WIN' text beneath, at the midpoint of the vote bar~~
 
 # Sound
 - Different clicks per character

@@ -14,6 +14,7 @@ TILESET voting_time_10 "voting/10.png" NONE NONE COLUMN
 
 TILESET voting_bar_corners "voting/barcorners.png" NONE NONE ROW
 TILESET voting_bar_mids "voting/barmiddle.png" NONE NONE ROW
+TILESET voting_bar_midline "voting/midline.png" NONE NONE COLUMN
 
 # FYI, cursor has to use PAL3
 TILESET voting_cursor "voting/cursor.png" NONE NONE COLUMN

@@ -63,9 +63,10 @@ VoteMode::~VoteMode
 {
 	if (m_graphicsReady)
 	{
-		m_game->Sprites().RemoveSprite(m_num[0]);
-		m_game->Sprites().RemoveSprite(m_num[1]);
+		std::ranges::for_each(m_num, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+		m_game->Sprites().RemoveSprite(m_midline);
 		m_game->Sprites().RemoveSprite(m_cursor);
+		std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 	}
 }
 
@@ -312,6 +313,12 @@ void VoteMode::SetupGraphics()
 			auto load = Tiles::LoadTiles_Chunked(&voting_bar_mids, tileIndex);
 			AwaitTask(load);
 		}
+		{
+			tileIndex -= voting_bar_midline.numTile;
+			m_barMidLine_tileIndex = tileIndex;
+			auto load = Tiles::LoadTiles_Chunked(&voting_bar_midline, tileIndex);
+			AwaitTask(load);
+		}
 
 		// Cursor
 		{
@@ -392,6 +399,16 @@ void VoteMode::SetupGraphics()
 			right.SetX(20 * 8);
 			right.SetY(2 * 8);
 			right.SetZ(z++);
+		}
+
+		// Add midline sprite
+		{
+			auto [id, spr] = m_game->Sprites().AddSprite(SpriteSize::r2c1, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_barMidLine_tileIndex));
+			m_midline = id;
+
+			spr.SetX(c_screenWidthPx / 2);
+			spr.SetY(16 * 8);
+			spr.SetZ(0); // behind cursor
 		}
 
 		// Add cursor sprite
@@ -656,6 +673,7 @@ u16 VoteMode::GetBarMidAttr
 void VoteMode::SetupEndGraphics()
 {
 	std::ranges::for_each(m_num, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+	m_game->Sprites().RemoveSprite(m_midline);
 	m_game->Sprites().RemoveSprite(m_cursor);
 	std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 
