@@ -150,7 +150,7 @@ void Script::InitVN
 		io_game.ResetVariables<Variables>();
 	}
 
-	m_nextScene = sceneToStart;
+	SetNextScene(sceneToStart);
 	UpdateVN(io_game, io_vn);
 }
 
@@ -162,9 +162,13 @@ void Script::UpdateVN
 {
 	if (m_nextScene)
 	{
-		// Save data first
-		io_game.SetVar<Variables::SceneNum>(*m_nextScene);
-		io_game.SaveVariables(c_saveVersion);
+		// Don't save if we're entering an ending scene
+		if (!m_nextSceneIsEnding)
+		{
+			// Save data first
+			io_game.SetVar<Variables::SceneNum>(*m_nextScene);
+			io_game.SaveVariables(c_saveVersion);
+		}
 
 		// Tidy up visuals
 		io_vn.HideCharacterVisual(io_game, false);

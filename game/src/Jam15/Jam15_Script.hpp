@@ -23,6 +23,7 @@ enum class Variables : u8
 	SpreadSeedsOfDoubt,
 	KishinAlliance,
 	PriceIncreaseVoteFails,
+	YuumaPromised,
 
 	Count,
 };
@@ -41,7 +42,8 @@ struct Game::VariablesTypeTuple<Jam15::Variables> {
 		bool, // LobbiedTheYama
 		bool, // SpreadSeedsOfDoubt
 		bool, // KishinAlliance
-		bool // PriceIncreaseVoteFails
+		bool, // PriceIncreaseVoteFails
+		bool // YuumaPromised
 	>;
 };
 
@@ -66,9 +68,11 @@ class Script
 	std::unique_ptr<Game::Scene> m_currentScene;
 	Game::SceneRoutine m_currentSceneRoutine;
 	std::optional<Scenes> m_nextScene;
+	bool m_nextSceneIsEnding{ false };
 
 public:
 	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
+	void GoToEnding(Scenes i_scene) { m_nextScene = i_scene; m_nextSceneIsEnding = true; }
 
 	Game::SFXID desc_beeps;
 
