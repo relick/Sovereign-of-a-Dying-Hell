@@ -16,7 +16,8 @@ namespace Game
 
 inline constexpr u16 c_lineCount = 3;
 inline constexpr u16 c_fullLineWidth = 34;
-inline constexpr u16 c_portraitLineWidth = c_fullLineWidth - c_portraitSizeTiles - 2;
+inline constexpr u16 c_lineXOffset = 1;
+inline constexpr u16 c_portraitLineWidth = (c_fullLineWidth - c_portraitSizeTiles - 2) + (c_lineXOffset * 2);
 inline constexpr u16 c_lineWidth = c_portraitLineWidth; // Using portrait for this game
 inline constexpr u16 c_pixelsPerTile = 8;
 
@@ -31,7 +32,7 @@ inline constexpr u16 c_nameTilesAddress = c_nameTilesIndex * 32;
 inline constexpr u16 c_namePosSide = 10;
 inline constexpr s16 c_namePosDown = -10;
 
-inline constexpr u16 c_textPosSide = ((c_screenWidthTiles - c_lineWidth) * 8) / 2;
+inline constexpr u16 c_textPosSide = (((c_screenWidthTiles - c_lineWidth) / 2) + c_lineXOffset) * 8;
 inline constexpr s16 c_textPosDown = -5;
 inline constexpr u16 c_lineSeparation = 2;
 inline constexpr u16 c_lineIndent = 1;
