@@ -14,10 +14,10 @@
 
 #define get_influence() io_game.ReadVar<Variables::Influence>()
 #define set_influence(AMOUNT) io_game.SetVar<Variables::Influence>(AMOUNT)
-#define add_influence(AMOUNT) set_influence(AMOUNT + get_influence());
+#define add_influence(AMOUNT) set_influence(get_influence() + AMOUNT);
 #define zsay(FACE, TEXT) say_face(zanmu, FACE, TEXT)
 #define zthink(FACE, TEXT) think_face(zanmu, FACE, TEXT)
-#define suika_cost() (io_game.ReadVar<Variables::SuikaDissuaded>() ? 0 : 20)
+#define suika_cost() (io_game.ReadVar<Variables::SuikaDissuaded>() ? 0 : 12)
 
 #define TEST_SKIP_TO_VOTE 0
 
@@ -71,13 +71,13 @@ SCENE_RUN(FirstVoteProposal)
 #else
     desc("Spend influence by mashing A/B/C on the gamepad!");
 #endif
-    set_influence(0);
+    set_influence(64);
 
     // It's impossible to win this
     Game::VoteModeParams const vote = {
         .m_voteName = "Use the earth spirits to maintain the torture chambers",
-        .m_votingTime = FIX16(7),
-        .m_startingPlayerInfluence = 64, // Fixed influence to start with
+        .m_votingTime = FIX16(5),
+        .m_startingPlayerInfluence = get_influence(), // Fixed influence to start with
         .m_attackSize = 128, // More attack than influence + enough to win
         .m_attackPattern = Game::AttackPattern::FastBitty,
         .m_playerWantsToLose = false,
@@ -90,7 +90,11 @@ SCENE_RUN(FirstVoteProposal)
     say(zanmu, "The lack of wisdom in this Council once again astounds.");
     say(zanmu, "Fine, argue over seating arrangements, or whatever it is you do, I will attend to real business.");
 
+#if TEST_SKIP_TO_VOTE
+    script.SetNextScene(Scenes::VotingForAnimalRights);
+#else
     script.SetNextScene(Scenes::HatchingThePlan);
+#endif
     end;
 }
 
@@ -305,7 +309,7 @@ SCENE_RUN(LobbyingYuugi)
         say(yuugi, "If you're holding the vote tomorrow, I'll make the rounds today.");
         say(yuugi, "It was a nice chat. Later, Nippaku.");
 
-        desc("You gained Yuugi's influence.");
+        desc("You gained Yuugi's influence for the next vote.");
     }
     else
     {
@@ -332,6 +336,7 @@ SCENE_RUN(VotingForAnimalRights)
     scene(kishin_council);
     wait_for_tasks();
 
+#if !TEST_SKIP_TO_VOTE
     show(zanmu, neutral);
     say(zanmu, "Wise Council, allow me to discuss something that's come to my attention.");
     say(zanmu, "We've not paid much mind to the Animal Realm recently, given the problems everywhere else have been greater.");
@@ -341,6 +346,9 @@ SCENE_RUN(VotingForAnimalRights)
     say(zanmu, "This may sound unorthodox, but let me tell you, every time we've increased punishments, the situation has become worse. Trying the opposite is surely worth a try?");
 
     say(speaker, "An interesting proposal. Any opinions?");
+#else
+    io_game.SetVar<Variables::HasYuugiInfluence>(true);
+#endif
 
     // Start on 100 or 150 now
     set_influence(128);
@@ -349,27 +357,31 @@ SCENE_RUN(VotingForAnimalRights)
     {
         show(yuugi, angry);
         say(yuugi, "We gotta do this! The animal spirits need some relief!");
-        add_influence(64);
+        add_influence(32);
     }
     else
     {
         zthink(unamused_sweat, "I see Hoshiguma's staying quiet.");
     }
 
-    desc("From now on, your influence is carried over between votes. Spend it wisely!");
+    //desc("From now on, your influence is carried over between votes. Spend it wisely!");
     desc("The vote is about to start.");
     Game::VoteModeParams const vote = {
         .m_voteName = "End solitary punishment, and feed the animals",
-        .m_votingTime = FIX16(7),
+        .m_votingTime = FIX16(5),
         .m_startingPlayerInfluence = get_influence(),
-        .m_attackSize = 64,
+        .m_attackSize = 96,
         .m_attackPattern = Game::AttackPattern::SlowChunky,
         .m_playerWantsToLose = false,
     };
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
 
-    set_influence(result.m_remainingInfluence);
+    if (io_game.ReadVar<Variables::HasYuugiInfluence>())
+    {
+        add_influence(-32);
+    }
+    //set_influence(result.m_remainingInfluence);
     io_game.SetVar<Variables::PunishmentVotePasses>(result.m_playerWon);
 
     if (io_game.ReadVar<Variables::PunishmentVotePasses>())
@@ -377,8 +389,8 @@ SCENE_RUN(VotingForAnimalRights)
         say(speaker, "It seems that passed.");
 
         zthink(pleasant, "That went perfectly!");
-        desc("Winning the vote has secured you further influence with the Council");
-        add_influence(128);
+        desc("Winning the vote has secured you lasting influence with the Council");
+        add_influence(64);
 
         show(zanmu, neutral);
         say(zanmu, "Wonderful!");
@@ -411,7 +423,11 @@ SCENE_RUN(VotingForAnimalRights)
         zthink(neutral, "Losing is a setback, but I can carry on with the plan.");
     }
 
+#if TEST_SKIP_TO_VOTE
+    script.SetNextScene(Scenes::VotingForPriceIncreases);
+#else
     script.SetNextScene(Scenes::SuikaApproaches);
+#endif
     end;
 }
 
@@ -650,6 +666,7 @@ SCENE_RUN(VotingForPriceIncreases)
     scene(kishin_council);
     wait_for_tasks();
 
+#if !TEST_SKIP_TO_VOTE
     show(zanmu, neutral);
     say(zanmu, "Thoughtful Council, I'd like your consideration on a small change.");
     say(zanmu, "I believe we should increase the prices for crossing the Sanzu a small amount, perhaps 10%.");
@@ -660,25 +677,35 @@ SCENE_RUN(VotingForPriceIncreases)
     say(acouncil, "Hm. It sounds quite sensible - surprise to be sure to come from you, Nippaku!");
     say(bcouncil, "Yeah. I see nothing wrong with this.");
     say(speaker, "Seems opinion isn't divided, but let's vote anyway to be sure.");
+#else
+    io_game.SetVar<Variables::SuikaDissuaded>(true);
+    io_game.SetVar<Variables::LobbiedTheYama>(false);
+    io_game.SetVar<Variables::SpreadSeedsOfDoubt>(true);
+    io_game.SetVar<Variables::KishinAlliance>(false);
+#endif
 
-    u16 initialInfluence = get_influence();
-    if (io_game.ReadVar<Variables::SpreadSeedsOfDoubt>() || io_game.ReadVar<Variables::KishinAlliance>())
+    if (io_game.ReadVar<Variables::SpreadSeedsOfDoubt>())
     {
-        desc("Hisami's work has granted you extra influence for this vote.");
-        initialInfluence += 64;
+        desc("Hisami's work with the lesser oni has granted you extra influence for this vote only.");
+        add_influence(32);
+    }
+    else if (io_game.ReadVar<Variables::KishinAlliance>())
+    {
+        desc("Hisami's work with a senior kishin has granted you lasting influence with the Council.");
+        add_influence(32);
     }
     u16 attackSize = 128;
     if (io_game.ReadVar<Variables::LobbiedTheYama>())
     {
         desc("Word of the Yama's support has reached the oni, they will be harder to dissuade.");
-        attackSize += 64;
+        attackSize += 52;
     }
     desc("In this vote, you are trying to ensure it fails. That means you will spend influence to push the bar in the opposite direction to usual.");
     desc("The vote is about to start.");
     Game::VoteModeParams const vote = {
         .m_voteName = "Increase cost of crossing the Sanzu by 10%",
-        .m_votingTime = FIX16(10),
-        .m_startingPlayerInfluence = initialInfluence,
+        .m_votingTime = FIX16(7),
+        .m_startingPlayerInfluence = get_influence(),
         .m_attackSize = static_cast<u16>(attackSize + suika_cost()),
         .m_attackPattern = Game::AttackPattern::FastBitty,
         .m_playerWantsToLose = true,
@@ -686,8 +713,12 @@ SCENE_RUN(VotingForPriceIncreases)
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
 
+    if (io_game.ReadVar<Variables::SpreadSeedsOfDoubt>())
+    {
+        add_influence(-32);
+    }
     // Min to account for the single vote bonus
-    set_influence(std::min<u16>(get_influence(), result.m_remainingInfluence));
+    //set_influence(std::min<u16>(get_influence(), result.m_remainingInfluence));
     io_game.SetVar<Variables::PriceIncreaseVoteFails>(result.m_playerWon);
 
     if (io_game.ReadVar<Variables::PriceIncreaseVoteFails>())
@@ -695,12 +726,15 @@ SCENE_RUN(VotingForPriceIncreases)
         say(speaker, "How surprising? I thought the sentiment was in your favour, Nippaku.");
 
         zthink(pleasant, "Oh, I think it went swimmingly!");
-        desc("Losing the vote has secured you great influence with the Council");
-        add_influence(128);
         if (io_game.ReadVar<Variables::LobbiedTheYama>())
         {
-            desc("Losing it despite the Yama's support has earned even more influence.");
+            desc("Losing the vote despite the Yama's support has secured you great and lasting influence with the Council.");
             add_influence(128);
+        }
+        else
+        {
+            desc("Losing the vote has secured you more lasting influence with the Council");
+            add_influence(64);
         }
 
         show(zanmu, neutral);
@@ -726,6 +760,9 @@ SCENE_RUN(VotingForPriceIncreases)
         }
     }
 
+#if TEST_SKIP_TO_VOTE
+    script.SetNextScene(Scenes::VotingForExecutive);
+#else
     scene(zanmu_study);
 
     zthink(neutral, "Time to prepare for the big vote.");
@@ -734,6 +771,7 @@ SCENE_RUN(VotingForPriceIncreases)
 
     //script.SetNextScene(Scenes::MeetingTheShadowyKishin);
     script.SetNextScene(Scenes::EngagingYuuma);
+#endif
     end;
 }
 
@@ -1025,6 +1063,7 @@ SCENE_RUN(VotingForExecutive)
     scene(kishin_council);
     wait_for_tasks();
 
+#if !TEST_SKIP_TO_VOTE
     show(zanmu, neutral);
     say(zanmu, "Illustrious Council! Before we attend to any further matters, I have an urgent proposal to make.");
     say(speaker, "Go ahead, Nippaku.");
@@ -1044,27 +1083,28 @@ SCENE_RUN(VotingForExecutive)
 
     say(speaker, "...QUIET!");
     say(speaker, "Nippaku, your proposal is acknowledged. We'll hold a vote now, to put the matter to rest. Hopefully a *productive* meeting can follow.");
+#endif
 
     if (io_game.ReadVar<Variables::KishinAlliance>())
     {
-        desc("Your alliance with the senior kishin has paid off in bonus influence for this vote.");
-        add_influence(64);
+        desc("Your alliance with the senior kishin has paid off again in bonus influence for this vote.");
+        add_influence(32);
     }
 
     desc("The vote is about to start.");
     // This vote is nearly impossible to win, requiring all influence across the game and good mashing
     Game::VoteModeParams const vote = {
-        .m_voteName = "Create a ruler of Hell",
+        .m_voteName = "Create a singular ruler of Hell",
         .m_votingTime = FIX16(8),
         .m_startingPlayerInfluence = get_influence(),
-        .m_attackSize = static_cast<u16>(256 + suika_cost()), // Possible influence until now totals 316
+        .m_attackSize = static_cast<u16>(304 + suika_cost()), // Possible influence until now totals 320
         .m_attackPattern = Game::AttackPattern::Variable,
         .m_playerWantsToLose = false,
     };
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
 
-    set_influence(result.m_remainingInfluence);
+    //set_influence(result.m_remainingInfluence);
 
     if (result.m_playerWon)
     {
@@ -1120,9 +1160,12 @@ SCENE_RUN(VotingForExecutive)
         }
     }*/
 
+#if TEST_SKIP_TO_VOTE
+    script.SetNextScene(Scenes::VotingToRelocateHell);
+#else
     zthink(neutral, "I think I should take a little break first.");
     script.SetNextScene(Scenes::FinalHisami);
-
+#endif
     end;
 }
 
@@ -1238,6 +1281,7 @@ SCENE_RUN(VotingToRelocateHell)
     scene(kishin_council);
     wait_for_tasks();
 
+#if !TEST_SKIP_TO_VOTE
     show(zanmu, neutral);
     say(zanmu, "Council, I said I had a fresh idea. I'll keep it short. We should move out of this Hell and start a new one.");
     say(zanmu, "Most of the problems we face are from overpopulation, overdevelopment, overspending. This would be a chance to solve all of these in one go.");
@@ -1254,14 +1298,17 @@ SCENE_RUN(VotingToRelocateHell)
     // TODO does yuugi speak up?
 
     say(speaker, "Our rule is to debate and vote on all proposals. Let this one be healthy.");
+#else
+    io_game.SetVar<Variables::YuumaPromised>(true);
+#endif
 
     desc("The vote is about to start.");
     {
         Game::VoteModeParams const vote = {
             .m_voteName = "Relocate Hell",
-            .m_votingTime = FIX16(8),
+            .m_votingTime = FIX16(7),
             .m_startingPlayerInfluence = get_influence(),
-            .m_attackSize = static_cast<u16>(160 + suika_cost()), // Not impossible, but it can be fine if they lose this
+            .m_attackSize = static_cast<u16>(244 + suika_cost()), // Not impossible, but it can be fine if they lose this
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
         };
@@ -1318,20 +1365,20 @@ SCENE_RUN(VotingToRelocateHell)
 
         say(speaker, "... We'll have to hold the vote again, if those are the stakes.");
 
-        desc("This is the final vote. Laying your cards out bare has refreshed your influence.");
+        desc("This is the final vote. Make it count!");
 
         Game::VoteModeParams const vote2 = {
             .m_voteName = "Relocate Hell",
             .m_votingTime = FIX16(5),
             .m_startingPlayerInfluence = get_influence(),
-            .m_attackSize = static_cast<u16>(80 + suika_cost()),
+            .m_attackSize = static_cast<u16>(108 + suika_cost()),
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
         };
         start_vote(vote2);
         Game::VoteResult const result2 = get_vote_result();
 
-        set_influence(result2.m_remainingInfluence);
+        //set_influence(result2.m_remainingInfluence);
 
         if (result2.m_playerWon)
         {
