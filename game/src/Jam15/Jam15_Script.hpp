@@ -69,8 +69,11 @@ class Script
 	Game::SceneRoutine m_currentSceneRoutine;
 	std::optional<Scenes> m_nextScene;
 	bool m_nextSceneIsEnding{ false };
+	
+	bool m_isMashlessMode{ false };
 
 public:
+	bool IsMashlessMode() const { return m_isMashlessMode; }
 	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
 	void GoToEnding(Scenes i_scene) { m_nextScene = i_scene; m_nextSceneIsEnding = true; }
 

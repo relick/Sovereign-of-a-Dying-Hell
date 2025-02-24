@@ -25,6 +25,7 @@ struct VoteModeParams
 	u16 m_attackSize{};
 	AttackPattern m_attackPattern{};
 	bool m_playerWantsToLose{};
+	bool m_easyMode{false};
 };
 
 struct AttackEvent
@@ -103,6 +104,7 @@ class VoteMode
 	s16 m_rightBounce{ 0 };
 
 	SFXID m_mash{};
+	u16 m_influencePerMash{1};
 
 	u16 m_endTimer{};
 

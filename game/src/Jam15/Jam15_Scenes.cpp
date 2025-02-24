@@ -19,7 +19,7 @@
 #define zthink(FACE, TEXT) think_face(zanmu, FACE, TEXT)
 #define suika_cost() (io_game.ReadVar<Variables::SuikaDissuaded>() ? 0 : 12)
 
-#define TEST_SKIP_TO_VOTE 0
+#define TEST_SKIP_TO_VOTE 1
 
 namespace Jam15
 {
@@ -81,6 +81,7 @@ SCENE_RUN(FirstVoteProposal)
         .m_attackSize = 128, // More attack than influence + enough to win
         .m_attackPattern = Game::AttackPattern::FastBitty,
         .m_playerWantsToLose = false,
+        .m_easyMode = script.IsMashlessMode(),
     };
     start_vote(vote);
 
@@ -373,6 +374,7 @@ SCENE_RUN(VotingForAnimalRights)
         .m_attackSize = 96,
         .m_attackPattern = Game::AttackPattern::SlowChunky,
         .m_playerWantsToLose = false,
+        .m_easyMode = script.IsMashlessMode(),
     };
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
@@ -709,6 +711,7 @@ SCENE_RUN(VotingForPriceIncreases)
         .m_attackSize = static_cast<u16>(attackSize + suika_cost()),
         .m_attackPattern = Game::AttackPattern::FastBitty,
         .m_playerWantsToLose = true,
+        .m_easyMode = script.IsMashlessMode(),
     };
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
@@ -1100,6 +1103,7 @@ SCENE_RUN(VotingForExecutive)
         .m_attackSize = static_cast<u16>(304 + suika_cost()), // Possible influence until now totals 320
         .m_attackPattern = Game::AttackPattern::Variable,
         .m_playerWantsToLose = false,
+        .m_easyMode = script.IsMashlessMode(),
     };
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
@@ -1311,6 +1315,7 @@ SCENE_RUN(VotingToRelocateHell)
             .m_attackSize = static_cast<u16>(244 + suika_cost()), // Not impossible, but it can be fine if they lose this
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
+            .m_easyMode = script.IsMashlessMode(),
         };
         start_vote(vote);
         Game::VoteResult const result = get_vote_result();
@@ -1374,6 +1379,7 @@ SCENE_RUN(VotingToRelocateHell)
             .m_attackSize = static_cast<u16>(108 + suika_cost()),
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
+            .m_easyMode = script.IsMashlessMode(),
         };
         start_vote(vote2);
         Game::VoteResult const result2 = get_vote_result();

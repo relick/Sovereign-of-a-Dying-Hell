@@ -88,6 +88,7 @@ void VoteMode::Start
 {
 	// Cache params
 	m_params = std::move(i_params);
+	m_influencePerMash = (m_params.m_easyMode ? 4 : 1) * c_influencePerMash;
 
 	// Set up data
 	m_framesLeft = fix16Mul(std::max<f16>(m_params.m_votingTime, FIX16(5)), FramesPerSecond()); // Min 5-seconds
@@ -133,20 +134,20 @@ void VoteMode::Update
 		return false;
 	}();
 
-	if (ABCpressedThisFrame && m_remainingInfluence >= c_influencePerMash)
+	if (ABCpressedThisFrame && m_remainingInfluence >= m_influencePerMash)
 	{
 		if (m_params.m_playerWantsToLose)
 		{
-			m_votePosition -= c_influencePerMash;
+			m_votePosition -= m_influencePerMash;
 			m_rightBounce = 8;
 		}
 		else
 		{
-			m_votePosition += c_influencePerMash;
+			m_votePosition += m_influencePerMash;
 			m_leftBounce = 8;
 		}
 		m_game->SFX().PlaySFX(m_mash);
-		m_remainingInfluence -= c_influencePerMash;
+		m_remainingInfluence -= m_influencePerMash;
 	}
 
 	if (m_params.m_playerWantsToLose)
