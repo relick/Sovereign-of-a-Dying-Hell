@@ -6,6 +6,7 @@
 #include "VNWorld.hpp"
 
 #include "res_voting.h"
+#include "Jam15/res_sfx.h"
 
 #include <cstdlib>
 #include <ranges>
@@ -67,6 +68,7 @@ VoteMode::~VoteMode
 (
 )
 {
+	m_game->SFX().RemoveSFX(m_mash);
 	if (m_graphicsReady)
 	{
 		std::ranges::for_each(m_num, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
@@ -91,6 +93,8 @@ void VoteMode::Start
 	m_framesLeft = fix16Mul(std::max<f16>(m_params.m_votingTime, FIX16(5)), FramesPerSecond()); // Min 5-seconds
 	m_remainingInfluence = m_params.m_startingPlayerInfluence;
 	m_voteWon = false;
+
+	m_mash = m_game->SFX().AddSFX(zanmu_beep, std::size(zanmu_beep), Channel::TextBeeps);
 
 	GenerateAttackEvents();
 	SetupGraphics();
@@ -141,6 +145,7 @@ void VoteMode::Update
 			m_votePosition += c_influencePerMash;
 			m_leftBounce = 8;
 		}
+		m_game->SFX().PlaySFX(m_mash);
 		m_remainingInfluence -= c_influencePerMash;
 	}
 

@@ -102,6 +102,8 @@ class VoteMode
 	s16 m_leftBounce{ 0 };
 	s16 m_rightBounce{ 0 };
 
+	SFXID m_mash{};
+
 	u16 m_endTimer{};
 
 public:
