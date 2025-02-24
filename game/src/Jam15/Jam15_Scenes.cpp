@@ -526,6 +526,7 @@ SCENE_RUN(SuikaApproaches)
             say(suika, "I don't like the atmosphere, and there's too many rules. I hear rumours of youkai trying to create some place on the surface, away from humans. Sounds kinda nice, right?");
             
             zsay(neutral, "Can't say I'm interested in such a place, but I understand wanting to leave. Take care, Suika.");
+            zthink(pleasant, "I think that means she won't get in my way. That's good!");
 
             io_game.SetVar<Variables::SuikaDissuaded>(true);
             break;
