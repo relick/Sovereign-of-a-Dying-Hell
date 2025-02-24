@@ -19,7 +19,7 @@
 #define zthink(FACE, TEXT) think_face(zanmu, FACE, TEXT)
 #define suika_cost() (io_game.ReadVar<Variables::SuikaDissuaded>() ? 0 : 12)
 
-#define TEST_SKIP_TO_VOTE 1
+#define TEST_SKIP_TO_VOTE 0
 
 namespace Jam15
 {

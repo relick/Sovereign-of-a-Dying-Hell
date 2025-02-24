@@ -10,6 +10,7 @@
 #include "Jam15/res_bg.h"
 #include "res_vn.h"
 #include "Jam15/res_sfx.h"
+#include "res_fonts.h"
 
 namespace Jam15
 {
@@ -20,20 +21,33 @@ void Script::InitTitle
 	Game::TitleWorld& io_title
 )
 {
-	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(kishin_council.tileset, c_tilesStart));
+	io_game.LoadVariables(c_saveVersion);
+	m_hasLoadedData = io_game.HasLoadedData();
+	if (!m_hasLoadedData)
+	{
+		m_selection = 1;
+	}
+	else
+	{
+		m_isMashlessMode = io_game.ReadVar<Variables::EasyMode>();
+	}
+
+	Image const& titleImg = m_hasLoadedData ? title : title_nocont;
+
+	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(hell_palace.tileset, c_tilesStart));
 	io_game.QueueFunctionTask(Tiles::ClearMap_Full(
 		VDP_BG_A,
 		Tiles::c_emptyPlane
 	));
-	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_B, kishin_council.tilemap->tilemap, kishin_council.tilemap->w, kishin_council.tilemap->h, c_tilesStart));
-	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(title.tileset, c_tilesEnd - title.tileset->numTile));
-	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_A, title.tilemap->tilemap, title.tilemap->w, title.tilemap->h,
-		TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, c_tilesEnd - title.tileset->numTile)
+	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_B, hell_palace.tilemap->tilemap, hell_palace.tilemap->w, hell_palace.tilemap->h, c_tilesStart));
+	io_game.QueueFunctionTask(Tiles::LoadTiles_Chunked(titleImg.tileset, c_tilesEnd - titleImg.tileset->numTile));
+	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_A, titleImg.tilemap->tilemap, titleImg.tilemap->w, titleImg.tilemap->h,
+		TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, c_tilesEnd - titleImg.tileset->numTile)
 	));
-	io_game.QueueLambdaTask([] -> Game::Task {
+	io_game.QueueLambdaTask([&titleImg] -> Game::Task {
 		std::array<u16, 32> pal;
-		Palettes::FadeOp<16> fade = Palettes::CreateFade<16>(pal.data(), kishin_council.palette->data, FramesPerSecond());
-		Palettes::FadeOp<16> fade2 = Palettes::CreateFade<16>(pal.data() + 16, title.palette->data, FramesPerSecond());
+		Palettes::FadeOp<16> fade = Palettes::CreateFade<16>(pal.data(), hell_palace.palette->data, FramesPerSecond());
+		Palettes::FadeOp<16> fade2 = Palettes::CreateFade<16>(pal.data() + 16, titleImg.palette->data, FramesPerSecond());
 
 		while (fade)
 		{
@@ -46,18 +60,12 @@ void Script::InitTitle
 		co_return;
 	});
 
-	io_game.LoadVariables(c_saveVersion);
-	m_hasLoadedData = io_game.HasLoadedData();
-	if (!m_hasLoadedData)
-	{
-		m_selection = 1;
-	}
-
 	u16 const arrowTiles = io_game.Sprites().InsertMiscTiles(misc_spr);
-	auto [arrowID, spr] = io_game.Sprites().AddSprite(Game::SpriteSize::r1c1, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, arrowTiles + 1));
+	PAL_setColors(16 * PAL3, text_font_pal.data, 16, DMA_QUEUE);
+	auto [arrowID, spr] = io_game.Sprites().AddSprite(Game::SpriteSize::r1c1, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, arrowTiles + 1));
 	m_arrowSpr = arrowID;
 	spr.SetX(8 * 5);
-	spr.SetY(8 * 21 + m_selection * 24);
+	spr.SetY(156 + m_selection * 21);
 
 }
 
@@ -72,41 +80,44 @@ void Script::UpdateTitle
 	u16 const buttons = JOY_readJoypad(JOY_1);
 	if ((buttons & (BUTTON_A | BUTTON_B | BUTTON_C)) != 0)
 	{
-		if (m_selection == 1)
+		if (m_selection != 0)
 		{
 			m_hasLoadedData = false;
+
+			m_isMashlessMode = m_selection == 2;
+			io_game.SetVar<Variables::EasyMode>(m_isMashlessMode);
 		}
 
 		io_game.Sprites().RemoveSprite(m_arrowSpr);
 		io_title.GoToVNWorld(io_game);
 		return;
 	}
-	else if (m_hasLoadedData && (buttons & BUTTON_DOWN) != 0)
+	else if ((buttons & BUTTON_DOWN) != 0)
 	{
 		if (!pressed)
 		{
 			++m_selection;
-			if (m_selection > 1)
+			if (m_selection > 2)
 			{
-				m_selection = 0;
+				m_selection = m_hasLoadedData ? 0 : 1;
 			}
 
 			auto spr = io_game.Sprites().EditSpriteData(m_arrowSpr);
-			spr.SetY(8 * 21 + m_selection * 24);
+			spr.SetY(156 + m_selection * 21);
 		}
 		pressed = true;
 	}
-	else if (m_hasLoadedData && (buttons & BUTTON_UP) != 0)
+	else if ((buttons & BUTTON_UP) != 0)
 	{
 		if (!pressed)
 		{
 			--m_selection;
-			if (m_selection < 0)
+			if (m_selection < (m_hasLoadedData ? 0 : 1))
 			{
-				m_selection = 1;
+				m_selection = 2;
 			}
 			auto spr = io_game.Sprites().EditSpriteData(m_arrowSpr);
-			spr.SetY(8 * 21 + m_selection * 24);
+			spr.SetY(156 + m_selection * 21);
 		}
 		pressed = true;
 	}

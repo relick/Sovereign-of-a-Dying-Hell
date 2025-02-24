@@ -24,6 +24,7 @@ enum class Variables : u8
 	KishinAlliance,
 	PriceIncreaseVoteFails,
 	YuumaPromised,
+	EasyMode,
 
 	Count,
 };
@@ -43,7 +44,8 @@ struct Game::VariablesTypeTuple<Jam15::Variables> {
 		bool, // SpreadSeedsOfDoubt
 		bool, // KishinAlliance
 		bool, // PriceIncreaseVoteFails
-		bool // YuumaPromised
+		bool, // YuumaPromised
+		bool // EasyMode
 	>;
 };
 
