@@ -602,14 +602,30 @@ SCENE_RUN(DelegatingToHisami)
     say(hisami, "I see~! In that case, how can I be of service?");
 
     zsay(neutral, "I'm going to propose that we raise the prices to cross the Sanzu.");
-    zsay(neutral, "I want you to...");
+    zsay(neutral, "There's a number of things you could do to help.");
+    zsay(neutral, "Perhaps you could lobby the Yama? If they voice support, it will be even harder to lose this proposal. But the psychological impact of such a surefire policy being rejected would be even greater on the Council.");
+    zsay(neutral, "Or maybe, it's better to play it safe and spread doubt of the idea among the rest of the oni so it's more likely to fail from the get go.");
+    if (io_game.ReadVar<Variables::SuikaDissuaded>())
+    {
+        zsay(neutral, "In fact, now that Suika's backed off, maybe one of her kishin friends would be open to an alliance. That could pay greater dividends in the long run.");
+    }
 
     {
-        choice(
-            "\"Lobby the Yama. Get them to voice support.\"",
-            "\"Spread doubt among the lesser oni.\"",
-            "\"Reach out to a senior kishin for an alliance.\""
-        );
+        if (io_game.ReadVar<Variables::SuikaDissuaded>())
+        {
+            choice(
+                "\"Lobby the Yama. Get them to voice support.\"",
+                "\"Spread doubt among the lesser oni.\""
+            );
+        }
+        else
+        {
+            choice(
+                "\"Lobby the Yama. Get them to voice support.\"",
+                "\"Spread doubt among the lesser oni.\"",
+                "\"Reach out to a senior kishin for an alliance.\""
+            );
+        }
         auto const res = get_choice_result();
 
         show(hisami, neutral);
@@ -619,26 +635,8 @@ SCENE_RUN(DelegatingToHisami)
         io_game.SetVar<Variables::LobbiedTheYama>(res == 0);
         io_game.SetVar<Variables::SpreadSeedsOfDoubt>(res == 1);
         io_game.SetVar<Variables::KishinAlliance>(res == 2);
-        switch(res)
-        {
-        case 0:
-        {
-            zthink(neutral, "That will make the vote harder to lose.");
-            zthink(gloat, "But if it does, the effect on the Council will be twice as strong!");
-            break;
-        }
-        case 1:
-        {
-            zthink(neutral, "That should make this vote easier to lose.");
-            zthink(pleasant, "It's good to save influence for later.");
-            break;
-        }
-        case 2:
-        {
-            zthink(neutral, "That probably won't change anything about this next vote, but I will do well to have that alliance in the future.");
-            break;
-        }
-        }
+
+        zthink(neutral, "Good. We'll see how that plays out, then.");
     }
 
     script.SetNextScene(Scenes::VotingForPriceIncreases);
@@ -664,7 +662,7 @@ SCENE_RUN(VotingForPriceIncreases)
     say(speaker, "Seems opinion isn't divided, but let's vote anyway to be sure.");
 
     u16 initialInfluence = get_influence();
-    if (io_game.ReadVar<Variables::SpreadSeedsOfDoubt>())
+    if (io_game.ReadVar<Variables::SpreadSeedsOfDoubt>() || io_game.ReadVar<Variables::KishinAlliance>())
     {
         desc("Hisami's work has granted you extra influence for this vote.");
         initialInfluence += 64;
@@ -675,7 +673,7 @@ SCENE_RUN(VotingForPriceIncreases)
         desc("Word of the Yama's support has reached the oni, they will be harder to dissuade.");
         attackSize += 64;
     }
-    desc("In this vote, you are trying to ensure it fails. This means you will spend influence in the opposite direction.");
+    desc("In this vote, you are trying to ensure it fails. That means you will spend influence to push the bar in the opposite direction to usual.");
     desc("The vote is about to start.");
     Game::VoteModeParams const vote = {
         .m_voteName = "Increase cost of crossing the Sanzu by 10%",
@@ -1046,6 +1044,12 @@ SCENE_RUN(VotingForExecutive)
 
     say(speaker, "...QUIET!");
     say(speaker, "Nippaku, your proposal is acknowledged. We'll hold a vote now, to put the matter to rest. Hopefully a *productive* meeting can follow.");
+
+    if (io_game.ReadVar<Variables::KishinAlliance>())
+    {
+        desc("Your alliance with the senior kishin has paid off in bonus influence for this vote.");
+        add_influence(64);
+    }
 
     desc("The vote is about to start.");
     // This vote is nearly impossible to win, requiring all influence across the game and good mashing
