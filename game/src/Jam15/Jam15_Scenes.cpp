@@ -675,6 +675,7 @@ SCENE_RUN(VotingForPriceIncreases)
         desc("Word of the Yama's support has reached the oni, they will be harder to dissuade.");
         attackSize += 64;
     }
+    desc("In this vote, you are trying to ensure it fails. This means you will spend influence in the opposite direction.");
     desc("The vote is about to start.");
     Game::VoteModeParams const vote = {
         .m_voteName = "Increase cost of crossing the Sanzu by 10%",

@@ -123,7 +123,14 @@ void VoteMode::Update
 
 	if (ABCpressedThisFrame && m_remainingInfluence >= c_influencePerMash)
 	{
-		m_votePosition += c_influencePerMash;
+		if (m_params.m_playerWantsToLose)
+		{
+			m_votePosition += c_influencePerMash;
+		}
+		else
+		{
+			m_votePosition -= c_influencePerMash;
+		}
 		m_remainingInfluence -= c_influencePerMash;
 	}
 
@@ -131,7 +138,14 @@ void VoteMode::Update
 	{
 		if (m_attackEvents.back().m_frame >= m_framesLeft)
 		{
-			m_votePosition -= static_cast<s16>(m_attackEvents.back().m_size);
+			if (m_params.m_playerWantsToLose)
+			{
+				m_votePosition += static_cast<s16>(m_attackEvents.back().m_size);
+			}
+			else
+			{
+				m_votePosition -= static_cast<s16>(m_attackEvents.back().m_size);
+			}
 			m_attackEvents.pop_back();
 		}
 	}
