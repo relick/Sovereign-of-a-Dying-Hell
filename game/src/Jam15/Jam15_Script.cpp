@@ -203,9 +203,9 @@ std::unique_ptr<Game::Scene> Script::CreateScene
 	case Scenes::EngagingYuuma: return std::make_unique<EngagingYuuma>();
 	case Scenes::VotingForExecutive: return std::make_unique<VotingForExecutive>();
 	case Scenes::FinalHisami: return std::make_unique<FinalHisami>();
-	case Scenes::FinalYuugi: return std::make_unique<FinalYuugi>();
-	case Scenes::FinalSuika: return std::make_unique<FinalSuika>();
-	case Scenes::FinalYuuma: return std::make_unique<FinalYuuma>();
+	//case Scenes::FinalYuugi: return std::make_unique<FinalYuugi>();
+	//case Scenes::FinalSuika: return std::make_unique<FinalSuika>();
+	//case Scenes::FinalYuuma: return std::make_unique<FinalYuuma>();
 	case Scenes::VotingToRelocateHell: return std::make_unique<VotingToRelocateHell>();
 
 	case Scenes::Ending_RulingDecay: return std::make_unique<Ending_RulingDecay>();

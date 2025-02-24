@@ -3,7 +3,7 @@
 #include "Declare.hpp"
 
 #ifndef WEB_BUILD
-#define WEB_BUILD 0
+#define WEB_BUILD 1
 #endif
 
 // Sys constants

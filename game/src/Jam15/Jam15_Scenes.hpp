@@ -18,9 +18,9 @@ enum class Scenes : u8
 	EngagingYuuma,
 	VotingForExecutive,
 	FinalHisami,
-	FinalYuugi,
-	FinalSuika,
-	FinalYuuma,
+	//FinalYuugi,
+	//FinalSuika,
+	//FinalYuuma,
 	VotingToRelocateHell,
 
 	Ending_RulingDecay,
@@ -44,9 +44,9 @@ SCENE(VotingForPriceIncreases);
 SCENE(EngagingYuuma);
 SCENE(VotingForExecutive);
 SCENE(FinalHisami);
-SCENE(FinalYuugi);
-SCENE(FinalSuika);
-SCENE(FinalYuuma);
+//SCENE(FinalYuugi);
+//SCENE(FinalSuika);
+//SCENE(FinalYuuma);
 SCENE(VotingToRelocateHell);
 
 SCENE(Ending_RulingDecay);

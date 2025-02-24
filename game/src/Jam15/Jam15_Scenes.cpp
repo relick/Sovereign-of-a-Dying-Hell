@@ -17,6 +17,7 @@
 #define add_influence(AMOUNT) set_influence(AMOUNT + get_influence());
 #define zsay(FACE, TEXT) say_face(zanmu, FACE, TEXT)
 #define zthink(FACE, TEXT) think_face(zanmu, FACE, TEXT)
+#define suika_cost() (io_game.ReadVar<Variables::SuikaDissuaded>() ? 0 : 20)
 
 #define TEST_SKIP_TO_VOTE 0
 
@@ -396,8 +397,6 @@ SCENE_RUN(VotingForAnimalRights)
     end;
 }
 
-// TODO: maybe an intermission where Hisami spreads fervour with the eagle spirits?
-
 SCENE_RUN(SuikaApproaches)
 {
     SCENE_SETUP();
@@ -412,13 +411,13 @@ SCENE_RUN(SuikaApproaches)
 
     desc("An oni with towering horns firmly pushes aside the shoji door.");
 
-    say(zanmu, "Suika? What a pleasant surprise.");
+    zsay(pained, "Suika? What a pleasant surprise.");
 
     show(suika, bigjoy);
     say(suika, "Zanmu!");
     say(suika, "I'm glad you're glad to see me. Is the potted plant around?");
 
-    say(zanmu, "She's on an errand.");
+    zsay(neutral, "She's on an errand.");
 
     show(suika, neutral);
     say(suika, "Good, 'cause I wanted to talk with you *extra* privately.");
@@ -428,7 +427,7 @@ SCENE_RUN(SuikaApproaches)
     zthink(neutral, "Suika always hides her true intentions under that playful mask.");
     zthink(neutral, "I need to think over carefully if she can be trusted.");
 
-    say(zanmu, "Straight to the point, huh?");
+    zsay(smirk, "Straight to the point, huh?");
 
     // Default to false, is set to true if persuasion is successful
     io_game.SetVar<Variables::SuikaDissuaded>(false);
@@ -441,33 +440,33 @@ SCENE_RUN(SuikaApproaches)
         auto const res = get_choice_result();
         if (res == 1)
         {
-            say(zanmu, "I'm not scheming anything. Has it become wrong to propose improvements to Hell?");
+            zsay(smirk, "I'm not scheming anything. Has it become wrong to propose improvements to Hell?");
 
             show(suika, pout);
             say(suika, "Ehhhh...");
             say(suika, "Fine! But if I find out you just lied, I don't care what it is. I'll fight you down.");
+            hide();
 
-            zthink(unamused_sweat, "Oh dear. Suika has considerable rapport with the other kishin. Votes might be harder to secure...");
+            zthink(unamused_sweat, "Oh dear. Suika has considerable rapport with the other kishin. Votes might be harder from now on...");
 
             script.SetNextScene(Scenes::DelegatingToHisami);
             end;
         }
     }
 
-    say(zanmu, "You're very observant. It's true, I'm scheming~");
+    zsay(smirk, "You're very observant. It's true, I'm scheming~");
     
     say(suika, "Woohoo! I knew it! What're you doing?");
 
-    say(zanmu, "I'm going to take over Hell, and make it run smoothly again.");
+    zsay(neutral, "I'm going to take over Hell, and make it run smoothly again.");
 
     show(suika, neutral);
     say(suika, "...Huh?");
     say(suika, "What do you mean you're going to take over?");
 
-    zthink(pained, "Ack. Suika's horrified. I need to "); // TODO
+    zthink(pained, "Ack. Suika's horrified. I need to tone it way down.");
     
     {
-        // TODO
         choice(
             "\"I'll be a true administrator.\"",
             "\"I'll be Hell's king.\"",
@@ -485,13 +484,15 @@ SCENE_RUN(SuikaApproaches)
         {
             say(suika, "You can't be serious!");
 
-            say(zanmu, "It's a serious situation.");
+            zsay(neutral, "It's a serious situation.");
 
             say(suika, "Damn! I thought you were just trying to poke fun at the Council. But this'll be going too far, Zanmu!");
             say(suika, "I need to warn the oni!");
             hide();
 
-            zthink(unamused_sweat, "Hm. It's within tolerance, but I won't deny she's going to make things harder.");
+            zthink(unamused_sweat, "Hm. It's within tolerance, but I won't deny she's going to make votes harder from now on.");
+
+            script.SetNextScene(Scenes::DelegatingToHisami);
             end;
         }
         }
@@ -499,6 +500,41 @@ SCENE_RUN(SuikaApproaches)
     
     say(suika, "I see. You've always been good at that, I suppose.");
     say(suika, "How're you gonna do it?");
+
+    {
+        choice(
+            "\"With threats and violence.\"",
+            "\"I'll put it to the vote.\"",
+            );
+        auto const res = get_choice_result();
+        switch (res)
+        {
+        case 0:
+        {
+            show(suika, neutral);
+            say(suika, "Nah, Zanmu, I can't condone that.");
+            say(suika, "You're meant to be one of our smart ones! I really didn't take you for a meat-headed brute.");
+
+            zthink(unamused_sweat, "Well, saying that got the unsurprising reaction. I was, uh, meant to tone it down. I suspect votes may be harder from now on.");
+            break;
+        }
+        case 1:
+        {
+            show(suika, bigjoy);
+            say(suika, "Good on ya, Zanmu! That's the way to do it.");
+            say(suika, "Truth be told, I'm not planning on staying in Hell much longer anyway.");
+            say(suika, "I don't like the atmosphere, and there's too many rules. I hear rumours of youkai trying to create some place on the surface, away from humans. Sounds kinda nice, right?");
+            
+            zsay(neutral, "Can't say I'm interested in such a place, but I understand wanting to leave. Take care, Suika.");
+
+            io_game.SetVar<Variables::SuikaDissuaded>(true);
+            break;
+        }
+        }
+    }
+
+    show(suika, bigjoy);
+    say(suika, "Well. Thanks for hearing me out! I'll leave you alone now.");
 
     script.SetNextScene(Scenes::DelegatingToHisami);
     end;
@@ -624,7 +660,7 @@ SCENE_RUN(VotingForPriceIncreases)
         .m_voteName = "Increase cost of crossing the Sanzu by 10%",
         .m_votingTime = FIX16(10),
         .m_startingPlayerInfluence = initialInfluence,
-        .m_attackSize = attackSize,
+        .m_attackSize = static_cast<u16>(attackSize + suika_cost()),
         .m_attackPattern = Game::AttackPattern::FastBitty,
         .m_playerWantsToLose = true,
     };
@@ -942,7 +978,7 @@ SCENE_RUN(VotingForExecutive)
         .m_voteName = "Create a ruler of Hell",
         .m_votingTime = FIX16(8),
         .m_startingPlayerInfluence = get_influence(),
-        .m_attackSize = 300, // Possible influence until now totals 316
+        .m_attackSize = static_cast<u16>(256 + suika_cost()), // Possible influence until now totals 316
         .m_attackPattern = Game::AttackPattern::Variable,
         .m_playerWantsToLose = false,
     };
@@ -970,7 +1006,7 @@ SCENE_RUN(VotingForExecutive)
     zthink(pleasant, "But maybe it was always going to be easier to take a more drastic option!");
     zthink(neutral, "Tomorrow, I will propose a relocation, to a new Hell.");
     zthink(gloat, "...");
-    zthink(smirk, "I should spend the rest of the day shoring up my support.");
+    /*zthink(smirk, "I should spend the rest of the day shoring up my support.");
 
     {
         choice(
@@ -1003,7 +1039,10 @@ SCENE_RUN(VotingForExecutive)
             break;
         }
         }
-    }
+    }*/
+
+    zthink(neutral, "I think I should take a little break first.");
+    script.SetNextScene(Scenes::FinalHisami);
 
     end;
 }
@@ -1074,7 +1113,7 @@ SCENE_RUN(FinalHisami)
     end;
 }
 
-SCENE_RUN(FinalYuugi)
+/*SCENE_RUN(FinalYuugi)
 {
     SCENE_SETUP();
 
@@ -1111,7 +1150,7 @@ SCENE_RUN(FinalYuuma)
 
     script.SetNextScene(Scenes::VotingToRelocateHell);
     end;
-}
+}*/
 
 SCENE_RUN(VotingToRelocateHell)
 {
@@ -1143,7 +1182,7 @@ SCENE_RUN(VotingToRelocateHell)
             .m_voteName = "Relocate Hell",
             .m_votingTime = FIX16(8),
             .m_startingPlayerInfluence = get_influence(),
-            .m_attackSize = 160, // Not impossible, but it can be fine if they lose this
+            .m_attackSize = static_cast<u16>(160 + suika_cost()), // Not impossible, but it can be fine if they lose this
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
         };
@@ -1206,7 +1245,7 @@ SCENE_RUN(VotingToRelocateHell)
             .m_voteName = "Relocate Hell",
             .m_votingTime = FIX16(5),
             .m_startingPlayerInfluence = get_influence(),
-            .m_attackSize = 80,
+            .m_attackSize = static_cast<u16>(80 + suika_cost()),
             .m_attackPattern = Game::AttackPattern::Variable,
             .m_playerWantsToLose = false,
         };
