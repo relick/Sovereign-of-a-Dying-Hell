@@ -151,7 +151,6 @@ SCENE_RUN(HatchingThePlan)
     end;
 }
 
-// TODO-HERE
 SCENE_RUN(LobbyingYuugi)
 {
     SCENE_SETUP();
@@ -159,27 +158,38 @@ SCENE_RUN(LobbyingYuugi)
     scene(hell_city);
     wait_for_tasks();
 
-    say(zanmu, "Hoshiguma, thanks for the meet up.");
+    zsay(pleasant, "Hoshiguma, thanks for the meet up.");
     show(yuugi, neutral);
     say(yuugi, "You're lucky I like you, Nippaku. How many times have you turned down my party invitations?");
 
-    say(zanmu, "Ehe... Eighteen times... I've been busy?");
+    zsay(pained, "Ehe... Eighteen times... I've been busy?");
 
     say(yuugi, "Don't worry about it. Sometimes I feel bad seeing you work so hard whilst I merely drink and relax. Sometimes.");
     say(yuugi, "Anyway, work is why you wanted to meet, right?");
 
     zthink(pleasant, "Hoshiguma prefers people to be direct. But let's start with flattery.");
 
-    say(zanmu, "Sure, but we can shoot the breeze first. I'm in no hurry.");
+    zsay(pleasant, "Sure, but we can shoot the breeze first. I'm in no hurry.");
 
+    show(yuugi, angry);
     say(yuugi, "Great! I miss this side of you.");
-    say(yuugi, "Hear me out on this, then. The other day, ");
+    say(yuugi, "Hear me out, then. The other day...");
+
+    hide();
 
     s8 opinion = 0;
-    // TODO: part one for opinion gaining
+    desc("Yuugi spends a few hours regaling you with her feats of strength.");
 
-    say(zanmu, "Yes. I need help passing a Council vote. I thought it would be particularly up your alley.");
-    say(zanmu, "My subordinate has reminded me of the horribly harsh conditions of the spirits in the Animal Realm.");
+    show(yuugi, neutral);
+
+    zthink(pained, "This is going on too long.");
+    zsay(pained, "Sorry Hoshiguma, could we talk about work now?");
+
+    show(yuugi, dejected);
+    say(yuugi, "Aww. Alright then. What did you need?");
+
+    zsay(neutral, "I need help passing a Council vote. I thought it would be particularly up your alley.");
+    zsay(neutral, "My subordinate has reminded me of the horribly harsh conditions of the spirits in the Animal Realm.");
 
     {
         choice(
@@ -192,7 +202,7 @@ SCENE_RUN(LobbyingYuugi)
         {
         case 0:
         {
-            opinion -= 1;
+            show(yuugi, angry);
             say(yuugi, "Of course I wouldn't, give me a break!");
 
             zthink(pained, "Oops. I need to remember not to pressure her.");
@@ -200,41 +210,44 @@ SCENE_RUN(LobbyingYuugi)
         }
         case 1:
         {
-            opinion -= 2;
+            opinion -= 1;
+            show(yuugi, angry);
             say(yuugi, "What the hell? That better be a joke. I've done a far sight more than you!");
 
-            say(zanmu, "I... uh, yeah, a bad joke. Hahaha!");
+            zsay(pained, "I... uh, yeah, a bad joke. Hahaha!");
             zthink(unamused_sweat, "I can't afford to insult her again.");
             break;
         }
         case 2:
         {
             opinion += 1;
+            show(yuugi, neutral);
             say(yuugi, "Huh. Yeah, we should!");
             break;
         }
         }
     }
 
+    show(yuugi, neutral);
     say(yuugi, "What's with the change of heart? You've never brought it up before.");
 
-    say(zanmu, "Well, I needn't pretend. I took note of how the level of misery was greatly impacting productivity.");
-    say(zanmu, "Hell's economy is totally anaemic! We're squeezing the life out of it by stamping the boot too hard.");
+    zsay(neutral, "I needn't pretend with you, Hoshiguma. I took note of how the level of misery was greatly impacting productivity.");
+    zsay(neutral, "Hell's economy is totally anaemic! We're squeezing the life out of it by stamping the boot too hard.");
 
     say(yuugi, "Hahaha. Nothing quite like a managerial problem to get the old monk in you fired up.");
     say(yuugi, "It's true how much excessive torture damages the economy, even if it's not why I care. I'll mention that next time I talk to the other oni.");
 
-    say(zanmu, "Great! They will appreciate your more wholistic worldview, I am sure.");
-    say(zanmu, "In any case, let me be specific. My proposal will be to end solitary confinements and provide sustenance even to those undergoing torture.");
+    zsay(smirk, "Great! They will appreciate your more wholistic worldview, I am sure.");
+    zsay(neutral, "In any case, let me be specific. My proposal will be to end solitary confinements and provide sustenance even to those undergoing torture.");
 
     say(yuugi, "You'd go that far..? That's a huge step! But good!");
     say(yuugi, "What can I do, though?");
 
-    say(zanmu, "I just need you to rally the oni in your circle. Combined with those I can account for myself, it should be enough.");
+    zsay(neutral, "I just need you to rally the oni in your circle. Combined with those I can account for myself, it should be enough.");
 
     say(yuugi, "Is that really enough, though? I just need to talk to a few oni?");
 
-    say(zanmu, "No, not just talk. I'm trying to *win* this vote, not make a moral statement.");
+    zsay(smirk, "No, not just talk. I'm trying to *win* this vote, not make a moral statement.");
 
     {
         choice(
@@ -247,16 +260,17 @@ SCENE_RUN(LobbyingYuugi)
         {
         case 0:
         {
-            opinion += 3;
+            opinion += 1;
+            show(yuugi, angry);
             say(yuugi, "Oh, hell yeah! Let's do it!");
             say(yuugi, "We're coming to free you, little bunny spirits!");
             break;
         }
         case 1:
         {
-            opinion -= 1;
+            show(yuugi, dejected);
             say(yuugi, "...Really? I don't think that's going to help.");
-            if (opinion > 0)
+            if (opinion >= 0)
             {
                 say(yuugi, "Still...");
             }
@@ -264,10 +278,11 @@ SCENE_RUN(LobbyingYuugi)
         }
         case 2:
         {
-            opinion -= 2;
+            opinion -= 1;
+            show(yuugi, neutral);
             say(yuugi, "Noted, Nippaku. But I only threaten my enemies.");
             say(yuugi, "If that's really how you think... I'd rather you didn't let it slip.");
-            if (opinion > 0)
+            if (opinion >= 0)
             {
                 say(yuugi, "Still...");
             }
@@ -276,13 +291,15 @@ SCENE_RUN(LobbyingYuugi)
         }
     }
 
-    bool const hasYuugiInfluence = opinion > 0;
+    show(yuugi, neutral);
+
+    bool const hasYuugiInfluence = opinion >= 0;
     io_game.SetVar<Variables::HasYuugiInfluence>(hasYuugiInfluence);
     if (hasYuugiInfluence)
     {
         say(yuugi, "I think this has a chance to work.");
 
-        say(zanmu, "Of course it does, I'm involved.");
+        zsay(gloat, "Of course it does, I'm involved.");
 
         say(yuugi, "Hahaha! How quick your arrogance returns now I'm on board!");
         say(yuugi, "If you're holding the vote tomorrow, I'll make the rounds today.");
@@ -295,12 +312,12 @@ SCENE_RUN(LobbyingYuugi)
         say(yuugi, "Ah...");
         say(yuugi, "You know, I'm having second thoughts. Call it an oni's hunch.");
 
-        say(zanmu, "Wait, why-");
+        zsay(unamused_sweat, "Wait, why-");
 
         say(yuugi, "Nope, I'm wise to your trickery, Nippaku, I'm not going to hear you out.");
         say(yuugi, "Thanks for the chat, though, I'd genuinely like that again.");
 
-        say(zanmu, "Mhm. Alright then.");
+        zsay(unamused, "Mhm. Alright then.");
         zthink(unamused_sweat, "Frustrating. I'll have to make do with the allies I have.");
     }
 
