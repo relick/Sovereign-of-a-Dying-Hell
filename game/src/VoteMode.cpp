@@ -134,14 +134,30 @@ void VoteMode::Update
 		if (m_params.m_playerWantsToLose)
 		{
 			m_votePosition -= c_influencePerMash;
+			m_rightBounce = 8;
 		}
 		else
 		{
 			m_votePosition += c_influencePerMash;
+			m_leftBounce = 8;
 		}
 		m_remainingInfluence -= c_influencePerMash;
 	}
 
+	if (m_params.m_playerWantsToLose)
+	{
+		if (m_leftBounce <= 2)
+		{
+			m_leftBounce = 5;
+		}
+	}
+	else
+	{
+		if (m_rightBounce <= 2)
+		{
+			m_rightBounce = 5;
+		}
+	}
 	if (!m_attackEvents.empty())
 	{
 		if (m_attackEvents.back().m_frame >= m_framesLeft)
@@ -149,10 +165,12 @@ void VoteMode::Update
 			if (m_params.m_playerWantsToLose)
 			{
 				m_votePosition += static_cast<s16>(m_attackEvents.back().m_size);
+				m_leftBounce = 8;
 			}
 			else
 			{
 				m_votePosition -= static_cast<s16>(m_attackEvents.back().m_size);
+				m_rightBounce = 8;
 			}
 			m_attackEvents.pop_back();
 		}
@@ -178,6 +196,14 @@ void VoteMode::Update
 	if (m_framesLeft > 0)
 	{
 		--m_framesLeft;
+		if (m_leftBounce > 0)
+		{
+			--m_leftBounce;
+		}
+		if (m_rightBounce > 0)
+		{
+			--m_rightBounce;
+		}
 	}
 	else
 	{
@@ -448,7 +474,7 @@ void VoteMode::SetupGraphics()
 				{
 					auto [id, spr] = m_game->Sprites().AddSprite(size,
 						TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, m_silLeft_tileIndex[r] + tileOffset));
-					spr.SetX(xOffset);
+					spr.SetX(xOffset - 8);
 					spr.SetY(r * 32);
 					spr.SetZ(z++);
 					m_silLeftSprites[arrOffset + r] = id;
@@ -458,7 +484,7 @@ void VoteMode::SetupGraphics()
 					auto [id, spr] = m_game->Sprites().AddSprite(size,
 						TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, m_silRight_tileIndex[r] + tileOffset));
 					m_silRightSprites[arrOffset + r] = id;
-					spr.SetX(c_screenWidthPx - 112 + xOffset);
+					spr.SetX(c_screenWidthPx - 112 + xOffset + 8);
 					spr.SetY(r * 32);
 					spr.SetZ(z++);
 				}
@@ -593,6 +619,25 @@ void VoteMode::UpdateGraphics()
 
 	auto cursor = m_game->Sprites().EditSpriteData(m_cursor);
 	cursor.SetX((c_screenWidthPx / 2) - 8 + m_votePosition);
+
+	u16 spriteI = 0;
+	for (u16 i = 0; i < 4; ++i)
+	{
+		s16 const xOffset = i * 32;
+		for (u16 r = 0; r < 7; ++r, ++spriteI)
+		{
+			// left
+			{
+				auto spr = m_game->Sprites().EditSpriteData(m_silLeftSprites[spriteI]);
+				spr.SetX(xOffset - 8 + m_leftBounce);
+			}
+			// right
+			{
+				auto spr = m_game->Sprites().EditSpriteData(m_silRightSprites[spriteI]);
+				spr.SetX(static_cast<s16>(c_screenWidthPx - 112) + xOffset + (8 - m_rightBounce));
+			}
+		}
+	}
 }
 
 //------------------------------------------------------------------------------

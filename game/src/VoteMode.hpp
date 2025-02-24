@@ -99,6 +99,9 @@ class VoteMode
 	std::array<SpriteID, 7 * 4> m_silLeftSprites{};
 	std::array<SpriteID, 7 * 4> m_silRightSprites{};
 
+	s16 m_leftBounce{ 0 };
+	s16 m_rightBounce{ 0 };
+
 	u16 m_endTimer{};
 
 public:
