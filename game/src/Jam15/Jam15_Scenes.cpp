@@ -151,6 +151,7 @@ SCENE_RUN(HatchingThePlan)
     end;
 }
 
+// TODO-HERE
 SCENE_RUN(LobbyingYuugi)
 {
     SCENE_SETUP();
@@ -401,21 +402,22 @@ SCENE_RUN(SuikaApproaches)
 {
     SCENE_SETUP();
 
-    scene(zanmu_study);
+    scene(hell_palace);
     wait_for_tasks();
 
-    desc("Your study feels sterile, yet stale, at the same time.");
+    desc("Returning from the council meeting, you pass through the eery hallways of one of Hell's many palaces.");
 
     zthink(neutral, "With that out the way, I need to work on the next step.");
     zthink(neutral, "I'll speak to Hisami about it tomorrow-");
 
-    desc("An oni with towering horns firmly pushes aside the shoji door.");
-
-    zsay(pained, "Suika? What a pleasant surprise.");
+    desc("An oni with towering horns steps into your view.");
 
     show(suika, bigjoy);
     say(suika, "Zanmu!");
-    say(suika, "I'm glad you're glad to see me. Is the potted plant around?");
+
+    zsay(pained, "Suika? What a pleasant surprise.");
+
+    say(suika, "I'm glad you're glad to see me. Is the potted plant stalking us?");
 
     zsay(neutral, "She's on an errand.");
 
@@ -700,14 +702,19 @@ SCENE_RUN(VotingForPriceIncreases)
 
         show(zanmu, neutral);
         say(zanmu, "Thank you Council, I'll hand over to others now.");
+        hide();
         
         if (!io_game.ReadVar<Variables::SuikaDissuaded>())
         {
-            zthink(neutral, "Hmm. Suika's here. She probably saw through my intentions...");
+            zthink(neutral, "Hmm. Suika was here today. She probably saw through my intentions...");
         }
     }
 
-    // TODO
+    scene(zanmu_study);
+
+    zthink(neutral, "Time to prepare for the big vote.");
+    zthink(neutral, "I think I need to pay that visit to the beast in the Animal Realm.");
+    zthink(gloat, "If I can make her do what I want, it's just the ticket I need to beat the Council.");
 
     //script.SetNextScene(Scenes::MeetingTheShadowyKishin);
     script.SetNextScene(Scenes::EngagingYuuma);
@@ -955,16 +962,25 @@ SCENE_RUN(EngagingYuuma)
         {
             if (failedBothFlattery)
             {
+                show(yuuma, annoyed);
+                say(yuuma, "...");
                 show(yuuma, neutral);
-                say(yuuma, ""); // TODO
+                say(yuuma, "I was hoping you'd be more convincing. But I'm a reasonable person, I see your ability at the votes.");
             }
-            else
-            {
 
-            }
+            zsay(pleasant, "So, I can count on you to start a mess when it matters?");
+
+            show(yuuma, pleased);
+            say(yuuma, "Hehehe. I'll do it!");
+            say(yuuma, "But you better follow through, or you're next on my dinner plate.");
+
+            zsay(pained, "Yes, yes.");
+
+            hide();
+
+            desc("You've secured Yuuma's backing.");
 
             zthink(gloat, "Fantastic. This will be key to my victory.");
-            desc("You've gained Yuuma's backing.");
             io_game.SetVar<Variables::YuumaPromised>(true);
 
             script.SetNextScene(Scenes::VotingForExecutive);
@@ -1311,7 +1327,7 @@ SCENE_RUN(Ending_RulingDecay)
 {
     SCENE_SETUP();
 
-    // TODO
+    // TODO-HERE
 
     end;
 }
@@ -1320,7 +1336,7 @@ SCENE_RUN(Ending_NewHell)
 {
     SCENE_SETUP();
 
-    // TODO
+    // TODO-HERE
 
     end;
 }
@@ -1329,7 +1345,7 @@ SCENE_RUN(Ending_AdministratingCollapse)
 {
     SCENE_SETUP();
 
-    // TODO
+    // TODO-HERE
 
     end;
 }
