@@ -434,8 +434,8 @@ SCENE_RUN(SuikaApproaches)
 
     {
         choice(
-            "Share your plans with Suika",
-            "Keep the plans secret",
+            "\"Fine, I'll tell you.\"",
+            "\"I'm not scheming anything.\"",
         );
         auto const res = get_choice_result();
         if (res == 1)
@@ -776,8 +776,8 @@ SCENE_RUN(EngagingYuuma)
             {
                 ++flattery;
                 say_hidden(yuuma, "They are. And you're different?");
-                zsay(gloat, "I see things how they really are.");
-                say_hidden(yuuma, "Hehe. Alright then.");
+                zsay(gloat, "I've got greater visions, where the strong and weak both see their burdens eased.");
+                say_hidden(yuuma, "Hah. Alright then.");
                 break;
             }
         }
@@ -789,28 +789,59 @@ SCENE_RUN(EngagingYuuma)
     zsay(neutral, "I wanted to see who was acting as a leader to the eagle spirits. I'm keen to see them prosper.");
 
     zthink(pained, "A taotie is their leader? She might turn out to be a loose cannon. Still, I need to get on her good side...");
-
-    // TODO: a bit more chatter to get to know Yuuma?
-
     zthink(neutral, "What I say next will be very important.");
 
     bool freeAnimalRealm = false;
     {
         choice(
-            "Raise the idea of a liberated Animal Realm",
-            "Offer advice on growing her organisation",
+            "\"Are you interested in a free Animal Realm?\"",
+            "\"Why did you reject my help?\"",
         );
         auto const res = get_choice_result();
         freeAnimalRealm = res == 0;
+    }
+    
+    if (!freeAnimalRealm)
+    {
+        zsay(pleasant, "You gave my subordinate some grief for helping you out.");
+        zsay(neutral, "I'm not sure I understood why. Aren't you interested in growing your ranks?");
+
+        show(yuuma, annoyed);
+        say(yuuma, "Nah, not really. Some of the eagles just decided to start doing what I say after they saw my strength. Then they've spread the word among themselves.");
+        say(yuuma, "Why do you care, though?");
+
+        zsay(unamused, "In truth, I was hoping you could cause some havoc and threaten the oni. It sounds like I've had you pegged all wrong.");
+
+        show(yuuma, pleased);
+        say(yuuma, "Whoa whoa whoa, hold on. I didn't say I wouldn't start some trouble. Tell me more!");
+
+        zsay(smirk, "Oho? Well then. My vision for Hell needs the Oni Council to surrender its power, somehow.");
+        zsay(neutral, "I'm handling things up top, I just need a *big stick* to threaten them with.");
+        zsay(gloat, "A powerful taotie and a legion of fired up eagle spirits ready to set the Animal Realm ablaze... that would be perfect.");
+
+        show(yuuma, neutral);
+        say(yuuma, "Can't say that doesn't sound fun, but you'll need to tell me more about that vision if I'm gonna go wrecking stuff for it.");
+        
+        choice(
+            "\"I'll be the sole ruler of Hell, and fix it.\"",
+            "\"Are you interested in a free Animal Realm?\"",
+        );
+        auto const res = get_choice_result();
+        freeAnimalRealm = res == 1;
     }
 
     if (freeAnimalRealm)
     {
         // freeAnimalRealm
 
-        zsay(neutral, "There's a bigger picture than the oni can see as they squabble over tiny details. The current system isn't working.");
-        zsay(smirk, "That's especially true here! The enslaved animal spirits are supposed to be the backbone of Hell's economy, but with so little freedom, they barely do any work. They have no loyalty or morale.");
+        show(yuuma, double);
+        say(yuuma, "Huh?");
 
+        zsay(neutral, "Let me explain. There's a bigger picture than the oni can see as they squabble over tiny details. The current system isn't working.");
+        zsay(smirk, "That's especially true here! The enslaved animal spirits are supposed to be the backbone of Hell's economy...");
+        zsay(smirk, "But with so little freedom, they barely do any work. They have no loyalty or morale.");
+
+        show(yuuma, annoyed);
         say(yuuma, "You don't sound so different from the other oni if all you care about is the economy?");
 
         zthink(unamused, "Hmm... she's not throwing me any bones.");
@@ -819,17 +850,20 @@ SCENE_RUN(EngagingYuuma)
         zsay(neutral, "They plan everything out, because they can't let go of even the smallest drop of their power.");
         zsay(neutral, "That's what makes them miss all the opportunities that only individuals can pursue.");
 
-        say(yuuma, "Hah! That is more my language. What do you see as the alternative?");
+        show(yuuma, pleased);
+        say(yuuma, "Hah! That is more my language. And so you want that for the Animal Realm?");
 
         zsay(smirk, "The Animal Realm understands the only rule that truly matters: 'the strong eat the weak'. I see no reason not to simply put that into practice.");
         zsay(gloat, "Set the whole Realm free, no hierarchy, no slavery from above. Let beasts and animals rule themselves.");
 
+        show(yuuma, neutral);
         say(yuuma, "The eagle spirits follow my words because they've seen my strength. The rule is as you say...");
-        say(yuuma, "But tell me how you're going to convince the oni to give up their grip?");
+        say(yuuma, "I'm game for that idea. Tell me what you wanted of me, then?");
 
-        zsay(neutral, "Well, that's what I need to ask of you. I'm aware of your ambitions to take your own territory. That's an essential bargaining chip.");
+        zsay(neutral, "The threat of you and the eagles starting an uprising and taking territory. That's an essential bargaining chip with the oni.");
         zsay(smirk, "They will vote for my plans believing it will prevent your uprising, and in doing so I will deliver the free Animal Realm regardless.");
 
+        show(yuuma, double);
         say(yuuma, "Hahahah!");
         say(yuuma, "I don't trust you one bit!");
 
@@ -840,7 +874,7 @@ SCENE_RUN(EngagingYuuma)
         else
         {
             show(yuuma, annoyed);
-            say(yuuma, "For one, you managed to get the Sanzu's prices raised on your own. Why do you need me for leverage?");
+            say(yuuma, "For one, I heard you managed to get the Sanzu's prices raised on your own. Why do you need me for leverage?");
         }
 
         show(yuuma, pleased);
@@ -865,6 +899,7 @@ SCENE_RUN(EngagingYuuma)
                 zsay(smirk, "You could carve out your own niche of the Animal Realm, give it a name, and rule it as you like.");
                 zsay(gloat, "But that's where it would end, there would be no more chances for more territory. The rest of Hell would resist fiercely and fight for it back.");
 
+                show(yuuma, annoyed);
                 say(yuuma, "Hmph. Maybe so. Defending it for eternity sounds exhausting.");
 
                 zthink(smirk, "Good, she liked that.");
@@ -874,7 +909,7 @@ SCENE_RUN(EngagingYuuma)
             {
                 zsay(smirk, "You'd be crushed if you tried. Only my plan will work.");
 
-                say(yuuma, "Why do you think calling me stupid would get you anywhere?");
+                say(yuuma, "Why do you think calling me weak or stupid would get you anywhere?");
 
                 zthink(unamused_sweat, "Argh, she's more annoyed now.");
                 break;
@@ -883,26 +918,34 @@ SCENE_RUN(EngagingYuuma)
         }
 
         // Flattery 2
-        if (flattery > 0)
         {
-            zthink(smirk, "Now to land the finishing blow.");
+            zthink(smirk, "Now to sweeten the deal.");
 
-            // TODO
             choice(
-                "\"\"",
-                "\"I'll tell everyone of your plans if you don't help.\"",
-                "\"\"",
+                "\"If you don't help, I'll crush you myself.\"",
+                "\"You'd be a leader in a free Animal Realm.\"",
             );
             auto const res = get_choice_result();
             switch (res)
             {
-            case 2:
+            case 0:
             {
-                failedBothFlattery = false;
+                show(yuuma, annoyed);
+                say(yuuma, "If you want to fight, just say it! I'll leave nothing left of you!");
+
+                zsay(pained, "N-no, I'm not in the mood right now.");
+
                 break;
             }
-            default:
+            case 1:
             {
+                failedBothFlattery = false;
+
+                show(yuuma, pleased);
+                say(yuuma, "That's what I was thinking too. I'd have a headstart on any other beasts, with the eagles already with me. Heheheh.");
+                
+                zthink(neutral, "I hope that's enough to persuade her.");
+
                 break;
             }
             }
@@ -910,37 +953,34 @@ SCENE_RUN(EngagingYuuma)
         
         if (flattery >= 2)
         {
-            // TODO
             if (failedBothFlattery)
             {
-
+                show(yuuma, neutral);
+                say(yuuma, ""); // TODO
             }
             else
             {
 
             }
-        }
-        else
-        {
-            say(yuuma, "Look. If you want to help the Animal Realm then do as you please. But I'm handling things my own way.");
 
-            zsay(unamused_sweat, "Hm. If you insist.");
+            zthink(gloat, "Fantastic. This will be key to my victory.");
+            desc("You've gained Yuuma's backing.");
+            io_game.SetVar<Variables::YuumaPromised>(true);
 
-            hide();
-
-            zthink(neutral, "That was disappointing. Without her backing, I'll need to be on top of my game.");
+            script.SetNextScene(Scenes::VotingForExecutive);
+            end;
         }
 
         // freeAnimalRealm
     }
-    else
-    {
-        // !freeAnimalRealm
+    
+    say(yuuma, "Look. Whatever you've got going on with the Council, I don't care. I handle my own things, my own way.");
 
-        // TODO
+    zsay(unamused_sweat, "Hm. If you insist.");
 
-        // !freeAnimalRealm
-    }
+    hide();
+
+    zthink(neutral, "That was disappointing. Without her backing, I'll need to be on top of my game.");
 
     script.SetNextScene(Scenes::VotingForExecutive);
     end;
