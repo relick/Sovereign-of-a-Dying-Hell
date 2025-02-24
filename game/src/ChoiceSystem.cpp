@@ -65,6 +65,15 @@ std::expected<u8, ChoiceSystem::NoChoiceMade> ChoiceSystem::Update
 	bool i_choosePressed
 )
 {
+	if (m_initialInputBlock > 0)
+	{
+		--m_initialInputBlock;
+		if (i_choosePressed)
+		{
+			i_choosePressed = false;
+		}
+	}
+
 	if (m_choices.empty())
 	{
 		// Not yet started
@@ -208,6 +217,11 @@ Task ChoiceSystem::RenderText()
 			++str;
 		}
 
+		if (m_maxChoiceX < x)
+		{
+			m_maxChoiceX = x;
+		}
+
 		while (!DMA_queueDmaFast(
 			DMA_VRAM,
 			m_tiles.data() + baseTileIndex,
@@ -222,6 +236,8 @@ Task ChoiceSystem::RenderText()
 
 		++strIndex;
 	}
+
+	m_maxChoiceX = std::max<u16>((c_screenWidthPx - m_maxChoiceX) / 2, c_choiceXPos);
 
 	co_return;
 }
@@ -243,7 +259,7 @@ void ChoiceSystem::SetupSprites
 				TILE_ATTR_FULL(PAL3, true, false, false, tileIndex + (4 * sprN))
 			);
 
-			spr.SetX(c_choiceXPos + (4 * c_pixelsPerTile * sprN));
+			spr.SetX(m_maxChoiceX + (4 * c_pixelsPerTile * sprN));
 			spr.SetY(m_baseChoiceY + separation);
 			spr.SetZ(z++);
 
@@ -261,7 +277,7 @@ void ChoiceSystem::SetupSprites
 		);
 
 		spr.SetVisible(false);
-		spr.SetX(c_choiceXPos + c_choiceArrowXOffset);
+		spr.SetX(m_maxChoiceX + c_choiceArrowXOffset);
 
 		m_choiceArrow = id;
 	}
@@ -295,7 +311,7 @@ void ChoiceSystem::UpdateSprites
 	for (u16 i = 0; i < m_choices.size(); ++i)
 	{
 		s16 const separation = i * c_choiceYSeparation;
-		s16 const choiceX = c_choiceXPos + (sinFix16((m_floatScroll + i * 36) * 4) >> 5);
+		s16 const choiceX = m_maxChoiceX + (sinFix16((m_floatScroll + i * 36) * 4) >> 5);
 		for (u16 sprN = 0; sprN < c_spritesPerChoice; ++sprN)
 		{
 			auto spr = m_game->Sprites().EditSpriteData(m_choiceTextSprites[sprI]);

@@ -23,10 +23,12 @@ class ChoiceSystem
 
 	std::span<char const* const> m_choices;
 	std::optional<f16> m_timeLimit{ 0 };
+	u16 m_initialInputBlock{ 30 };
 
 	std::array<Tiles::Tile, 128> m_tiles{};
 
 	// 4 sprites per choice i.e. 128 pixels
+	u16 m_maxChoiceX{ 0 };
 	std::vector<SpriteID> m_choiceTextSprites;
 	SpriteID m_choiceArrow;
 	s16 m_baseChoiceY{ 0 };
