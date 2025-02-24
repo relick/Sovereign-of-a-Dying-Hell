@@ -42,19 +42,25 @@ inline constexpr std::array<TileSet const*, 11> c_nums = {
 	&voting_time_10,
 };
 
-template<size_t t_Amount>
-consteval std::array<u16, t_Amount> GenerateFrameNums(u16 i_framesPerSecond)
-{
-	std::array<u16, t_Amount> ret;
-	for (u16 i = 0; i < t_Amount; ++i)
-	{
-		ret[i] = (i + 1) * i_framesPerSecond;
-	}
-	return ret;
-}
+inline constexpr std::array<TileSet const*, 7> c_silLeft = {
+	&voting_sil_left1,
+	&voting_sil_left2,
+	&voting_sil_left3,
+	&voting_sil_left4,
+	&voting_sil_left5,
+	&voting_sil_left6,
+	&voting_sil_left7,
+};
 
-inline constexpr auto c_pal_framesForNums = GenerateFrameNums<11>(50);
-inline constexpr auto c_ntsc_framesForNums = GenerateFrameNums<11>(60);
+inline constexpr std::array<TileSet const*, 7> c_silRight = {
+	&voting_sil_right1,
+	&voting_sil_right2,
+	&voting_sil_right3,
+	&voting_sil_right4,
+	&voting_sil_right5,
+	&voting_sil_right6,
+	&voting_sil_right7,
+};
 
 //------------------------------------------------------------------------------
 VoteMode::~VoteMode
@@ -66,7 +72,9 @@ VoteMode::~VoteMode
 		std::ranges::for_each(m_num, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 		m_game->Sprites().RemoveSprite(m_midline);
 		m_game->Sprites().RemoveSprite(m_cursor);
-		std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+		//std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+		std::ranges::for_each(m_silLeftSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+		std::ranges::for_each(m_silRightSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 	}
 }
 
@@ -125,11 +133,11 @@ void VoteMode::Update
 	{
 		if (m_params.m_playerWantsToLose)
 		{
-			m_votePosition += c_influencePerMash;
+			m_votePosition -= c_influencePerMash;
 		}
 		else
 		{
-			m_votePosition -= c_influencePerMash;
+			m_votePosition += c_influencePerMash;
 		}
 		m_remainingInfluence -= c_influencePerMash;
 	}
@@ -268,67 +276,66 @@ void VoteMode::GenerateAttackEvents
 }
 
 //------------------------------------------------------------------------------
-std::pair<u16, u16> VoteMode::FindNumTileIndicesForFrameTimer() const
-{
-	if (System::IsNTSC())
-	{
-		for (u16 i = 0; i < c_ntsc_framesForNums.size(); ++i)
-		{
-			if (m_framesLeft < c_ntsc_framesForNums[i])
-			{
-				return { m_num_tileIndex[i], m_num_tileIndex[i] + 12, };
-			}
-		}
-	}
-	else
-	{
-		for (u16 i = 0; i < c_pal_framesForNums.size(); ++i)
-		{
-			if (m_framesLeft < c_pal_framesForNums[i])
-			{
-				return { m_num_tileIndex[i], m_num_tileIndex[i] + 12, };
-			}
-		}
-	}
-
-	return { m_num_tileIndex[0], m_num_tileIndex[0] + 12, };
-}
-
-//------------------------------------------------------------------------------
 void VoteMode::SetupGraphics()
 {
 	// Load required tiles for sprites, bar, and large text
 	m_game->QueueLambdaTask([this] -> Task {
+		// Start with the background
+		{
+			Task prio = m_vnWorld->SetCurBGPriority(false);
+			AwaitTask(prio);
+		}
 		PAL_setColors(16 * PAL2, voting_palette.data, 16, DMA_QUEUE); // Borrow portrait palette line
 
 		// Borrow character region
-		u16 tileIndex = c_tilesEnd;
+		u16 tileIndex = c_extraTilesEnd;
+		bool pastMid = false;
+		bool pastExtra = false;
+		auto fnUpdateTileIndex = [&tileIndex, &pastMid, &pastExtra](u16 i_numTiles)
+		{
+			if (!pastExtra && (tileIndex - i_numTiles) < c_extraTilesStart)
+			{
+				tileIndex = c_midTilesEnd - i_numTiles;
+				pastExtra = true;
+				return;
+			}
+
+			if (!pastMid && (tileIndex - i_numTiles) < c_midTilesStart)
+			{
+				tileIndex = c_tilesEnd - i_numTiles;
+				pastMid = true;
+				return;
+			}
+			
+			tileIndex -= i_numTiles;
+		};
 
 		// Time numbers
-		for (u16 numI = 0; TileSet const* numTiles : c_nums)
+		//for (u16 numI = 0; TileSet const* numTiles : c_nums)
 		{
-			tileIndex -= numTiles->numTile;
-			m_num_tileIndex[numI] = tileIndex;
-			++numI;
-			auto load = Tiles::LoadTiles_Chunked(numTiles, tileIndex);
+			u16 const num = std::min<u16>(m_framesLeft / FramesPerSecond(), 10);
+			fnUpdateTileIndex(c_nums[num]->numTile);
+			m_num_tileIndex = tileIndex;
+			//++numI;
+			auto load = Tiles::LoadTiles_Chunked(c_nums[num], tileIndex);
 			AwaitTask(load);
 		}
 
 		// Bars
 		{
-			tileIndex -= voting_bar_corners.numTile;
+			fnUpdateTileIndex(voting_bar_corners.numTile);
 			m_barCorners_tileIndex = tileIndex;
 			auto load = Tiles::LoadTiles_Chunked(&voting_bar_corners, tileIndex);
 			AwaitTask(load);
 		}
 		{
-			tileIndex -= voting_bar_mids.numTile;
+			fnUpdateTileIndex(voting_bar_mids.numTile);
 			m_barMids_tileIndex = tileIndex;
 			auto load = Tiles::LoadTiles_Chunked(&voting_bar_mids, tileIndex);
 			AwaitTask(load);
 		}
 		{
-			tileIndex -= voting_bar_midline.numTile;
+			fnUpdateTileIndex(voting_bar_midline.numTile);
 			m_barMidLine_tileIndex = tileIndex;
 			auto load = Tiles::LoadTiles_Chunked(&voting_bar_midline, tileIndex);
 			AwaitTask(load);
@@ -336,47 +343,21 @@ void VoteMode::SetupGraphics()
 
 		// Cursor
 		{
-			tileIndex -= voting_cursor.numTile;
+			fnUpdateTileIndex(voting_cursor.numTile);
 			m_cursor_tileIndex = tileIndex;
 			auto load = Tiles::LoadTiles_Chunked(&voting_cursor, tileIndex);
 			AwaitTask(load);
 		}
 
-		// Giant text
-		{
-			tileIndex -= voting_passed_vote_set.numTile;
-			m_passed_vote_tileIndex = tileIndex;
-			auto load = Tiles::LoadTiles_Chunked(&voting_passed_vote_set, tileIndex);
-			AwaitTask(load);
-		}
-		{
-			tileIndex -= voting_passed_passed_set.numTile;
-			m_passed_passed_tileIndex = tileIndex;
-			auto load = Tiles::LoadTiles_Chunked(&voting_passed_passed_set, tileIndex);
-			AwaitTask(load);
-		}
-		{
-			tileIndex -= voting_failed_vote_set.numTile;
-			m_failed_vote_tileIndex = tileIndex;
-			auto load = Tiles::LoadTiles_Chunked(&voting_failed_vote_set, tileIndex);
-			AwaitTask(load);
-		}
-		{
-			tileIndex -= voting_failed_failed_set.numTile;
-			m_failed_failed_tileIndex = tileIndex;
-			auto load = Tiles::LoadTiles_Chunked(&voting_failed_failed_set, tileIndex);
-			AwaitTask(load);
-		}
-
 		// Influence bar
 		{
-			tileIndex -= voting_influence_bar.numTile;
+			fnUpdateTileIndex(voting_influence_bar.numTile);
 			m_influenceBar_tileIndex = tileIndex;
 			auto load = Tiles::LoadTiles_Chunked(&voting_influence_bar, tileIndex);
 			AwaitTask(load);
 		}
 		{
-			tileIndex -= voting_influence_bar_text_set.numTile;
+			fnUpdateTileIndex(voting_influence_bar_text_set.numTile);
 			m_influenceBarText_tileIndex = tileIndex;
 			auto load = Tiles::LoadTiles_Chunked(&voting_influence_bar_text_set, tileIndex);
 			AwaitTask(load);
@@ -392,18 +373,35 @@ void VoteMode::SetupGraphics()
 			AwaitTask(map);
 		}
 
+		// Sillhouettes
+		for (u16 i = 0; TileSet const* silLeft : c_silLeft)
+		{
+			fnUpdateTileIndex(silLeft->numTile);
+			m_silLeft_tileIndex[i] = tileIndex;
+			++i;
+			auto load = Tiles::LoadTiles_Chunked(silLeft, tileIndex);
+			AwaitTask(load);
+		}
+		for (u16 i = 0; TileSet const* silRight : c_silRight)
+		{
+			fnUpdateTileIndex(silRight->numTile);
+			m_silRight_tileIndex[i] = tileIndex;
+			++i;
+			auto load = Tiles::LoadTiles_Chunked(silRight, tileIndex);
+			AwaitTask(load);
+		}
+
 		// Text
 		{
 			auto text = RenderText(tileIndex);
 			AwaitTask(text);
 		}
 
-		// Add sprites for number
 		s8 z = -64;
+		// Add sprites for number
 		{
-			std::pair<u16, u16> const tileIndex = FindNumTileIndicesForFrameTimer();
-			auto [leftID, left] = m_game->Sprites().AddSprite(SpriteSize::r4c3, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, tileIndex.first));
-			auto [rightID, right] = m_game->Sprites().AddSprite(SpriteSize::r4c3, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, tileIndex.second));
+			auto [leftID, left] = m_game->Sprites().AddSprite(SpriteSize::r4c3, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_num_tileIndex));
+			auto [rightID, right] = m_game->Sprites().AddSprite(SpriteSize::r4c3, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_num_tileIndex + 12));
 			m_num[0] = leftID;
 			m_num[1] = rightID;
 
@@ -436,9 +434,48 @@ void VoteMode::SetupGraphics()
 			spr.SetZ(z++);
 		}
 
+		// Add sillhouette sprites, in columns to make it easier to update x later
+		z = -96; // below everything
+		for (u16 i = 0; i < 4; ++i)
+		{
+			u16 const tileOffset = i * 16;
+			u16 const xOffset = tileOffset * 2;
+			u16 const arrOffset = i * 7;
+			SpriteSize const size = (i == 3 ? SpriteSize::r4c2 : SpriteSize::r4c4);
+			for (u16 r = 0; r < 7; ++r)
+			{
+				// left
+				{
+					auto [id, spr] = m_game->Sprites().AddSprite(size,
+						TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, m_silLeft_tileIndex[r] + tileOffset));
+					spr.SetX(xOffset);
+					spr.SetY(r * 32);
+					spr.SetZ(z++);
+					m_silLeftSprites[arrOffset + r] = id;
+				}
+				// right
+				{
+					auto [id, spr] = m_game->Sprites().AddSprite(size,
+						TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, m_silRight_tileIndex[r] + tileOffset));
+					m_silRightSprites[arrOffset + r] = id;
+					spr.SetX(c_screenWidthPx - 112 + xOffset);
+					spr.SetY(r * 32);
+					spr.SetZ(z++);
+				}
+			}
+		}
+
+		m_updateNumTiles = UpdateNumTiles();
+
 		// Create bars
 		m_updateBarTileMap = UpdateBarTileMap();
 		m_updateInfluenceBarMap = UpdateInfluenceBarTileMap();
+
+		// Fade in sillhouettes
+		{
+			auto fade = m_vnWorld->FadeCharaPalTo(voting_sil.data);
+			AwaitTask(fade);
+		}
 
 		m_graphicsReady = true;
 	});
@@ -525,17 +562,24 @@ Task VoteMode::RenderText
 
 	co_yield{};
 
-	// Add sprites
-	s8 z = -32;
-	u16 spriteX = (c_screenWidthPx - x) / 2;
-	for (u16 i = 0; i < m_voteNameTextTiles.size(); i += 4)
+	// Draw to map
+	std::vector<u16> textMap;
+	textMap.reserve(m_voteNameTextTiles.size());
+	for(u16 i = 0; i < m_voteNameTextTiles.size(); ++i)
 	{
-		auto [id, spr] = m_game->Sprites().AddSprite(SpriteSize::r1c4, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, textTileIndex + i));
-		m_voteNameSprites.push_back(id);
-		spr.SetX(spriteX + (i * 8));
-		spr.SetY(10 * 8);
-		spr.SetZ(z++);
+		textMap.push_back(TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, textTileIndex + i));
 	}
+	u16 tileX = (c_screenWidthTiles - (x / 8)) / 2;
+	auto map = Tiles::SetMap_SubFull(
+		VDP_BG_A,
+		textMap.data(),
+		textMap.size(),
+		1,
+		0,
+		tileX,
+		10
+	);
+	AwaitTask(map);
 
 	co_return;
 }
@@ -543,17 +587,12 @@ Task VoteMode::RenderText
 //------------------------------------------------------------------------------
 void VoteMode::UpdateGraphics()
 {
+	m_updateNumTiles();
 	m_updateBarTileMap();
 	m_updateInfluenceBarMap();
 
 	auto cursor = m_game->Sprites().EditSpriteData(m_cursor);
 	cursor.SetX((c_screenWidthPx / 2) - 8 + m_votePosition);
-
-	auto numLeft = m_game->Sprites().EditSpriteData(m_num[0]);
-	auto numRight = m_game->Sprites().EditSpriteData(m_num[1]);
-	auto const [numTileLeft, numTileRight] = FindNumTileIndicesForFrameTimer();
-	numLeft.SetFirstTileIndex(numTileLeft);
-	numRight.SetFirstTileIndex(numTileRight);
 }
 
 //------------------------------------------------------------------------------
@@ -689,7 +728,9 @@ void VoteMode::SetupEndGraphics()
 	std::ranges::for_each(m_num, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 	m_game->Sprites().RemoveSprite(m_midline);
 	m_game->Sprites().RemoveSprite(m_cursor);
-	std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+	//std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+	std::ranges::for_each(m_silLeftSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+	std::ranges::for_each(m_silRightSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 
 	m_vnWorld->WhiteBG(*m_game, true);
 	m_vnWorld->HideCharacterVisual(*m_game, true);
@@ -705,8 +746,15 @@ Task VoteMode::UpdateEndGraphics()
 	{
 		co_yield{};
 	}
+	u16 tileIndex = c_tilesEnd;
 	if (m_voteWon)
 	{
+		{
+			tileIndex -= voting_passed_vote_set.numTile;
+			m_passed_vote_tileIndex = tileIndex;
+			auto load = Tiles::LoadTiles_Chunked(&voting_passed_vote_set, tileIndex);
+			AwaitTask(load);
+		}
 		auto map = Tiles::SetMap_SubFull(
 			VDP_BG_A,
 			voting_passed_vote_map.tilemap,
@@ -720,6 +768,12 @@ Task VoteMode::UpdateEndGraphics()
 	}
 	else
 	{
+		{
+			tileIndex -= voting_failed_vote_set.numTile;
+			m_failed_vote_tileIndex = tileIndex;
+			auto load = Tiles::LoadTiles_Chunked(&voting_failed_vote_set, tileIndex);
+			AwaitTask(load);
+		}
 		auto map = Tiles::SetMap_SubFull(
 			VDP_BG_A,
 			voting_failed_vote_map.tilemap,
@@ -738,6 +792,12 @@ Task VoteMode::UpdateEndGraphics()
 	}
 	if (m_voteWon)
 	{
+		{
+			tileIndex -= voting_passed_passed_set.numTile;
+			m_passed_passed_tileIndex = tileIndex;
+			auto load = Tiles::LoadTiles_Chunked(&voting_passed_passed_set, tileIndex);
+			AwaitTask(load);
+		}
 		auto map = Tiles::SetMap_SubFull(
 			VDP_BG_A,
 			voting_passed_passed_map.tilemap,
@@ -751,6 +811,12 @@ Task VoteMode::UpdateEndGraphics()
 	}
 	else
 	{
+		{
+			tileIndex -= voting_failed_failed_set.numTile;
+			m_failed_failed_tileIndex = tileIndex;
+			auto load = Tiles::LoadTiles_Chunked(&voting_failed_failed_set, tileIndex);
+			AwaitTask(load);
+		}
 		auto map = Tiles::SetMap_SubFull(
 			VDP_BG_A,
 			voting_failed_failed_map.tilemap,
@@ -768,6 +834,19 @@ Task VoteMode::UpdateEndGraphics()
 		co_yield{};
 	}
 	m_graphicsDone = true;
+
+	co_return;
+}
+
+Task VoteMode::UpdateNumTiles()
+{
+	while (!m_votingComplete)
+	{
+		u16 const num = std::min<u16>(m_framesLeft / FramesPerSecond(), 10);
+		auto load = Tiles::LoadTiles_Chunked(c_nums[num], m_num_tileIndex);
+		AwaitTask(load);
+		co_yield{};
+	}
 
 	co_return;
 }

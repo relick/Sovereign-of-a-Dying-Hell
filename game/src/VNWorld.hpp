@@ -23,6 +23,7 @@ class VNWorld
 
 	std::unique_ptr<Script> m_script;
 
+	Image const* m_bgSrc{};
 	u16 const* m_bgSrcPal{ palette_black };
 	u16 const* m_charaSrcPal{ palette_black };
 	std::array<u16, 32> m_mainPals{};
@@ -81,8 +82,12 @@ public:
 	void StopMusic(u16 i_fadeOutFrames);
 
 	void SetBG(Game& io_game, Image const& i_bg);
+	Task SetCurBGPriority(bool i_priority);
 	void BlackBG(Game& io_game, bool i_fast);
 	void WhiteBG(Game& io_game, bool i_fast);
+
+	// Override PAL1 manually, and instantly
+	Task FadeCharaPalTo(u16 const* i_pal);
 
 	void SetCharacterVisual(Game& io_game, Pose const& i_pose);
 	void HideCharacterVisual(Game& io_game, bool i_fast);

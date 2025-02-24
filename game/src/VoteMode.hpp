@@ -68,7 +68,7 @@ class VoteMode
 	SpriteID m_midline{};
 	SpriteID m_cursor{};
 
-	std::array<u16, 11> m_num_tileIndex{};
+	u16 m_num_tileIndex{};
 	u16 m_barCorners_tileIndex{};
 	u16 m_barMids_tileIndex{};
 	u16 m_barMidLine_tileIndex{};
@@ -79,6 +79,10 @@ class VoteMode
 	u16 m_failed_failed_tileIndex{};
 	u16 m_influenceBar_tileIndex{};
 	u16 m_influenceBarText_tileIndex{};
+	std::array<u16, 7> m_silLeft_tileIndex{};
+	std::array<u16, 7> m_silRight_tileIndex{};
+
+	Task m_updateNumTiles;
 
 	// 2 rows of 32 tiles
 	std::array<u16, 64> m_barTileMap{};
@@ -90,7 +94,10 @@ class VoteMode
 
 	// Vote text, uses as many tiles/sprites as needed
 	std::vector<Tiles::Tile> m_voteNameTextTiles;
-	std::vector<SpriteID> m_voteNameSprites;
+
+	// Columns of sil sprites
+	std::array<SpriteID, 7 * 4> m_silLeftSprites{};
+	std::array<SpriteID, 7 * 4> m_silRightSprites{};
 
 	u16 m_endTimer{};
 
@@ -117,7 +124,6 @@ public:
 
 private:
 	void GenerateAttackEvents();
-	std::pair<u16, u16> FindNumTileIndicesForFrameTimer() const;
 	void SetupGraphics();
 	Task RenderText(u16 i_tileIndex);
 	void UpdateGraphics();
@@ -127,6 +133,7 @@ private:
 	u16 GetBarMidAttr(u16 i_tileI) const;
 	void SetupEndGraphics();
 	Task UpdateEndGraphics();
+	Task UpdateNumTiles();
 };
 
 }

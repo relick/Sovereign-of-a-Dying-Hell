@@ -368,6 +368,7 @@ void VNWorld::SetBG
 		TILE_ATTR_FULL(PAL0, TRUE, FALSE, FALSE, c_tilesStart)
 	));
 	io_game.QueueLambdaTask([this, &i_bg]() -> Task {
+		m_bgSrc = &i_bg;
 		m_bgSrcPal = i_bg.palette->data;
 
 		if (CurrentMode() == SceneMode::Dialogue)
@@ -427,6 +428,26 @@ void VNWorld::SetBG
 }
 
 //------------------------------------------------------------------------------
+Task VNWorld::SetCurBGPriority
+(
+	bool i_priority
+)
+{
+	if (!m_bgSrc)
+	{
+		return [] -> Task { co_return; }();
+	}
+
+	return Tiles::SetMap_Full(
+		VDP_BG_B,
+		m_bgSrc->tilemap->tilemap,
+		m_bgSrc->tilemap->w,
+		m_bgSrc->tilemap->h,
+		TILE_ATTR_FULL(PAL0, i_priority, FALSE, FALSE, c_tilesStart)
+	);
+}
+
+//------------------------------------------------------------------------------
 void VNWorld::BlackBG
 (
 	Game& io_game,
@@ -436,6 +457,7 @@ void VNWorld::BlackBG
 	if (i_fast)
 	{
 		io_game.QueueLambdaTask([this] -> Task {
+			m_bgSrc = nullptr;
 			std::copy(palette_black, palette_black + 16, m_mainPals.begin());
 			std::copy(palette_black, palette_black + 16, m_namePals.begin());
 			std::copy(palette_black, palette_black + 16, m_textPals.begin());
@@ -446,6 +468,7 @@ void VNWorld::BlackBG
 	else
 	{
 		io_game.QueueLambdaTask([this] -> Task {
+			m_bgSrc = nullptr;
 			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), palette_black, FramesPerSecond() >> 2);
 			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), palette_black, FramesPerSecond() >> 2);
 			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), palette_black, FramesPerSecond() >> 2);
@@ -510,6 +533,27 @@ void VNWorld::WhiteBG
 }
 
 //------------------------------------------------------------------------------
+Task VNWorld::FadeCharaPalTo
+(
+	u16 const* i_pal
+)
+{
+	Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data() + 16, i_pal, FramesPerSecond() >> 1);
+	Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data() + 16, i_pal, FramesPerSecond() >> 1);
+	Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data() + 16, i_pal, FramesPerSecond() >> 1);
+
+	while (fadeOp1)
+	{
+		fadeOp1.DoFadeStep();
+		fadeOp2.DoFadeStep();
+		fadeOp3.DoFadeStep();
+		co_yield{};
+	}
+
+	co_return;
+}
+
+//------------------------------------------------------------------------------
 void VNWorld::SetCharacterVisual
 (
 	Game& io_game,
@@ -536,23 +580,30 @@ void VNWorld::SetCharacterVisual
 
 		m_charaSrcPal = i_pose.m_palette->data;
 
-		if (CurrentMode() == SceneMode::Dialogue)
+		switch (CurrentMode())
+		{
+		case SceneMode::Dialogue:
 		{
 			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
 			Palettes::Tint(m_mainPals.data() + 16, m_namePals.data() + 16, c_tintColour);
 			Palettes::MinusOne(m_namePals.data() + 16, m_textPals.data() + 16);
+			break;
 		}
-		else if (CurrentMode() == SceneMode::Choice)
+		case SceneMode::Choice:
 		{
 			Palettes::Tint(m_charaSrcPal, m_mainPals.data() + 16, c_tintColour);
 			std::copy(m_mainPals.begin() + 16, m_mainPals.begin() + 32, m_namePals.begin() + 16);
 			std::copy(m_mainPals.begin() + 16, m_mainPals.begin() + 32, m_textPals.begin() + 16);
+			break;
 		}
-		else
+		case SceneMode::None:
+		case SceneMode::Voting:
 		{
 			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_mainPals.begin() + 16);
 			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_namePals.begin() + 16);
 			std::copy(m_charaSrcPal, m_charaSrcPal + 16, m_textPals.begin() + 16);
+			break;
+		}
 		}
 
 		u16 const tileIndex = c_tilesEnd - i_pose.m_tileset->numTile;
