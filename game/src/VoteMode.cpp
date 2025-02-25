@@ -91,7 +91,7 @@ void VoteMode::Start
 	m_influencePerMash = (m_params.m_easyMode ? 4 : 1) * c_influencePerMash;
 
 	// Set up data
-	m_framesLeft = fix16Mul(std::max<f16>(m_params.m_votingTime, FIX16(5)), FramesPerSecond()); // Min 5-seconds
+	m_framesLeft = fix16ToInt(fix16Mul(std::max<f16>(m_params.m_votingTime, FIX16(5)), FIX16(40))); // Min 5-seconds
 	m_remainingInfluence = m_params.m_startingPlayerInfluence;
 	m_voteWon = false;
 
@@ -345,7 +345,7 @@ void VoteMode::SetupGraphics()
 		// Time numbers
 		//for (u16 numI = 0; TileSet const* numTiles : c_nums)
 		{
-			u16 const num = std::min<u16>(m_framesLeft / FramesPerSecond(), 10);
+			u16 const num = std::min<u16>(m_framesLeft / 40, 10);
 			fnUpdateTileIndex(c_nums[num]->numTile);
 			m_num_tileIndex = tileIndex;
 			//++numI;
@@ -893,7 +893,7 @@ Task VoteMode::UpdateNumTiles()
 {
 	while (!m_votingComplete)
 	{
-		u16 const num = std::min<u16>(m_framesLeft / FramesPerSecond(), 10);
+		u16 const num = std::min<u16>(m_framesLeft / 40, 10);
 		auto load = Tiles::LoadTiles_Chunked(c_nums[num], m_num_tileIndex);
 		AwaitTask(load);
 		co_yield{};
