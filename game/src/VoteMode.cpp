@@ -445,16 +445,6 @@ void VoteMode::SetupGraphics()
 			right.SetZ(z++);
 		}
 
-		// Add midline sprite
-		{
-			auto [id, spr] = m_game->Sprites().AddSprite(SpriteSize::r2c1, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_barMidLine_tileIndex));
-			m_midline = id;
-
-			spr.SetX(c_screenWidthPx / 2);
-			spr.SetY(16 * 8);
-			spr.SetZ(0); // behind cursor
-		}
-
 		// Add cursor sprite
 		{
 			// Cursor has to use PAL3 to get shadow mode to work
@@ -466,8 +456,17 @@ void VoteMode::SetupGraphics()
 			spr.SetZ(z++);
 		}
 
+		// Add midline sprite
+		{
+			auto [id, spr] = m_game->Sprites().AddSprite(SpriteSize::r2c1, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_barMidLine_tileIndex));
+			m_midline = id;
+
+			spr.SetX(c_screenWidthPx / 2);
+			spr.SetY(16 * 8);
+			spr.SetZ(z++); // behind cursor
+		}
+
 		// Add sillhouette sprites, in columns to make it easier to update x later
-		z = -96; // below everything
 		for (u16 i = 0; i < 4; ++i)
 		{
 			u16 const tileOffset = i * 16;
@@ -482,7 +481,7 @@ void VoteMode::SetupGraphics()
 						TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, m_silLeft_tileIndex[r] + tileOffset));
 					spr.SetX(xOffset - 8);
 					spr.SetY(r * 32);
-					spr.SetZ(z++);
+					spr.SetZ(z++); // behind everything
 					m_silLeftSprites[arrOffset + r] = id;
 				}
 				// right
@@ -492,7 +491,7 @@ void VoteMode::SetupGraphics()
 					m_silRightSprites[arrOffset + r] = id;
 					spr.SetX(c_screenWidthPx - 112 + xOffset + 8);
 					spr.SetY(r * 32);
-					spr.SetZ(z++);
+					spr.SetZ(z++); // behind everything
 				}
 			}
 		}
