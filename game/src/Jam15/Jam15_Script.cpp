@@ -222,6 +222,8 @@ std::unique_ptr<Game::Scene> Script::CreateScene
 	case Scenes::Ending_RulingDecay: return std::make_unique<Ending_RulingDecay>();
 	case Scenes::Ending_NewHell: return std::make_unique<Ending_NewHell>();
 	case Scenes::Ending_AdministratingCollapse: return std::make_unique<Ending_AdministratingCollapse>();
+
+	case Scenes::CharacterViewer: return std::make_unique<CharacterViewer>();
 	}
 	
 	return {};

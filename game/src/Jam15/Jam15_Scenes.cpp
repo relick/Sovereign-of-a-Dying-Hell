@@ -1459,4 +1459,19 @@ SCENE_RUN(Ending_AdministratingCollapse)
     end;
 }
 
+SCENE_RUN(CharacterViewer)
+{
+    SCENE_SETUP();
+
+    scene(zanmu_study);
+    show(hisami, neutral);
+    wait_for_tasks();
+    io_vn.WaitUntilInput(); wait;
+
+    scene(animal_realm);
+    show(yuuma, annoyed);
+    wait_for_tasks();
+    io_vn.WaitUntilInput(); wait;
+}
+
 }

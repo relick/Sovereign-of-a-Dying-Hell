@@ -27,6 +27,8 @@ enum class Scenes : u8
 	Ending_NewHell,
 	Ending_AdministratingCollapse,
 
+	CharacterViewer,
+
 	InitialScene = FirstVoteProposal,
 };
 
@@ -52,5 +54,7 @@ SCENE(VotingToRelocateHell);
 SCENE(Ending_RulingDecay);
 SCENE(Ending_NewHell);
 SCENE(Ending_AdministratingCollapse);
+
+SCENE(CharacterViewer);
 
 }
