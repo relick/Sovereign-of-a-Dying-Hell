@@ -1402,8 +1402,15 @@ SCENE_RUN(Ending_RulingDecay)
 {
     SCENE_SETUP();
 
-    // TODO-HERE
+    desc("Zanmu Nippaku has managed to swindle her way to the top of this crumbling Hell.");
+    desc("Through a massive and crushing force of oni might, she somehow brings Hell back to some semblance of stability.");
+    desc("But, she can't help but be bothered by all the cracks that form, needing constant repair.");
+    desc("Perhaps, getting everything she thought she wanted wasn't really the best outcome.");
+    desc("Maybe there was another way?");
 
+    desc("Ending 1: King of Decay\n\nThanks for playing! Try again for other endings!");
+
+    io_game.RequestNextWorld(std::make_unique<Game::IntroWorld>());
     end;
 }
 
@@ -1411,8 +1418,30 @@ SCENE_RUN(Ending_NewHell)
 {
     SCENE_SETUP();
 
-    // TODO-HERE
+    desc("Zanmu Nippaku successfully negotiates with the oni and the Yama to move Hell.");
 
+    desc("Yuugi and Suika flee to Gensokyo, although Yuugi soon returns to the Former Hell. It's hard to forget where home is.");
+
+    desc("The logistics of relocation aren't easy, but the results speak for themselves.");
+
+    io_vn.ClearMode(io_game);
+
+    scene(ending);
+    wait_for_tasks();
+    io_vn.WaitUntilInput(); wait;
+
+    desc("The New Hell is a thriving expanse, with realms of great wealth and great poverty alike.");
+    desc("The likes of Yuuma Toutetsu and other gang leaders rule vast and growing metropolises as the oni power dwindles.");
+
+    desc("What a wondrous world!");
+
+    desc("Ending 2: Shin Jigoku\n\nThanks for playing! Try again for other endings!");
+
+    io_vn.ClearMode(io_game);
+
+    io_vn.WaitUntilInput(); wait;
+
+    io_game.RequestNextWorld(std::make_unique<Game::IntroWorld>());
     end;
 }
 
@@ -1420,8 +1449,13 @@ SCENE_RUN(Ending_AdministratingCollapse)
 {
     SCENE_SETUP();
 
-    // TODO-HERE
+    desc("Despite her frantic efforts, Zanmu is unable to change anything major about Hell.");
+    desc("It slips into further and further decay, and then total collapse...");
+    desc("It's only a matter of time before the Yama do something drastic, with an ill fate awaiting all residents of Hell.");
 
+    desc("Ending 3: Infernal Collapse\n\nThanks for playing! Try again for other endings!");
+
+    io_game.RequestNextWorld(std::make_unique<Game::IntroWorld>());
     end;
 }
 

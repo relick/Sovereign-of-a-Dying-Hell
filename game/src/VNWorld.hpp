@@ -54,6 +54,7 @@ class VNWorld
 	enum class ProgressMode : u8
 	{
 		Always, // Reset to this after progress made via any way. In particular used by wait_for_tasks()
+		Input, // Waits until a button is pressed
 		Scene, // Waits for current scene mode subsystem to indicate progress
 	};
 	ProgressMode m_progressMode{ ProgressMode::Always };
@@ -69,6 +70,8 @@ class VNWorld
 	// Portrait
 	SpriteID m_portraitSprite{};
 
+	bool m_waitUntilInput{ false };
+
 public:
 	VNWorld(std::unique_ptr<Script> i_script);
 
@@ -77,6 +80,7 @@ public:
 	void Run(Game &io_game) override;
 
 	void WaitForTasks(Game& io_game);
+	void WaitUntilInput();
 
 	void StartMusic(u8 const* i_bgm, u16 i_fadeInFrames, bool i_loop);
 	void StopMusic(u16 i_fadeOutFrames);

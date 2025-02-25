@@ -252,6 +252,15 @@ void VNWorld::Run
 			m_script->UpdateVN(io_game, *this);
 			break;
 		}
+		case ProgressMode::Input:
+		{
+			if (ABCpressedThisFrame)
+			{
+				m_progressMode = ProgressMode::Always;
+				m_script->UpdateVN(io_game, *this);
+			}
+			break;
+		}
 		case ProgressMode::Scene:
 		{
 			switch (CurrentMode())
@@ -309,6 +318,13 @@ void VNWorld::WaitForTasks
 		--m_waitingForTasksStack;
 		co_return;
 	});
+}
+
+//------------------------------------------------------------------------------
+void VNWorld::WaitUntilInput
+()
+{
+	m_progressMode = ProgressMode::Input;
 }
 
 //------------------------------------------------------------------------------
