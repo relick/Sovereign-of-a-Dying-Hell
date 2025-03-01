@@ -29,7 +29,7 @@ SCENE_RUN(FirstVoteProposal)
     SCENE_SETUP();
 
     scene(kishin_council);
-    //play_music(faron, 0.0, true);
+    //play_music(faron, true);
     wait_for_tasks();
 
 #if !TEST_SKIP_TO_VOTE

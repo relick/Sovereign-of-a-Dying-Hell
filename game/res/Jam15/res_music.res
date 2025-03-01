@@ -1,1 +1,1 @@
-XGM faron "music/faron study.vgm"
+XGM voting "music/voting.vgm"

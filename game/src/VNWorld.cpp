@@ -135,7 +135,7 @@ WorldRoutine VNWorld::Shutdown
 {
 	io_game.Sprites().RemoveSprite(m_portraitSprite);
 
-	StopMusic(0);
+	StopMusic(io_game);
 
 	SYS_setHIntCallback(nullptr);
 	VDP_setHInterrupt(false);
@@ -330,22 +330,28 @@ void VNWorld::WaitUntilInput
 //------------------------------------------------------------------------------
 void VNWorld::StartMusic
 (
+	Game& io_game,
 	u8 const* i_bgm,
-	u16 i_fadeInFrames,
 	bool i_loop
 )
 {
-	XGM_startPlay(i_bgm);
-	XGM_setLoopNumber(i_loop ? -1 : 0);
+	io_game.QueueFunctionTask([](u8 const* i_bgm, bool i_loop) -> Task {
+		XGM_startPlay(i_bgm);
+		XGM_setLoopNumber(i_loop ? -1 : 0);
+		co_return;
+	}(i_bgm, i_loop));
 }
 
 //------------------------------------------------------------------------------
 void VNWorld::StopMusic
 (
-	u16 i_fadeOutFrames
+	Game& io_game
 )
 {
-	XGM_stopPlay();
+	io_game.QueueFunctionTask([] -> Task {
+		XGM_stopPlay();
+		co_return;
+	}());
 }
 
 //------------------------------------------------------------------------------

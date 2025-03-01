@@ -12,7 +12,8 @@
 
 #define scene(BG) io_vn.SetBG(io_game, BG)
 
-#define play_music(MUSIC, FADE_IN_SECONDS, LOOP) io_vn.StartMusic(MUSIC, fix16ToInt(fix16Mul(FIX16(FADE_IN_SECONDS), FramesPerSecond())), LOOP)
+#define play_music(MUSIC, LOOP) io_vn.StartMusic(io_game, MUSIC, LOOP); wait_for_tasks()
+#define stop_music() io_vn.StopMusic(io_game); wait_for_tasks()
 #define play_sfx(SFX)
 
 #define wait_for_tasks() io_vn.WaitForTasks(io_game); wait
@@ -38,7 +39,7 @@
 #define get_timed_choice_result() io_vn.GetChoiceResult()
 
 // Use HideCharacterVisual to quickly put away the VOTE X'D graphic
-#define start_vote(VOTE_PARAMS) io_vn.StartVote(io_game, VOTE_PARAMS); wait; io_vn.HideCharacterVisual(io_game, false)
+#define start_vote(VOTE_PARAMS) play_music(voting, false); io_vn.StartVote(io_game, VOTE_PARAMS); wait; io_vn.HideCharacterVisual(io_game, false)
 #define get_vote_result() io_vn.GetVoteResult()
 
 // TODO

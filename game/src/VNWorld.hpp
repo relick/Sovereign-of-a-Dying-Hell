@@ -82,8 +82,8 @@ public:
 	void WaitForTasks(Game& io_game);
 	void WaitUntilInput();
 
-	void StartMusic(u8 const* i_bgm, u16 i_fadeInFrames, bool i_loop);
-	void StopMusic(u16 i_fadeOutFrames);
+	void StartMusic(Game& io_game, u8 const* i_bgm, bool i_loop);
+	void StopMusic(Game& io_game);
 
 	void SetBG(Game& io_game, Image const& i_bg);
 	Task SetCurBGPriority(bool i_priority);
