@@ -634,6 +634,7 @@ SCENE_RUN(DelegatingToHisami)
             choice(
                 "\"Lobby the Yama. Get them to voice support.\"",
                 "\"Spread doubt among the lesser oni.\""
+                "\"Reach out to a senior kishin for an alliance.\""
             );
         }
         else
@@ -641,7 +642,6 @@ SCENE_RUN(DelegatingToHisami)
             choice(
                 "\"Lobby the Yama. Get them to voice support.\"",
                 "\"Spread doubt among the lesser oni.\"",
-                "\"Reach out to a senior kishin for an alliance.\""
             );
         }
         auto const res = get_choice_result();
