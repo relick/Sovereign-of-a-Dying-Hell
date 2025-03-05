@@ -148,7 +148,7 @@ SCENE_RUN(HatchingThePlan)
 
     zthink(smirk, "I need to prepare the waters...");
     zthink(smirk, "First, I'll make the Council weaken their own grip on the Animal Realm. That'll serve well to make them cower.");
-    zthink(neutral, "Then, I'll prove the process is charade with a sham vote.");
+    zthink(neutral, "Then, I'll prove the process is a charade with a sham vote.");
     zthink(gloat, "If all goes well, I'll finish with a vote to install me as sole ruler!");
     zthink(neutral, "Okay, for the first vote, I should talk to Hoshiguma. She's always been squeamish of the punishments wrought on the animals. That, and she has enough influence on the Council to sway it my way.");
 

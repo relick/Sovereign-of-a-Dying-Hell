@@ -1,4 +1,5 @@
 {
+    "cmake.configureOnOpen": false,
     "files.associations": {
         "*.s": "m68k",
         "*.rcpp": "cpp",

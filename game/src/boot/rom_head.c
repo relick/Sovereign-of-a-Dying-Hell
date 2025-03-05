@@ -10,8 +10,8 @@ const ROMHeader rom_header = {
     "SEGA MEGA DRIVE ",
 #endif
     "(C)KDEV 2025.FEB",                                 // Copyright, format `(C)XXXX YYYY.ZZZ` with X = dev ID, Y = year, Z = month
-    "SAMPLE PROGRAM                                  ", // Japan name
-    "SAMPLE PROGRAM                                  ", // Overseas name
+    "Sovereign of a Dying Hell v0.3                  ", // Japan name
+    "Sovereign of a Dying Hell v0.3                  ", // Overseas name
     "GM 00000000-00",                                   // Serial number, format `GM YYYYYYYY-ZZ` with Y = number, Z = revision
     0x000,                                              // checksum, compute by adding every 16 bit word from $000200 to end of the rom, then truncate
     "J6              ",                                 // List of supported devices. J6 = 3 and 6 button support
