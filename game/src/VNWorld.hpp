@@ -87,8 +87,8 @@ public:
 
 	void SetBG(Game& io_game, Image const& i_bg);
 	Task SetCurBGPriority(bool i_priority);
-	void BlackBG(Game& io_game, bool i_fast);
-	void WhiteBG(Game& io_game, bool i_fast);
+	void BlackBG(Game& io_game, bool i_fast, bool i_setBG);
+	void WhiteBG(Game& io_game, bool i_fast, bool i_setBG);
 
 	// Override PAL1 manually, and instantly
 	Task FadeCharaPalTo(u16 const* i_pal);

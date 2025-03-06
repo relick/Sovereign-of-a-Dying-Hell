@@ -782,9 +782,9 @@ void VoteMode::SetupEndGraphics()
 	std::ranges::for_each(m_silLeftSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 	std::ranges::for_each(m_silRightSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
 
-	m_vnWorld->WhiteBG(*m_game, true);
+	m_vnWorld->WhiteBG(*m_game, true, false);
 	m_vnWorld->HideCharacterVisual(*m_game, true);
-	m_vnWorld->BlackBG(*m_game, false);
+	m_vnWorld->BlackBG(*m_game, false, false);
 
 	m_game->QueueFunctionTask(UpdateEndGraphics());
 }

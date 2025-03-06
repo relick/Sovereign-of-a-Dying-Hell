@@ -45,7 +45,7 @@ void Script::InitTitle
 		TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, c_tilesEnd - titleImg.tileset->numTile)
 	));
 	io_game.QueueLambdaTask([&titleImg] -> Game::Task {
-		std::array<u16, 32> pal;
+		std::array<u16, 32> pal{};
 		Palettes::FadeOp<16> fade = Palettes::CreateFade<16>(pal.data(), hell_palace.palette->data, FramesPerSecond());
 		Palettes::FadeOp<16> fade2 = Palettes::CreateFade<16>(pal.data() + 16, titleImg.palette->data, FramesPerSecond());
 
@@ -184,7 +184,7 @@ void Script::UpdateVN
 		// Tidy up visuals
 		io_vn.HideCharacterVisual(io_game, false);
 		io_vn.ClearModeImmediate(io_game);
-		io_vn.BlackBG(io_game, true);
+		io_vn.BlackBG(io_game, true, true);
 
 		m_currentScene = CreateScene(*m_nextScene);
 		m_nextScene = std::nullopt;

@@ -473,13 +473,18 @@ Task VNWorld::SetCurBGPriority
 void VNWorld::BlackBG
 (
 	Game& io_game,
-	bool i_fast
+	bool i_fast,
+	bool i_setBG
 )
 {
 	if (i_fast)
 	{
-		io_game.QueueLambdaTask([this] -> Task {
-			m_bgSrc = nullptr;
+		io_game.QueueLambdaTask([this, i_setBG] -> Task {
+			if (i_setBG)
+			{
+				m_bgSrc = nullptr;
+				m_bgSrcPal = palette_black;
+			}
 			std::copy(palette_black, palette_black + 16, m_mainPals.begin());
 			std::copy(palette_black, palette_black + 16, m_namePals.begin());
 			std::copy(palette_black, palette_black + 16, m_textPals.begin());
@@ -489,8 +494,12 @@ void VNWorld::BlackBG
 	}
 	else
 	{
-		io_game.QueueLambdaTask([this] -> Task {
-			m_bgSrc = nullptr;
+		io_game.QueueLambdaTask([this, i_setBG] -> Task {
+			if (i_setBG)
+			{
+				m_bgSrc = nullptr;
+				m_bgSrcPal = palette_black;
+			}
 			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), palette_black, FramesPerSecond() >> 2);
 			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), palette_black, FramesPerSecond() >> 2);
 			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), palette_black, FramesPerSecond() >> 2);
@@ -521,12 +530,18 @@ inline constexpr std::array<u16, 16> c_palette_white = FillPaletteWhite();
 void VNWorld::WhiteBG
 (
 	Game& io_game,
-	bool i_fast
+	bool i_fast,
+	bool i_setBG
 )
 {
 	if (i_fast)
 	{
-		io_game.QueueLambdaTask([this] -> Task {
+		io_game.QueueLambdaTask([this, i_setBG] -> Task {
+			if (i_setBG)
+			{
+				m_bgSrc = nullptr;
+				m_bgSrcPal = c_palette_white.data();
+			}
 			std::copy(c_palette_white.begin(), c_palette_white.end(), m_mainPals.begin());
 			std::copy(c_palette_white.begin(), c_palette_white.end(), m_namePals.begin());
 			std::copy(c_palette_white.begin(), c_palette_white.end(), m_textPals.begin());
@@ -536,7 +551,12 @@ void VNWorld::WhiteBG
 	}
 	else
 	{
-		io_game.QueueLambdaTask([this] -> Task {
+		io_game.QueueLambdaTask([this, i_setBG] -> Task {
+			if (i_setBG)
+			{
+				m_bgSrc = nullptr;
+				m_bgSrcPal = c_palette_white.data();
+			}
 			Palettes::FadeOp<16> fadeOp1 = Palettes::CreateFade<16>(m_mainPals.data(), c_palette_white.data(), FramesPerSecond() >> 2);
 			Palettes::FadeOp<16> fadeOp2 = Palettes::CreateFade<16>(m_namePals.data(), c_palette_white.data(), FramesPerSecond() >> 2);
 			Palettes::FadeOp<16> fadeOp3 = Palettes::CreateFade<16>(m_textPals.data(), c_palette_white.data(), FramesPerSecond() >> 2);
