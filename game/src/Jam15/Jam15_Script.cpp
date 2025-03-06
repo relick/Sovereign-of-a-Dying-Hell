@@ -44,7 +44,7 @@ void Script::InitTitle
 	io_game.QueueFunctionTask(Tiles::SetMap_Full(VDP_BG_A, titleImg.tilemap->tilemap, titleImg.tilemap->w, titleImg.tilemap->h,
 		TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, c_tilesEnd - titleImg.tileset->numTile)
 	));
-	io_game.QueueLambdaTask([&titleImg] -> Game::Task {
+	io_game.QueueLambdaTask([this, &io_game, &titleImg] -> Game::Task {
 		std::array<u16, 32> pal{};
 		Palettes::FadeOp<16> fade = Palettes::CreateFade<16>(pal.data(), hell_palace.palette->data, FramesPerSecond());
 		Palettes::FadeOp<16> fade2 = Palettes::CreateFade<16>(pal.data() + 16, titleImg.palette->data, FramesPerSecond());
@@ -57,16 +57,15 @@ void Script::InitTitle
 			co_yield{};
 		}
 
+		u16 const arrowTiles = io_game.Sprites().InsertMiscTiles(misc_spr);
+		PAL_setColors(16 * PAL3, text_font_pal.data, 16, DMA_QUEUE);
+		auto [arrowID, spr] = io_game.Sprites().AddSprite(Game::SpriteSize::r1c1, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, arrowTiles + 1));
+		m_arrowSpr = arrowID;
+		spr.SetX(8 * 5);
+		spr.SetY(156 + m_selection * 21);
+
 		co_return;
 	});
-
-	u16 const arrowTiles = io_game.Sprites().InsertMiscTiles(misc_spr);
-	PAL_setColors(16 * PAL3, text_font_pal.data, 16, DMA_QUEUE);
-	auto [arrowID, spr] = io_game.Sprites().AddSprite(Game::SpriteSize::r1c1, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, arrowTiles + 1));
-	m_arrowSpr = arrowID;
-	spr.SetX(8 * 5);
-	spr.SetY(156 + m_selection * 21);
-
 }
 
 void Script::UpdateTitle
