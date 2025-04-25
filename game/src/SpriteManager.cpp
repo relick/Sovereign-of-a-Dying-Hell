@@ -124,9 +124,9 @@ std::pair<SpriteID, EditableSpriteData> SpriteManager::AddSprite
     u16 i_tileAttr
 )
 {
-    Assert(m_spriteMapping.SpriteCount() < c_maxSpriteCount, "Too many sprites"); // TODO: actually handle properly?
-
     SpriteID const newID = m_spriteMapping.NewSprite();
+    Assert(newID.Valid(), "Failed to make sprite");
+
     Sprite& spr = m_sprites.emplace_back();
     VRAMSprite& vSpr = m_vramSprites.emplace_back();
 

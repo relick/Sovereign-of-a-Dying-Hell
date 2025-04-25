@@ -47,7 +47,11 @@ public:
         {
             ++id;
         }
-        if (id == c_maxSpriteCount) { return SpriteID(); }
+        if (id == c_maxSpriteCount)
+        { 
+            Error("Too many sprites"); // TODO: actually handle properly?
+            return SpriteID();
+        }
 
         m_indices[id] = SpriteCount();
         ++m_count;
