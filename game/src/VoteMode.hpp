@@ -55,6 +55,7 @@ class VoteMode
 	s16 m_votePosition{ 0 };
 	
 	u16 m_framesLeft{};
+	u16 m_bounceTicks{};
 	u16 m_remainingInfluence{};
 	bool m_voteWon{ false };
 

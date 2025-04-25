@@ -22,6 +22,8 @@ inline constexpr u16 c_framesForLeftTitle = 60;
 inline constexpr u16 c_framesForRightTitle = 100;
 inline constexpr u16 c_framesForEnd = 240;
 
+inline constexpr u16 c_bounceTickSpeed = 2; // Number of frames between bounce decrements
+
 inline constexpr u16 SetVFlip(u16 i_attr) {
 	return (i_attr & (~TILE_ATTR_VFLIP_MASK)) | TILE_ATTR_VFLIP_MASK;
 }
@@ -202,13 +204,21 @@ void VoteMode::Update
 	if (m_framesLeft > 0)
 	{
 		--m_framesLeft;
-		if (m_leftBounce > 0)
+		if (m_bounceTicks > 0)
 		{
-			--m_leftBounce;
+			--m_bounceTicks;
 		}
-		if (m_rightBounce > 0)
+		else
 		{
-			--m_rightBounce;
+			m_bounceTicks = c_bounceTickSpeed;
+			if (m_leftBounce > 0)
+			{
+				--m_leftBounce;
+			}
+			if (m_rightBounce > 0)
+			{
+				--m_rightBounce;
+			}
 		}
 	}
 	else
