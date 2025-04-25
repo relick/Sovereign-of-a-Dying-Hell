@@ -69,7 +69,7 @@ SCENE_RUN(FirstVoteProposal)
 #if WEB_BUILD
     desc("Spend influence by mashing the space bar!");
 #else
-    desc("Spend influence by mashing A/B/C on the gamepad!");
+    desc("Spend influence by mashing {|} on the gamepad!");
 #endif
     set_influence(64);
 
