@@ -9,7 +9,35 @@
             "type": "cppdbg",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build and Run (Debug)",
+            "preLaunchTask": "Build (Debug) and Run (Debugger)",
+            "program": "game/out/rom.out",
+            /*"logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            },*/
+            "miDebuggerPath": "${workspaceFolder}\\..\\..\\SDKs\\SGDKplusplus\\x68k-gcc\\bin\\m68k-elf-gdb.exe",
+            "miDebuggerServerAddress": ":1234",
+            "MIMode": "gdb",
+            //"stopAtEntry": true, // doesn't seem to be needed now
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing",
+                    "description": "enable pretty printing",
+                    "ignoreFailures": true
+                },
+                {
+                   "text": "set target-async off"
+                }
+            ],
+            "targetArchitecture": "x64"
+        },
+        {
+            "name": "Run (Release)",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build (Release) and Run (Debugger)",
             "program": "game/out/rom.out",
             /*"logging": {
                 "engineLogging": true,

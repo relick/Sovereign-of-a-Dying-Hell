@@ -75,7 +75,8 @@
         "vdp.h": "c",
         "*.txt": "cpp",
         "coroutine": "cpp",
-        "expected": "cpp"
+        "expected": "cpp",
+        "csignal": "cpp"
     },
     "files.exclude": {
         "**/*.rpyc": true,

@@ -9,6 +9,7 @@ SET "PATH=%GDK_WIN%\bin;%XGCC_WIN%;%PATH%"
 
 set DIR=game
 
-echo "Building '%DIR%' in release..."
-%GDK_WIN%\bin\make -C "%DIR%" release -f %GDK_WIN%\makefilecpp.gen
+echo "Building '%DIR%' in final..."
+%GDK_WIN%\bin\make -C "%DIR%" final -f %GDK_WIN%\makefilecpp.gen
+%GDK_WIN%\bin\make -C "%DIR%" distclean -f %GDK_WIN%\makefilecpp.gen
 echo "Build complete."

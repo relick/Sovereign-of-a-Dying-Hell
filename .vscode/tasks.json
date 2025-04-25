@@ -4,24 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build ASM",
-            "type": "shell",
-            "command": "./build_asm.bat",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": true
-            },
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
             "label": "Clean",
             "type": "shell",
             "command": "./clean.bat",
@@ -40,7 +22,107 @@
             }
         },
         {
-            "label": "Build",
+            "label": "Switch to ASM",
+            "dependsOn": [
+                "Clean",
+                "Build ASM"
+            ],
+            "dependsOrder": "sequence",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Switch to Final",
+            "dependsOn": [
+                "Clean",
+                "Build (Final)"
+            ],
+            "dependsOrder": "sequence",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Switch to Release",
+            "dependsOn": [
+                "Clean",
+                "Build (Release)"
+            ],
+            "dependsOrder": "sequence",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Switch to Debug",
+            "dependsOn": [
+                "Clean",
+                "Build (Debug)"
+            ],
+            "dependsOrder": "sequence",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Build ASM",
+            "type": "shell",
+            "command": "./build_asm.bat",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build (Final)",
+            "type": "shell",
+            "command": "./build_final.bat",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build (Release)",
             "type": "shell",
             "command": "./build_release.bat",
             "presentation": {
@@ -89,7 +171,7 @@
             }
         },
         {
-            "label": "Run (Debug)",
+            "label": "Run (Debugger)",
             "type": "shell",
             "command": "\"..\\..\\SDKs\\blastem\\blastem.exe\" \"game\\out\\rom.bin\" -D",
             "presentation": {
@@ -102,9 +184,9 @@
             }
         },
         {
-            "label": "Build and Run",
+            "label": "Build (Final) and Run",
             "dependsOn": [
-                "Build",
+                "Build (Final)",
                 "Run"
             ],
             "dependsOrder": "sequence",
@@ -118,10 +200,60 @@
             }
         },
         {
-            "label": "Build and Run (Debug)",
+            "label": "Build (Release) and Run",
+            "dependsOn": [
+                "Build (Release)",
+                "Run"
+            ],
+            "dependsOrder": "sequence",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Build (Debug) and Run",
             "dependsOn": [
                 "Build (Debug)",
-                "Run (Debug)"
+                "Run"
+            ],
+            "dependsOrder": "sequence",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Build (Release) and Run (Debugger)",
+            "hide": true,
+            "dependsOn": [
+                "Build (Release)",
+                "Run (Debugger)"
+            ],
+            "dependsOrder": "sequence",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "label": "Build (Debug) and Run (Debugger)",
+            "hide": true,
+            "dependsOn": [
+                "Build (Debug)",
+                "Run (Debugger)"
             ],
             "dependsOrder": "sequence",
             "presentation": {
