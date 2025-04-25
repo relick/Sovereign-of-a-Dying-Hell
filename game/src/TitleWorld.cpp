@@ -14,7 +14,7 @@ TitleWorld::TitleWorld
 )
 	: m_script{ std::move(i_script) }
 {
-	if (!m_script) { Error("Must provide a script to TitleWorld"); }
+	Assert(m_script, "Must provide a script to TitleWorld");
 }
 
 //------------------------------------------------------------------------------

@@ -71,12 +71,12 @@ VoteMode::~VoteMode
 	m_game->SFX().RemoveSFX(m_mash);
 	if (m_graphicsReady)
 	{
-		std::ranges::for_each(m_num, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
-		m_game->Sprites().RemoveSprite(m_midline);
-		m_game->Sprites().RemoveSprite(m_cursor);
-		//std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
-		std::ranges::for_each(m_silLeftSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
-		std::ranges::for_each(m_silRightSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+		std::ranges::for_each(m_num, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+		m_midline = m_game->Sprites().RemoveSprite(m_midline);
+		m_cursor = m_game->Sprites().RemoveSprite(m_cursor);
+		//std::ranges::for_each(m_voteNameSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+		std::ranges::for_each(m_silLeftSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+		std::ranges::for_each(m_silRightSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
 	}
 }
 
@@ -91,7 +91,7 @@ void VoteMode::Start
 	m_influencePerMash = (m_params.m_easyMode ? 4 : 1) * c_influencePerMash;
 
 	// Set up data
-	m_framesLeft = fix16ToInt(fix16Mul(std::max<f16>(m_params.m_votingTime, FIX16(5)), FIX16(40))); // Min 5-seconds
+	m_framesLeft = fix16ToInt(fix16Mul(std::max<f16>(m_params.m_votingTime, FIX16(5)), FIX16(FramesPerSecond()))); // Min 5-seconds
 	m_remainingInfluence = m_params.m_startingPlayerInfluence;
 	m_voteWon = false;
 
@@ -345,7 +345,7 @@ void VoteMode::SetupGraphics()
 		// Time numbers
 		//for (u16 numI = 0; TileSet const* numTiles : c_nums)
 		{
-			u16 const num = std::min<u16>(m_framesLeft / 40, 10);
+			u16 const num = std::min<u16>(m_framesLeft / FramesPerSecond(), 10);
 			fnUpdateTileIndex(c_nums[num]->numTile);
 			m_num_tileIndex = tileIndex;
 			//++numI;
@@ -775,12 +775,12 @@ u16 VoteMode::GetBarMidAttr
 //------------------------------------------------------------------------------
 void VoteMode::SetupEndGraphics()
 {
-	std::ranges::for_each(m_num, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
-	m_game->Sprites().RemoveSprite(m_midline);
-	m_game->Sprites().RemoveSprite(m_cursor);
-	//std::ranges::for_each(m_voteNameSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
-	std::ranges::for_each(m_silLeftSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
-	std::ranges::for_each(m_silRightSprites, [this](SpriteID id) { m_game->Sprites().RemoveSprite(id); });
+	std::ranges::for_each(m_num, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+	m_midline = m_game->Sprites().RemoveSprite(m_midline);
+	m_cursor = m_game->Sprites().RemoveSprite(m_cursor);
+	//std::ranges::for_each(m_voteNameSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+	std::ranges::for_each(m_silLeftSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+	std::ranges::for_each(m_silRightSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
 
 	m_vnWorld->WhiteBG(*m_game, true, false);
 	m_vnWorld->HideCharacterVisual(*m_game, true);
@@ -892,7 +892,7 @@ Task VoteMode::UpdateNumTiles()
 {
 	while (!m_votingComplete)
 	{
-		u16 const num = std::min<u16>(m_framesLeft / 40, 10);
+		u16 const num = std::min<u16>(m_framesLeft / FramesPerSecond(), 10);
 		auto load = Tiles::LoadTiles_Chunked(c_nums[num], m_num_tileIndex);
 		AwaitTask(load);
 		co_yield{};

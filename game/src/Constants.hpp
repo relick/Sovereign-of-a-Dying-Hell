@@ -12,6 +12,8 @@ inline constexpr u16 c_screenHeightTiles = 28;
 inline constexpr u16 c_screenWidthPx = c_screenWidthTiles << 3;
 inline constexpr u16 c_screenHeightPx = c_screenHeightTiles << 3;
 
+inline constexpr u16 c_maxSpriteCount = 80;
+
 inline constexpr u16 c_vramEndTile = 2048;
 inline constexpr u16 c_reservedClearTile = c_vramEndTile - 1;
 inline constexpr u16 c_portraitSizeTiles = 4;

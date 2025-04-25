@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 
+#include <algorithm>
 #include <vector>
 
 namespace Game
@@ -20,10 +21,45 @@ struct VRAMSprite
 //------------------------------------------------------------------------------
 struct Sprite
 {
-    SpriteID m_id{ UINT16_MAX };
+    SpriteID m_id;
 
     bool m_visible{ true };
     s8 m_z{ 0 };
+};
+
+//------------------------------------------------------------------------------
+class SpriteMapping
+{
+    std::vector<u16> m_indices;
+    u16 m_count{ 0 };
+
+public:
+    SpriteMapping() { m_indices.resize(c_maxSpriteCount, UINT16_MAX); }
+    void ClearAllSprites() { std::ranges::fill(m_indices, UINT16_MAX); }
+    u16 SpriteCount() const { return m_count; }
+    bool ValidSprite(SpriteID i_id) const { return i_id.Valid() && m_indices[i_id.Get()] < UINT16_MAX; }
+    u16& operator[](SpriteID i_id) { return m_indices[i_id.Get()]; }
+
+    SpriteID NewSprite()
+    {
+        SpriteID::Core id = 0;
+        while (id < c_maxSpriteCount && m_indices[id] < UINT16_MAX)
+        {
+            ++id;
+        }
+        if (id == c_maxSpriteCount) { return SpriteID(); }
+
+        m_indices[id] = SpriteCount();
+        ++m_count;
+
+        return SpriteID(id);
+    }
+
+    void RemoveSprite(SpriteID i_id)
+    {
+        m_indices[i_id.Get()] = UINT16_MAX;
+        --m_count;
+    }
 };
 
 class EditableSpriteData;
@@ -33,10 +69,10 @@ class SpriteManager
 {
     friend EditableSpriteData;
 
+    // SpriteID -> Sprite/VRAMSprite indices
+    SpriteMapping m_spriteMapping;
     std::vector<Sprite> m_sprites;
-    std::vector<VRAMSprite> m_vramSprites; // TODO: in-place vector
-
-    SpriteID m_nextSpriteID{0};
+    std::vector<VRAMSprite> m_vramSprites;
 
     u16 m_miscSpriteTilesIndex{0};
 
@@ -50,14 +86,19 @@ class SpriteManager
     u16 m_firstSpriteIndex{ UINT16_MAX };
     u16 m_lastSpriteIndex{ 0 };
 
+    void UpdateMapping();
+
 public:
-    SpriteManager() { m_sprites.reserve(80); m_vramSprites.reserve(80); /* Max sprite count */ }
+    SpriteManager()
+    {
+        m_sprites.reserve(c_maxSpriteCount);
+        m_vramSprites.reserve(c_maxSpriteCount);
+    }
 
     void Update(Game& io_game);
 
     std::pair<SpriteID, EditableSpriteData> AddSprite(SpriteSize i_size, u16 i_tileAttr);
-    std::pair<SpriteID, EditableSpriteData> CloneSprite(SpriteID i_id);
-    void RemoveSprite(SpriteID i_id);
+    [[nodiscard]] SpriteID RemoveSprite(SpriteID i_id); // e.g. id = RemoveSprite(id); to clear the id value
     void ClearAllSprites();
 
     EditableSpriteData EditSpriteData(SpriteID i_id);

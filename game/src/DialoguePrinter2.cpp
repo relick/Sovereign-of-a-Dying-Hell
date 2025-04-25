@@ -127,15 +127,15 @@ DialoguePrinter2::~DialoguePrinter2
 	if (m_spritesInitialised)
 	{
 		// Should clean up even if the world will do it, in case we spawn and kill multiple DialoguePrinters!
-		for(SpriteID id : m_nameSprites)
+		for(SpriteID& id : m_nameSprites)
 		{
-			m_game->Sprites().RemoveSprite(id);
+			id = m_game->Sprites().RemoveSprite(id);
 		}
-		for(SpriteID id : m_textSprites)
+		for(SpriteID& id : m_textSprites)
 		{
-			m_game->Sprites().RemoveSprite(id);
+			id = m_game->Sprites().RemoveSprite(id);
 		}
-		m_game->Sprites().RemoveSprite(m_nextArrow);
+		m_nextArrow = m_game->Sprites().RemoveSprite(m_nextArrow);
 	}
 }
 
@@ -198,6 +198,7 @@ void DialoguePrinter2::SetupSprites
 
 		++y;
 	}
+	Assert(sprI == m_textSprites.size(), "Text sprite size incorrect");
 
 	// Arrow sprite
 	{
@@ -256,12 +257,9 @@ void DialoguePrinter2::SetName
 			break; // done
 		}
 
-#if DEBUG
-		if (!((curChar >= 'A' && curChar <= 'Z') || curChar == '?' || curChar == ' '))
-		{
-			Error("Character '%s' has invalid name", m_curName);
-		}
-#endif
+		Assert((curChar >= 'A' && curChar <= 'Z') || curChar == '?' || curChar == ' ',
+			"Character '%s' has invalid name", m_curName);
+
 		auto const [upperTile, lowerTile] = m_fonts->GetVNNameFontTiles(curChar);
 
 		m_tiles[c_textTileCount + (tileI++)] = *upperTile;

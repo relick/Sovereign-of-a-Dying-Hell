@@ -87,7 +87,7 @@ void Script::UpdateTitle
 			io_game.SetVar<Variables::EasyMode>(m_isMashlessMode);
 		}
 
-		io_game.Sprites().RemoveSprite(m_arrowSpr);
+		m_arrowSpr = io_game.Sprites().RemoveSprite(m_arrowSpr);
 		io_title.GoToVNWorld(io_game);
 		return;
 	}

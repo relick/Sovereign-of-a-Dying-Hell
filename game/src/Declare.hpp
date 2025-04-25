@@ -2,6 +2,7 @@
 
 #include <genesis.h>
 #include "Constants.hpp"
+#include "TypeSafeID.hpp"
 
 #include <array>
 #include <optional>
@@ -28,7 +29,7 @@ struct NoSFX { constexpr operator std::optional<SFXID>() const { return std::nul
 class SFXManager;
 
 // SpriteManager
-using SpriteID = u16;
+using SpriteID = TypeSafeID<struct SpriteIDTag, u8>;
 class SpriteData;
 class SpriteManager;
 

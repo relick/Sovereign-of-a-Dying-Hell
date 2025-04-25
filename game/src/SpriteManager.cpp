@@ -14,6 +14,20 @@ inline constexpr u16 c_maxMiscTiles = c_extraTilesCount;
 inline constexpr VRAMSprite c_noSprites{};
 
 //------------------------------------------------------------------------------
+void SpriteManager::UpdateMapping
+(
+)
+{
+    Assert(m_sprites.size() == m_spriteMapping.SpriteCount(), "Sprite mapping mismatch");
+    Assert(m_vramSprites.size() == m_spriteMapping.SpriteCount(), "Sprite mapping mismatch");
+
+    for (u16 i = 0; i < m_sprites.size(); ++i)
+    {
+        m_spriteMapping[m_sprites[i].m_id] = i;
+    }
+}
+
+//------------------------------------------------------------------------------
 void SpriteManager::Update
 (
     Game& io_game
@@ -28,6 +42,7 @@ void SpriteManager::Update
     {
         auto zipped = std::views::zip(m_sprites, m_vramSprites);
         std::ranges::sort(zipped, [](auto const& sprA, auto const& sprB) { return std::get<0>(sprA).m_z < std::get<0>(sprB).m_z; });
+        UpdateMapping();
     }
 
     // Update links if needed
@@ -109,64 +124,39 @@ std::pair<SpriteID, EditableSpriteData> SpriteManager::AddSprite
     u16 i_tileAttr
 )
 {
-    if (m_sprites.size() >= 80)
-    {
-        Error("Too many sprites"); // TODO: actually handle properly?
-    }
+    Assert(m_spriteMapping.SpriteCount() < c_maxSpriteCount, "Too many sprites"); // TODO: actually handle properly?
 
+    SpriteID const newID = m_spriteMapping.NewSprite();
     Sprite& spr = m_sprites.emplace_back();
     VRAMSprite& vSpr = m_vramSprites.emplace_back();
-    spr.m_id = m_nextSpriteID++;
+
+    spr.m_id = newID;
     vSpr.m_size = i_size;
     vSpr.m_tileAttr = i_tileAttr;
 
     m_spritesAdded = true;
-
     return { spr.m_id, { spr, vSpr, *this } };
 }
 
 //------------------------------------------------------------------------------
-std::pair<SpriteID, EditableSpriteData> SpriteManager::CloneSprite
+SpriteID SpriteManager::RemoveSprite
 (
     SpriteID i_id
 )
 {
-    auto clonedSprI = std::find_if(
-        m_sprites.begin(),
-        m_sprites.end(),
-        [i_id](auto const& spr) { return spr.m_id == i_id; }
-    );
+    if (!i_id.Valid()) { return SpriteID(); }
 
-    if (clonedSprI != m_sprites.end())
-    {
-        Sprite& newSpr = m_sprites.emplace_back(*clonedSprI);
-        VRAMSprite& vSpr = m_vramSprites.emplace_back(*(m_vramSprites.begin() + std::distance(m_sprites.begin(), clonedSprI)));
-        m_spritesAdded = true;
+    Assert(m_spriteMapping.ValidSprite(i_id), "Tried to remove a sprite that does not exist");
+    u16 const index = m_spriteMapping[i_id];
 
-        return { newSpr.m_id, { newSpr, vSpr, * this } };
-    }
+    m_vramSprites.erase(m_vramSprites.begin() + index);
+    m_sprites.erase(m_sprites.begin() + index);
+    m_spriteMapping.RemoveSprite(i_id);
 
-    return { {}, { m_sprites.back(), m_vramSprites.back(), *this } };
-}
+    m_spritesRemoved = true;
+    UpdateMapping();
 
-//------------------------------------------------------------------------------
-void SpriteManager::RemoveSprite
-(
-    SpriteID i_id
-)
-{
-	auto sprI = std::find_if(
-		m_sprites.begin(),
-		m_sprites.end(),
-		[i_id](auto const& spr) { return spr.m_id == i_id; }
-	);
-
-    if(sprI != m_sprites.end())
-    {
-        m_vramSprites.erase(m_vramSprites.begin() + std::distance(m_sprites.begin(), sprI));
-        m_sprites.erase(sprI);
-        m_spritesRemoved = true;
-    }
+    return SpriteID();
 }
 
 //------------------------------------------------------------------------------
@@ -174,8 +164,10 @@ void SpriteManager::ClearAllSprites
 (
 )
 {
-    m_sprites.clear();
     m_vramSprites.clear();
+    m_sprites.clear();
+    m_spriteMapping.ClearAllSprites();
+
     m_spritesRemoved = true;
 }
 
@@ -185,20 +177,11 @@ EditableSpriteData SpriteManager::EditSpriteData
     SpriteID i_id
 )
 {
-	auto sprI = std::find_if(
-		m_sprites.begin(),
-		m_sprites.end(),
-		[i_id](auto const& spr) { return spr.m_id == i_id; }
-	);
+    Assert(m_spriteMapping.ValidSprite(i_id), "Tried to edit a sprite that does not exist");
+    u16 const index = m_spriteMapping[i_id];
 
-    if(sprI != m_sprites.end())
-    {
-        m_spriteDataEdited = true;
-        return { *sprI, *(m_vramSprites.begin() + std::distance(m_sprites.begin(), sprI)), * this };
-    }
-
-    Error("Tried to edit a sprite that no longer exists");
-    return { m_sprites.back(), m_vramSprites.back(), *this };
+    m_spriteDataEdited = true;
+    return { m_sprites[index], m_vramSprites[index], *this };
 }
 
 //------------------------------------------------------------------------------
@@ -207,15 +190,12 @@ u16 SpriteManager::InsertMiscTiles
     TileSet const& i_tileset
 )
 {
+    Assert(i_tileset.numTile <= c_maxMiscTiles, "Too many tiles in misc tiles request to fit into misc region");
+
     if(m_miscSpriteTilesIndex + i_tileset.numTile > c_maxMiscTiles)
     {
         // start overwriting from the start!
         m_miscSpriteTilesIndex = 0;
-
-        if (i_tileset.numTile > c_maxMiscTiles)
-        {
-            Error("Too many tiles in misc tiles request to fit into end area");
-        }
     }
 
     u16 const tileIndex = m_miscSpriteTilesIndex + c_miscTilesBaseIndex;

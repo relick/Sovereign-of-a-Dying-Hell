@@ -73,7 +73,7 @@ VNWorld::VNWorld
 )
 	: m_script{ std::move(i_script) }
 {
-	if (!m_script) { Error("Must provide a script to VNWorld"); }
+	Assert(m_script, "Must provide a script to VNWorld");
 }
 
 //------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ WorldRoutine VNWorld::Shutdown
 	Game& io_game
 )
 {
-	io_game.Sprites().RemoveSprite(m_portraitSprite);
+	m_portraitSprite = io_game.Sprites().RemoveSprite(m_portraitSprite);
 
 	StopMusic(io_game);
 

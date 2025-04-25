@@ -38,7 +38,7 @@ class DialoguePrinter2
 	bool m_nameOnLeft{true};
 
 	std::array<SpriteID, 4> m_nameSprites{};
-	std::array<SpriteID, 27> m_textSprites{};
+	std::array<SpriteID, 24> m_textSprites{};
 	SpriteID m_nextArrow{};
 
 	u8 m_arrowTimer{0};

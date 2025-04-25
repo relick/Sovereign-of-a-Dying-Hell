@@ -35,12 +35,12 @@ ChoiceSystem::ChoiceSystem
 //------------------------------------------------------------------------------
 ChoiceSystem::~ChoiceSystem()
 {
-	for (SpriteID id : m_choiceTextSprites)
+	for (SpriteID& id : m_choiceTextSprites)
 	{
-		m_game->Sprites().RemoveSprite(id);
+		id = m_game->Sprites().RemoveSprite(id);
 	}
 
-	m_game->Sprites().RemoveSprite(m_choiceArrow);
+	m_choiceArrow = m_game->Sprites().RemoveSprite(m_choiceArrow);
 }
 
 //------------------------------------------------------------------------------
