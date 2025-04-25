@@ -21,11 +21,10 @@ namespace Game
 class Game;
 class World;
 
-using VBlankCallbackID = u8;
+using VBlankCallbackID = TypeSafeID<struct VBlankCallbackIDTag, u8>;
 
 // SFXManager
-using SFXID = u8;
-struct NoSFX { constexpr operator std::optional<SFXID>() const { return std::nullopt; } }; // Allows for missing beeps for a character
+using SFXID = TypeSafeID<struct SFXIDTag, u8>;
 class SFXManager;
 
 // SpriteManager

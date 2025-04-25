@@ -26,8 +26,8 @@
 
 #define desc(TEXT) hide_face(); io_vn.SetText(io_game, &Game::c_special_desc, TEXT, script.desc_beeps); wait
 
-#define think(TEXT) hide_face(); io_vn.SetText(io_game, nullptr, "(" TEXT ")", std::nullopt); wait
-#define think_face(CHARA, FACE, TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")", std::nullopt); face(CHARA, FACE); wait
+#define think(TEXT) hide_face(); io_vn.SetText(io_game, nullptr, "(" TEXT ")", Game::SFXID{}); wait
+#define think_face(CHARA, FACE, TEXT) io_vn.SetText(io_game, nullptr, "(" TEXT ")", Game::SFXID{}); face(CHARA, FACE); wait
 
 #define say(CHARA, TEXT) hide_face(); io_vn.SetText(io_game, &c_ ## CHARA, TEXT, script. CHARA ## _beeps); wait
 #define say_hidden(CHARA, TEXT) hide_face(); io_vn.SetText(io_game, (c_ ## CHARA).m_showOnLeft ? &Game::c_special_l_hidden : &Game::c_special_r_hidden, TEXT, script. CHARA ## _beeps); wait

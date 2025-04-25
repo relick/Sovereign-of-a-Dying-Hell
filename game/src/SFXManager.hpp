@@ -25,7 +25,7 @@ class SFXManager
     std::array<SFXData, 64> m_sfxData;
 
     // IDs 0-63 reserved for use by music, so we add 64 to the index from sfxData
-    static u8 SFXIDToXGMID(SFXID i_id) { return i_id + 64; }
+    static u8 SFXIDToXGMID(SFXID i_id) { return i_id.Get() + 64; }
 public:
     SFXID AddSFX(u8 const* i_sample, u32 i_len, Channel i_channel);
     void RemoveSFX(SFXID i_id);

@@ -79,7 +79,7 @@ class Game
 	std::vector<TaskData> m_tasks;
 	static inline u16 s_taskMonotonic = 0;
 
-	static inline VBlankCallbackID s_callbackID = 0;
+	static inline VBlankCallbackID::Core s_callbackID = 0;
 	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
 
 	// TODO: improve beyond just being a set of numbers.

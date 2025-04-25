@@ -100,7 +100,7 @@ public:
 	void SetPortrait(Game& io_game, PortraitFace const& i_face);
 	void HidePortrait(Game& io_game);
 	
-	void SetText(Game& io_game, Character const* i_char, char const* i_text, std::optional<SFXID> i_beeps); // null char = hide name
+	void SetText(Game& io_game, Character const* i_char, char const* i_text, SFXID i_beeps); // null char = hide name
 
 	void Choice(Game& io_game, std::span<char const* const> i_choices);
 	void TimedChoice(Game& io_game, std::span<char const* const> i_choices, f16 i_timeInSeconds);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Declare.hpp"
+#include "Debug.hpp"
 
 #include <algorithm>
 #include <vector>

@@ -113,13 +113,15 @@ u32 Game::GetVCount()
 //------------------------------------------------------------------------------
 VBlankCallbackID Game::AddVBlankCallback(std::function<void()>&& i_callback)
 {
-	s_vBlankCallbacks.push_back({ s_callbackID, std::move(i_callback), });
-	return s_callbackID++;
+	s_vBlankCallbacks.push_back({ VBlankCallbackID(s_callbackID), std::move(i_callback), });
+	return VBlankCallbackID(s_callbackID++);
 }
 
 //------------------------------------------------------------------------------
 void Game::RemoveVBlankCallback(VBlankCallbackID i_callbackID)
 {
+	Assert(i_callbackID.Valid(), "Invalid VBlankCallbackID");
+
 	auto cbI = std::find_if(
 		s_vBlankCallbacks.begin(),
 		s_vBlankCallbacks.end(),

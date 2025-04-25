@@ -19,9 +19,9 @@ SFXID SFXManager::AddSFX
     if(nextFreeI == m_sfxData.end())
     {
         Error("Ran out of SFX slots!");
-        return -1;
+        return SFXID();
     }
-    SFXID const id = std::distance(m_sfxData.begin(), nextFreeI);
+    SFXID const id(std::distance(m_sfxData.begin(), nextFreeI));
     XGM_setPCM(SFXIDToXGMID(id), i_sample, i_len);
 
     nextFreeI->m_used = true;
@@ -36,7 +36,8 @@ void SFXManager::RemoveSFX
     SFXID i_id
 )
 {
-    m_sfxData[i_id].m_used = false;
+    Assert(i_id.Valid(), "Invalid SFXID");
+    m_sfxData[i_id.Get()].m_used = false;
 }
 
 //------------------------------------------------------------------------------
@@ -45,7 +46,8 @@ bool SFXManager::IsPlaying
     SFXID i_id
 ) const
 {
-    return IsPlaying(m_sfxData[i_id].m_channel);
+    Assert(i_id.Valid(), "Invalid SFXID");
+    return IsPlaying(m_sfxData[i_id.Get()].m_channel);
 }
 
 //------------------------------------------------------------------------------
@@ -64,7 +66,8 @@ void SFXManager::PlaySFX
     u8 i_priority
 ) const
 {
-    XGM_startPlayPCM(SFXIDToXGMID(i_id), i_priority, static_cast<u16>(m_sfxData[i_id].m_channel));
+    Assert(i_id.Valid(), "Invalid SFXID");
+    XGM_startPlayPCM(SFXIDToXGMID(i_id), i_priority, static_cast<u16>(m_sfxData[i_id.Get()].m_channel));
 }
 
 //------------------------------------------------------------------------------
@@ -73,7 +76,8 @@ void SFXManager::StopSFX
     SFXID i_id
 ) const
 {
-    StopSFX(m_sfxData[i_id].m_channel);
+    Assert(i_id.Valid(), "Invalid SFXID");
+    StopSFX(m_sfxData[i_id.Get()].m_channel);
 }
 
 //------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ class Script
 	std::unique_ptr<Game::Scene> m_nextScene;
 
 public:
-	Game::NoSFX zanmu_beeps;
+	Game::SFXID zanmu_beeps;
 };
 
 }
