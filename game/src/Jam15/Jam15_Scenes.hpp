@@ -5,6 +5,8 @@
 namespace Jam15
 {
 
+#define TEST_SKIP_TO_VOTE 0
+
 enum class Scenes : u8
 {
 	FirstVoteProposal,
