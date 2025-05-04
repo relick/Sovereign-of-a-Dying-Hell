@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 #include "GameRoutines.hpp"
+#include "SpriteManager.hpp"
 #include "TileData.hpp"
 
 #include <array>
@@ -29,8 +30,8 @@ class ChoiceSystem
 
 	// 4 sprites per choice i.e. 128 pixels
 	u16 m_maxChoiceX{ 0 };
-	std::vector<SpriteID> m_choiceTextSprites;
-	SpriteID m_choiceArrow;
+	std::vector<SpriteHandle> m_choiceTextSprites;
+	SpriteHandle m_choiceArrow;
 	s16 m_baseChoiceY{ 0 };
 	u16 m_floatScroll{ 0 };
 	s16 m_float{ 0 };

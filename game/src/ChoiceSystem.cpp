@@ -35,9 +35,9 @@ ChoiceSystem::ChoiceSystem
 //------------------------------------------------------------------------------
 ChoiceSystem::~ChoiceSystem()
 {
-	for (SpriteID& id : m_choiceTextSprites)
+	for (SpriteHandle& handle : m_choiceTextSprites)
 	{
-		id = m_game->Sprites().RemoveSprite(id);
+		handle = m_game->Sprites().RemoveSprite(handle);
 	}
 
 	m_choiceArrow = m_game->Sprites().RemoveSprite(m_choiceArrow);
@@ -254,16 +254,16 @@ void ChoiceSystem::SetupSprites
 		s16 const separation = i * c_choiceYSeparation;
 		for (u16 sprN = 0; sprN < c_spritesPerChoice; ++sprN)
 		{
-			auto [id, spr] = m_game->Sprites().AddSprite(
-				SpriteSize::r1c4,
-				TILE_ATTR_FULL(PAL3, true, false, false, tileIndex + (4 * sprN))
+			auto& spr = m_choiceTextSprites.emplace_back(
+				m_game->Sprites().AddSprite(
+					SpriteSize::r1c4,
+					TILE_ATTR_FULL(PAL3, true, false, false, tileIndex + (4 * sprN))
+				)
 			);
 
 			spr.SetX(m_maxChoiceX + (4 * c_pixelsPerTile * sprN));
 			spr.SetY(m_baseChoiceY + separation);
 			spr.SetZ(z++);
-
-			m_choiceTextSprites.push_back(id);
 		}
 
 		tileIndex += c_tilesPerChoice;
@@ -271,15 +271,12 @@ void ChoiceSystem::SetupSprites
 
 	// Arrow sprite
 	{
-		auto [id, spr] = m_game->Sprites().AddSprite(
+		m_choiceArrow = m_game->Sprites().AddInvisibleSprite(
 			SpriteSize::r1c1,
 			TILE_ATTR_FULL(PAL3, true, false, false, m_game->Sprites().InsertMiscTiles(misc_spr) + 1) // 1 is where the right-arrow is
 		);
 
-		spr.SetVisible(false);
-		spr.SetX(m_maxChoiceX + c_choiceArrowXOffset);
-
-		m_choiceArrow = id;
+		m_choiceArrow.SetX(m_maxChoiceX + c_choiceArrowXOffset);
 	}
 }
 
@@ -293,16 +290,14 @@ void ChoiceSystem::UpdateSprites
 
 	// Arrow
 	{
-		auto spr = m_game->Sprites().EditSpriteData(m_choiceArrow);
-
-		spr.SetY(m_baseChoiceY + (m_highlightedChoice * c_choiceYSeparation) + m_float);
+		m_choiceArrow.SetY(m_baseChoiceY + (m_highlightedChoice * c_choiceYSeparation) + m_float);
 
 		// TODO proper timer
 		static u8 arrowTimer = 0;
 		++arrowTimer;
 		if (arrowTimer > 6)
 		{
-			spr.SetVisible(!spr.IsVisible());
+			m_choiceArrow.SetVisible(!m_choiceArrow.IsVisible());
 			arrowTimer = 0;
 		}
 	}
@@ -314,7 +309,7 @@ void ChoiceSystem::UpdateSprites
 		s16 const choiceX = m_maxChoiceX + (sinFix16((m_floatScroll + i * 36) * 4) >> 5);
 		for (u16 sprN = 0; sprN < c_spritesPerChoice; ++sprN)
 		{
-			auto spr = m_game->Sprites().EditSpriteData(m_choiceTextSprites[sprI]);
+			auto& spr = m_choiceTextSprites[sprI];
 
 			spr.SetY(m_baseChoiceY + separation + m_float);
 			spr.SetX(choiceX + (4 * c_pixelsPerTile * sprN));

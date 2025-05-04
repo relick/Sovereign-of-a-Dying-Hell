@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Declare.hpp"
+#include "SpriteManager.hpp"
 #include "TileData.hpp"
 
 #include <array>
@@ -36,9 +37,9 @@ class DialoguePrinter2
 
 	bool m_nameOnLeft{true};
 
-	std::array<SpriteID, 4> m_nameSprites{};
-	std::array<SpriteID, 24> m_textSprites{};
-	SpriteID m_nextArrow{};
+	std::array<SpriteHandle, 4> m_nameSprites{};
+	std::array<SpriteHandle, 24> m_textSprites{};
+	SpriteHandle m_nextArrow{};
 
 	u8 m_arrowTimer{0};
 

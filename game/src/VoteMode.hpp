@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 #include "GameRoutines.hpp"
+#include "SpriteManager.hpp"
 #include "TileData.hpp"
 #include "Worlds.hpp"
 
@@ -66,9 +67,10 @@ class VoteMode
 	bool m_graphicsReady{ false };
 	bool m_graphicsDone{ false }; // set to true when post-vote animation finishes
 
-	std::array<SpriteID, 2> m_num{};
-	SpriteID m_midline{};
-	SpriteID m_cursor{};
+	SpriteHandle m_numLeft{};
+	SpriteHandle m_numRight{};
+	SpriteHandle m_midline{};
+	SpriteHandle m_cursor{};
 
 	u16 m_num_tileIndex{};
 	u16 m_barCorners_tileIndex{};
@@ -98,8 +100,8 @@ class VoteMode
 	std::vector<Tiles::Tile> m_voteNameTextTiles;
 
 	// Columns of sil sprites
-	std::array<SpriteID, 7 * 4> m_silLeftSprites{};
-	std::array<SpriteID, 7 * 4> m_silRightSprites{};
+	std::array<SpriteHandle, 7 * 4> m_silLeftSprites{};
+	std::array<SpriteHandle, 7 * 4> m_silRightSprites{};
 
 	s16 m_leftBounce{ 0 };
 	s16 m_rightBounce{ 0 };
@@ -139,6 +141,7 @@ private:
 	Task UpdateInfluenceBarTileMap();
 	u16 GetBarCornerAttr(bool i_hflip) const;
 	u16 GetBarMidAttr(u16 i_tileI) const;
+	void RemoveMainSprites();
 	void SetupEndGraphics();
 	Task UpdateEndGraphics();
 	Task UpdateNumTiles();

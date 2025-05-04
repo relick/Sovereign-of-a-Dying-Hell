@@ -113,13 +113,11 @@ WorldRoutine VNWorld::Init
 
 	// Create portrait sprite
 	{
-		auto [id, spr] = io_game.Sprites().AddSprite(SpriteSize::r4c4, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, c_reservedPortraitTileStart));
-		m_portraitSprite = id;
-		spr.SetVisible(false);
+		m_portraitSprite = io_game.Sprites().AddInvisibleSprite(SpriteSize::r4c4, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, c_reservedPortraitTileStart));
 		// Position 10x10 in from corner
-		spr.SetX(10);
-		spr.SetY(c_screenHeightPx - c_portraitSizePx - 8);
-		spr.SetZ(-128);
+		m_portraitSprite.SetX(10);
+		m_portraitSprite.SetY(c_screenHeightPx - c_portraitSizePx - 8);
+		m_portraitSprite.SetZ(-128);
 	}
 
 	m_script->InitVN(io_game, *this);
@@ -766,8 +764,7 @@ void VNWorld::SetPortrait
 {
 	io_game.QueueLambdaTask([this, &io_game, &i_face] -> Task {
 		{
-			auto spr = io_game.Sprites().EditSpriteData(m_portraitSprite);
-			spr.SetVisible(false);
+			m_portraitSprite.SetVisible(false);
 		}
 
 		PAL_setColors(16 * PAL2, i_face.m_pal->data, 16, DMA_QUEUE);
@@ -778,8 +775,7 @@ void VNWorld::SetPortrait
 
 		// May have yielded, so need to request again as iter may be invalidated
 		{
-			auto spr = io_game.Sprites().EditSpriteData(m_portraitSprite);
-			spr.SetVisible(true);
+			m_portraitSprite.SetVisible(true);
 		}
 
 		co_return;
@@ -793,8 +789,7 @@ void VNWorld::HidePortrait
 )
 {
 	io_game.QueueLambdaTask([this, &io_game] -> Task {
-		auto spr = io_game.Sprites().EditSpriteData(m_portraitSprite);
-		spr.SetVisible(false);
+		m_portraitSprite.SetVisible(false);
 
 		co_return;
 	});

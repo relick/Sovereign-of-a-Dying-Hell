@@ -12,7 +12,6 @@ enum class TaskPriority : u8
 	Normal,
 	High,
 	Animations,
-	Sprites,
 };
 #define AwaitTask(TASK_VAR) while(TASK_VAR) { TASK_VAR(); if (TASK_VAR) { co_yield{}; } }
 

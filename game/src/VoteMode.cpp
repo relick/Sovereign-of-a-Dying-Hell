@@ -9,7 +9,6 @@
 #include "Jam15/res_sfx.h"
 
 #include <cstdlib>
-#include <ranges>
 
 namespace Game
 {
@@ -73,12 +72,7 @@ VoteMode::~VoteMode
 	m_game->SFX().RemoveSFX(m_mash);
 	if (m_graphicsReady)
 	{
-		std::ranges::for_each(m_num, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
-		m_midline = m_game->Sprites().RemoveSprite(m_midline);
-		m_cursor = m_game->Sprites().RemoveSprite(m_cursor);
-		//std::ranges::for_each(m_voteNameSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
-		std::ranges::for_each(m_silLeftSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
-		std::ranges::for_each(m_silRightSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+		RemoveMainSprites();
 	}
 }
 
@@ -442,38 +436,34 @@ void VoteMode::SetupGraphics()
 		s8 z = -64;
 		// Add sprites for number
 		{
-			auto [leftID, left] = m_game->Sprites().AddSprite(SpriteSize::r4c3, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_num_tileIndex));
-			auto [rightID, right] = m_game->Sprites().AddSprite(SpriteSize::r4c3, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_num_tileIndex + 12));
-			m_num[0] = leftID;
-			m_num[1] = rightID;
+			m_numLeft = m_game->Sprites().AddSprite(SpriteSize::r4c3, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_num_tileIndex));
+			m_numRight = m_game->Sprites().AddSprite(SpriteSize::r4c3, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_num_tileIndex + 12));
 
-			left.SetX(17 * 8);
-			left.SetY(2 * 8);
-			left.SetZ(z++);
-			right.SetX(20 * 8);
-			right.SetY(2 * 8);
-			right.SetZ(z++);
+			m_numLeft.SetX(17 * 8);
+			m_numLeft.SetY(2 * 8);
+			m_numLeft.SetZ(z++);
+			m_numRight.SetX(20 * 8);
+			m_numRight.SetY(2 * 8);
+			m_numRight.SetZ(z++);
 		}
 
 		// Add cursor sprite
 		{
 			// Cursor has to use PAL3 to get shadow mode to work
-			auto [id, spr] = m_game->Sprites().AddSprite(SpriteSize::r4c2, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, m_cursor_tileIndex));
-			m_cursor = id;
+			m_cursor = m_game->Sprites().AddSprite(SpriteSize::r4c2, TILE_ATTR_FULL(PAL3, TRUE, FALSE, FALSE, m_cursor_tileIndex));
 
-			spr.SetX((c_screenWidthPx / 2) - 8);
-			spr.SetY((16 - 1) * 8);
-			spr.SetZ(z++);
+			m_cursor.SetX((c_screenWidthPx / 2) - 8);
+			m_cursor.SetY((16 - 1) * 8);
+			m_cursor.SetZ(z++);
 		}
 
 		// Add midline sprite
 		{
-			auto [id, spr] = m_game->Sprites().AddSprite(SpriteSize::r2c1, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_barMidLine_tileIndex));
-			m_midline = id;
+			m_midline = m_game->Sprites().AddSprite(SpriteSize::r2c1, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, m_barMidLine_tileIndex));
 
-			spr.SetX(c_screenWidthPx / 2);
-			spr.SetY(16 * 8);
-			spr.SetZ(z++); // behind cursor
+			m_midline.SetX(c_screenWidthPx / 2);
+			m_midline.SetY(16 * 8);
+			m_midline.SetZ(z++); // behind cursor
 		}
 
 		// Add sillhouette sprites, in columns to make it easier to update x later
@@ -487,18 +477,18 @@ void VoteMode::SetupGraphics()
 			{
 				// left
 				{
-					auto [id, spr] = m_game->Sprites().AddSprite(size,
+					auto spr = m_game->Sprites().AddSprite(size,
 						TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, m_silLeft_tileIndex[r] + tileOffset));
 					spr.SetX(xOffset - 8);
 					spr.SetY(r * 32);
 					spr.SetZ(z++); // behind everything
-					m_silLeftSprites[arrOffset + r] = id;
+					m_silLeftSprites[arrOffset + r] = spr;
 				}
 				// right
 				{
-					auto [id, spr] = m_game->Sprites().AddSprite(size,
+					auto spr = m_game->Sprites().AddSprite(size,
 						TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, m_silRight_tileIndex[r] + tileOffset));
-					m_silRightSprites[arrOffset + r] = id;
+					m_silRightSprites[arrOffset + r] = spr;
 					spr.SetX(c_screenWidthPx - 112 + xOffset + 8);
 					spr.SetY(r * 32);
 					spr.SetZ(z++); // behind everything
@@ -632,24 +622,22 @@ void VoteMode::UpdateGraphics()
 	m_updateBarTileMap();
 	m_updateInfluenceBarMap();
 
-	auto cursor = m_game->Sprites().EditSpriteData(m_cursor);
-	cursor.SetX((c_screenWidthPx / 2) - 8 + m_votePosition);
+	m_cursor.SetX((c_screenWidthPx / 2) - 8 + m_votePosition);
 
 	u16 spriteI = 0;
-	for (u16 i = 0; i < 4; ++i)
+	s16 leftXOffset = m_leftBounce - 8;
+	s16 rightXOffset = static_cast<s16>(c_screenWidthPx - 112) + (8 - m_rightBounce);
+	for (u16 i = 0; i < 4; ++i, leftXOffset += 32, rightXOffset += 32)
 	{
-		s16 const xOffset = i * 32;
 		for (u16 r = 0; r < 7; ++r, ++spriteI)
 		{
 			// left
 			{
-				auto spr = m_game->Sprites().EditSpriteData(m_silLeftSprites[spriteI]);
-				spr.SetX(xOffset - 8 + m_leftBounce);
+				m_silLeftSprites[spriteI].SetX(leftXOffset);
 			}
 			// right
 			{
-				auto spr = m_game->Sprites().EditSpriteData(m_silRightSprites[spriteI]);
-				spr.SetX(static_cast<s16>(c_screenWidthPx - 112) + xOffset + (8 - m_rightBounce));
+				m_silRightSprites[spriteI].SetX(rightXOffset);
 			}
 		}
 	}
@@ -783,14 +771,20 @@ u16 VoteMode::GetBarMidAttr
 }
 
 //------------------------------------------------------------------------------
-void VoteMode::SetupEndGraphics()
+void VoteMode::RemoveMainSprites()
 {
-	std::ranges::for_each(m_num, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+	m_numLeft = m_game->Sprites().RemoveSprite(m_numLeft);
+	m_numRight = m_game->Sprites().RemoveSprite(m_numRight);
 	m_midline = m_game->Sprites().RemoveSprite(m_midline);
 	m_cursor = m_game->Sprites().RemoveSprite(m_cursor);
-	//std::ranges::for_each(m_voteNameSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
-	std::ranges::for_each(m_silLeftSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
-	std::ranges::for_each(m_silRightSprites, [this](SpriteID& id) { id = m_game->Sprites().RemoveSprite(id); });
+	for (SpriteHandle& handle : m_silLeftSprites) { handle = m_game->Sprites().RemoveSprite(handle); }
+	for (SpriteHandle& handle : m_silRightSprites) { handle = m_game->Sprites().RemoveSprite(handle); }
+}
+
+//------------------------------------------------------------------------------
+void VoteMode::SetupEndGraphics()
+{
+	RemoveMainSprites();
 
 	m_vnWorld->WhiteBG(*m_game, true, false);
 	m_vnWorld->HideCharacterVisual(*m_game, true);

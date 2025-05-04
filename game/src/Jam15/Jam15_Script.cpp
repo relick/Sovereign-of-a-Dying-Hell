@@ -59,10 +59,9 @@ void Script::InitTitle
 
 		u16 const arrowTiles = io_game.Sprites().InsertMiscTiles(misc_spr);
 		PAL_setColors(16 * PAL3, text_font_pal.data, 16, DMA_QUEUE);
-		auto [arrowID, spr] = io_game.Sprites().AddSprite(Game::SpriteSize::r1c1, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, arrowTiles + 1));
-		m_arrowSpr = arrowID;
-		spr.SetX(8 * 5);
-		spr.SetY(156 + m_selection * 21);
+		m_arrowSpr = io_game.Sprites().AddSprite(Game::SpriteSize::r1c1, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, arrowTiles + 1));
+		m_arrowSpr.SetX(8 * 5);
+		m_arrowSpr.SetY(156 + m_selection * 21);
 
 		co_return;
 	});
@@ -100,9 +99,7 @@ void Script::UpdateTitle
 			{
 				m_selection = m_hasLoadedData ? 0 : 1;
 			}
-
-			auto spr = io_game.Sprites().EditSpriteData(m_arrowSpr);
-			spr.SetY(156 + m_selection * 21);
+			m_arrowSpr.SetY(156 + m_selection * 21);
 		}
 		pressed = true;
 	}
@@ -115,8 +112,7 @@ void Script::UpdateTitle
 			{
 				m_selection = 2;
 			}
-			auto spr = io_game.Sprites().EditSpriteData(m_arrowSpr);
-			spr.SetY(156 + m_selection * 21);
+			m_arrowSpr.SetY(156 + m_selection * 21);
 		}
 		pressed = true;
 	}

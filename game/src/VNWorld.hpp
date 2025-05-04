@@ -5,6 +5,7 @@
 #include "ChoiceSystem.hpp"
 #include "DialoguePrinter2.hpp"
 #include "FontData.hpp"
+#include "SpriteManager.hpp"
 #include "VoteMode.hpp"
 #include "Worlds.hpp"
 
@@ -68,7 +69,7 @@ class VNWorld
 	std::optional<u8> m_choiceMade;
 
 	// Portrait
-	SpriteID m_portraitSprite{};
+	SpriteHandle m_portraitSprite{};
 
 	bool m_waitUntilInput{ false };
 

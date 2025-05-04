@@ -4,6 +4,7 @@
 #include "Game.hpp"
 #include "Script.hpp"
 #include "Scene.hpp"
+#include "SpriteManager.hpp"
 #include "Jam15_Scenes.hpp"
 
 #include <memory>
@@ -63,7 +64,7 @@ class Script
 	
 	std::unique_ptr<Game::Scene> CreateScene(Scenes i_scene);
 
-	Game::SpriteID m_arrowSpr;
+	Game::SpriteHandle m_arrowSpr;
 	s16 m_selection{ 0 };
 	bool m_hasLoadedData{ false };
 

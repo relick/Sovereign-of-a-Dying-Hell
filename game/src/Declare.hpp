@@ -29,7 +29,7 @@ class SFXManager;
 
 // SpriteManager
 using SpriteID = TypeSafeID<struct SpriteIDTag, u8>;
-class SpriteData;
+class SpriteHandle;
 class SpriteManager;
 
 //------------------------------------------------------------------------------
