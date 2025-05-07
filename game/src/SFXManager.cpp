@@ -67,7 +67,7 @@ void SFXManager::PlaySFX
 ) const
 {
     Assert(i_id.Valid(), "Invalid SFXID");
-    XGM_startPlayPCM(SFXIDToXGMID(i_id), i_priority, static_cast<u16>(m_sfxData[i_id.Get()].m_channel));
+    XGM_startPlayPCM(SFXIDToXGMID(i_id), i_priority, static_cast<SoundPCMChannel>(m_sfxData[i_id.Get()].m_channel));
 }
 
 //------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ void SFXManager::StopSFX
     Channel i_channel
 ) const
 {
-    XGM_stopPlayPCM(static_cast<u16>(i_channel));
+    XGM_stopPlayPCM(static_cast<SoundPCMChannel>(i_channel));
 }
 
 }

@@ -87,7 +87,7 @@ void VoteMode::Start
 	m_influencePerMash = (m_params.m_easyMode ? 4 : 1) * c_influencePerMash;
 
 	// Set up data
-	m_framesLeft = fix16ToInt(fix16Mul(std::max<f16>(m_params.m_votingTime, FIX16(5)), FIX16(FramesPerSecond()))); // Min 5-seconds
+	m_framesLeft = F16_toInt(F16_mul(std::max<f16>(m_params.m_votingTime, FIX16(5)), FIX16(FramesPerSecond()))); // Min 5-seconds
 	m_remainingInfluence = m_params.m_startingPlayerInfluence;
 	m_voteWon = false;
 
@@ -243,9 +243,9 @@ void VoteMode::GenerateAttackEvents
 
 		for (u16 i = 0; i < possibleAttacks; ++i)
 		{
-			f16 const r = rand() & FIX16_FRAC_MASK;
-			f16 const variation = fix16Mul(r, i_attackSizeVar) - attackSizeVarHalf;
-			u16 const attackSize = fix16ToInt(variation) + i_attackSize;
+			f16 const r = U16_rand() & FIX16_FRAC_MASK;
+			f16 const variation = F16_mul(r, i_attackSizeVar) - attackSizeVarHalf;
+			u16 const attackSize = F16_toInt(variation) + i_attackSize;
 
 			if (remainingAttack < attackSize)
 			{
@@ -266,14 +266,14 @@ void VoteMode::GenerateAttackEvents
 		}
 
 		u16 const averageFramesPerAttack = m_framesLeft / (m_attackEvents.size() + 1); // Add 1 to avoid attacking immediately at the end
-		u16 const earliestAllowedAttack = m_framesLeft - fix16ToInt(attackFramesVarHalf);
+		u16 const earliestAllowedAttack = m_framesLeft - F16_toInt(attackFramesVarHalf);
 
 		u16 regularFrames = averageFramesPerAttack;
 		for (u16 i = 0; i < m_attackEvents.size(); ++i)
 		{
-			f16 const r = rand() & FIX16_FRAC_MASK;
-			f16 const variation = fix16Mul(r, i_attackFramesVar) - attackFramesVarHalf;
-			u16 const attackTime = std::min<u16>(fix16ToInt(variation < 0 ? attackFramesVarHalf : variation) + regularFrames, earliestAllowedAttack);
+			f16 const r = U16_rand() & FIX16_FRAC_MASK;
+			f16 const variation = F16_mul(r, i_attackFramesVar) - attackFramesVarHalf;
+			u16 const attackTime = std::min<u16>(F16_toInt(variation < 0 ? attackFramesVarHalf : variation) + regularFrames, earliestAllowedAttack);
 
 			m_attackEvents[i].m_frame = attackTime;
 

@@ -2,6 +2,7 @@
 
 #include "Declare.hpp"
 
+#include <cstdint>
 #include <span>
 #include <utility>
 #include <cstdlib>
@@ -43,9 +44,9 @@ public:
 		}
 
 		// TODO: don't use rand(), and definitely not like this!
-		f16 const r = rand() & FIX16_FRAC_MASK;
-		f16 const mul = fix16Mul(r, intToFix16(m_maxDuration - m_minDuration));
-		return std::max<u16>(fix16ToInt(mul) + m_minDuration, 1);
+		f16 const r = U16_rand() & FIX16_FRAC_MASK;
+		f16 const mul = F16_mul(r, FIX16(m_maxDuration - m_minDuration));
+		return std::max<u16>(F16_toInt(mul) + m_minDuration, 1);
 	}
 };
 

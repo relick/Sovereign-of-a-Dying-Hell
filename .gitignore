@@ -39,3 +39,4 @@
 // Ignore generated res headers
 **/res/**/*.h
 *.zip
+/build
