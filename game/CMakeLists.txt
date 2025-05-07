@@ -28,7 +28,7 @@ target_sources(soadh
     src/Jam15/Jam15_Scenes.cpp
     src/Jam15/Jam15_Script.cpp
 )
-md_target_res_sources(soadh
+md_target_resources(soadh
   PRIVATE
     res/res_fonts.res
     res/res_intro.res
