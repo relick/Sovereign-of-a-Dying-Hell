@@ -1,0 +1,6 @@
+{
+  "version": 9,
+  "include": [
+    "${fileDir}/../../SDKs/SGDK2-CPP/install/cmake/CMakeGamePresets.json"
+  ]
+}

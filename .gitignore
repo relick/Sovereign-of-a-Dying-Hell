@@ -40,3 +40,4 @@
 **/res/**/*.h
 *.zip
 /build
+/.vs
