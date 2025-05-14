@@ -3,8 +3,10 @@
 #include "Declare.hpp"
 #include "Debug.hpp"
 
+#include <algorithm>
 #include <array>
 #include <memory>
+#include <ranges>
 
 namespace Game
 {

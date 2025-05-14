@@ -2,10 +2,11 @@
 
 #include "Declare.hpp"
 
+#include <algorithm>
 #include <cstdint>
+#include <cstdlib>
 #include <span>
 #include <utility>
-#include <cstdlib>
 
 namespace Game
 {
