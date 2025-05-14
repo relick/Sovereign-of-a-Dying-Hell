@@ -7,5 +7,4 @@ set DIR=game
 
 echo "Building '%DIR%' in final..."
 %GDK_WIN%\bin\make -C "%DIR%" final -f %GDK_WIN%\makefile.gen
-%GDK_WIN%\bin\make -C "%DIR%" distclean -f %GDK_WIN%\makefile.gen
 echo "Build complete."
