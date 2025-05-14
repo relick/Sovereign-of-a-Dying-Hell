@@ -1,6 +1,6 @@
-#include "genesis.h"
+#include <genesis.h>
 
-__attribute__((externally_visible))
+USED_EXTERNALLY
 const ROMHeader rom_header = {
 #if (ENABLE_BANK_SWITCH != 0)
     "SEGA SSF        ",
