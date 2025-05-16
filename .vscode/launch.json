@@ -10,7 +10,7 @@
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build (Debug) and Run (Debugger)",
-            "program": "game/out/rom.out",
+            "program": "game/out/debug/rom.out",
             /*"logging": {
                 "engineLogging": true,
                 "trace": true,
@@ -38,7 +38,7 @@
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build (Release) and Run (Debugger)",
-            "program": "game/out/rom.out",
+            "program": "game/out/release/rom.out",
             /*"logging": {
                 "engineLogging": true,
                 "trace": true,

@@ -47,7 +47,7 @@ void Game::RequestNextWorld(std::unique_ptr<World> i_nextWorld)
 }
 
 //------------------------------------------------------------------------------
-void Game::Run()
+NEVER_RETURNS Game::Run()
 {
 	while (true)
 	{

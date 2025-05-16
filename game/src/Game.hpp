@@ -91,7 +91,7 @@ public:
 
 	void RequestNextWorld(std::unique_ptr<World> i_nextWorld);
 
-	void Run();
+	NEVER_RETURNS Run();
 
 #if PROFILER
 	static u32 GetVCount();
