@@ -4,7 +4,15 @@ project(Jam15 C CXX ASM)
 
 find_package(SGDK REQUIRED)
 
-md_add_rom(soadh SGDK::mdcpp src/boot/rom_head.c src/boot/sega.s)
+md_add_rom(soadh SGDK::mdcpp)
+
+md_rom_title(soadh "Sovereign of a Dying Hell v0.3")
+md_rom_revision(soadh 3)
+md_rom_copyright(soadh "KDev" June 2025)
+
+md_rom_use_devices(soadh 3_BUTTON)
+md_rom_enable_sram(soadh SAVING ODD_8)
+
 target_include_directories(soadh
   PRIVATE
     src

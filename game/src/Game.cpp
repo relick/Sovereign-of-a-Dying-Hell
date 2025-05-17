@@ -230,7 +230,7 @@ bool Game::LoadVariables
 		SRAM_enable();
 
 		// Need to clear SRAM
-		u32 const sramSize = (rom_header.sram_end - rom_header.sram_start) / 2;
+		u32 const sramSize = (rom_header.ext_ram_end - rom_header.ext_ram_start) / 2;
 		for (u32 i = 0; i < sramSize; ++i)
 		{
 			SRAM_writeByte(i, 0);
