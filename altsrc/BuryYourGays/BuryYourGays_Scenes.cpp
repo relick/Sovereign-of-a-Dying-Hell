@@ -1,9 +1,9 @@
 #include "BuryYourGays_Scenes.hpp"
 #include "BuryYourGays_Script.hpp"
 #include "BuryYourGays_Chara.hpp"
-#include "IntroWorld.hpp"
+#include "adventure-md/IntroWorld.hpp"
 
-#include "SceneDefines.hpp"
+#include "adventure-md/SceneDefines.hpp"
 
 #include "res/music.h"
 #include "res/bg.h"

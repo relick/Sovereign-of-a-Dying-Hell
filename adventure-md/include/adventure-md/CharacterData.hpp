@@ -1,0 +1,88 @@
+#pragma once
+
+#include "adventure-md/Declare.hpp"
+
+#include <algorithm>
+#include <cstdint>
+#include <cstdlib>
+#include <span>
+#include <utility>
+
+namespace Game
+{
+
+class AnimFrameDuration
+{
+	u16 m_minDuration{ 0 };
+	u16 m_maxDuration{ 0 };
+
+	constexpr AnimFrameDuration(u16 i_minDuration, u16 i_maxDuration)
+		: m_minDuration{ i_minDuration }
+		, m_maxDuration{ i_maxDuration }
+	{}
+
+public:
+	constexpr static AnimFrameDuration Infinite()
+	{
+		return { 0, 0 };
+	}
+
+	constexpr static AnimFrameDuration Fixed(u16 i_duration)
+	{
+		return { std::max<u16>(i_duration, 1), std::max<u16>(i_duration, 1) };
+	}
+
+	constexpr static AnimFrameDuration Variable(u16 i_minDuration, u16 i_maxDuration)
+	{
+		return { std::max<u16>(i_minDuration, 1), std::max<u16>(i_maxDuration, std::max<u16>(i_minDuration, 1)) };
+	}
+
+	constexpr u16 Get() const
+	{
+		if (m_minDuration == m_maxDuration)
+		{
+			return m_minDuration;
+		}
+
+		// TODO: don't use rand(), and definitely not like this!
+		f16 const r = U16_rand() & FIX16_FRAC_MASK;
+		f16 const mul = F16_mul(r, FIX16(m_maxDuration - m_minDuration));
+		return std::max<u16>(F16_toInt(mul) + m_minDuration, 1);
+	}
+};
+
+struct AnimFrame
+{
+	TileMap const* m_tilemap{ nullptr };
+	AnimFrameDuration m_duration;
+	u16 m_xOffset{ 0 };
+	u16 m_yOffset{ 0 };
+	u16 m_nextIndex{ UINT16_MAX };
+};
+
+struct Pose
+{
+	TileSet const* m_tileset{ nullptr };
+	Palette const* m_palette{ nullptr };
+	std::span<AnimFrame const> m_animation{};
+};
+
+struct Character
+{
+	char const* m_displayName{ nullptr };
+	bool m_showOnLeft{ false };
+	std::span<Pose const> m_poses{};
+	bool m_useDescFont{ false };
+};
+
+inline constexpr Character c_special_desc = { .m_displayName = "", .m_useDescFont = true, };
+inline constexpr Character c_special_l_hidden = { .m_displayName = "?????", .m_showOnLeft = true, };
+inline constexpr Character c_special_r_hidden = { .m_displayName = "?????", .m_showOnLeft = false, };
+
+struct PortraitFace
+{
+	TileSet const* m_tiles{ nullptr };
+	Palette const* m_pal{ nullptr };
+};
+
+}
