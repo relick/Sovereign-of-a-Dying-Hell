@@ -9,7 +9,7 @@
 #include "TileOps.hpp"
 #include "Version.hpp"
 
-#include "res_fonts.h"
+#include "res/fonts.h"
 
 #include <algorithm>
 #include <cstring>

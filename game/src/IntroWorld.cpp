@@ -5,7 +5,7 @@
 #include "TitleWorld.hpp"
 
 #include "Jam15/Jam15_Script.hpp"
-#include "res_intro.h"
+#include "res/intro.h"
 
 namespace Game
 {

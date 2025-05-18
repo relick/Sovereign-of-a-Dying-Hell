@@ -3,7 +3,7 @@
 #include "Declare.hpp"
 #include "CharacterData.hpp"
 
-#include "Jam15/res_chara.h"
+#include "res/Jam15/chara.h"
 
 namespace Jam15
 {

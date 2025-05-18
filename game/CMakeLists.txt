@@ -16,7 +16,6 @@ md_rom_enable_sram(soadh SAVING ODD_8)
 target_include_directories(soadh
   PRIVATE
     src
-    res
 )
 target_sources(soadh
   PRIVATE
@@ -38,13 +37,13 @@ target_sources(soadh
 )
 md_target_resources(soadh
   PRIVATE
-    res/res_fonts.res
-    res/res_intro.res
-    res/res_vn.res
-    res/res_voting.res
-    res/Jam15/res_bg.res
-    res/Jam15/res_chara.res
-    res/Jam15/res_music.res
-    res/Jam15/res_sfx.res
-    res/Jam15/res_spr.res
+    res/fonts.res
+    res/intro.res
+    res/vn.res
+    res/voting.res
+    res/Jam15/bg.res
+    res/Jam15/chara.res
+    res/Jam15/music.res
+    res/Jam15/sfx.res
+    res/Jam15/spr.res
 )

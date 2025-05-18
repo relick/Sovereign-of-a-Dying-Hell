@@ -5,8 +5,8 @@
 #include "Version.hpp"
 #include "VNWorld.hpp"
 
-#include "res_voting.h"
-#include "Jam15/res_sfx.h"
+#include "res/voting.h"
+#include "res/Jam15/sfx.h"
 
 #include <cstdlib>
 

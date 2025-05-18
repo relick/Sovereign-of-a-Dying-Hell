@@ -6,8 +6,8 @@
 
 #include "SceneDefines.hpp"
 
-#include "Jam15/res_music.h"
-#include "Jam15/res_bg.h"
+#include "res/Jam15/music.h"
+#include "res/Jam15/bg.h"
 
 #define SCENE_RUN(scene_name) Game::SceneRoutine scene_name::Run(Game::Game& io_game, Game::VNWorld& io_vn, Game::Script& io_script)
 #define SCENE_SETUP() [[maybe_unused]] Jam15::Script& script = static_cast<Jam15::Script&>(io_script)

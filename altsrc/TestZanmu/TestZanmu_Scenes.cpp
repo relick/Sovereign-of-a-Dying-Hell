@@ -4,8 +4,8 @@
 
 #include "SceneDefines.hpp"
 
-#include "res_music.h"
-#include "res_bg.h"
+#include "res/music.h"
+#include "res/bg.h"
 
 #define SCENE_RUN(scene_name) Game::SceneRoutine scene_name::Run(Game::Game& io_game, Game::VNWorld& io_vn, Game::Script const& i_script)
 #define SCENE_SETUP() [[maybe_unused]] TestZanmu::Script const& script = static_cast<TestZanmu::Script const&>(i_script)

@@ -32,12 +32,15 @@
 *.app
 *.bin
 
-**/out/**
-.gdbinit
+# Dev
 **/dev/**
 
-// Ignore generated res headers
-**/res/**/*.h
-*.zip
+# Build
 /build
+
+# Config
 /.vs
+
+# Distribution
+*.zip
+/distribute

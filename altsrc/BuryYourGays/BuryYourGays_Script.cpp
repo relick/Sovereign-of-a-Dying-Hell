@@ -8,9 +8,9 @@
 #include "Version.hpp"
 #include "VNWorld.hpp"
 
-#include "res_bg.h"
-#include "res_spr.h"
-#include "res_sfx.h"
+#include "res/bg.h"
+#include "res/spr.h"
+#include "res/sfx.h"
 
 namespace BuryYourGays
 {

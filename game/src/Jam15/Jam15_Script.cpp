@@ -7,10 +7,10 @@
 #include "Version.hpp"
 #include "VNWorld.hpp"
 
-#include "Jam15/res_bg.h"
-#include "res_vn.h"
-#include "Jam15/res_sfx.h"
-#include "res_fonts.h"
+#include "res/Jam15/bg.h"
+#include "res/vn.h"
+#include "res/Jam15/sfx.h"
+#include "res/fonts.h"
 
 namespace Jam15
 {

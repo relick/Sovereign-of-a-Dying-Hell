@@ -5,21 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run (Debug)",
+            "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build (Debug) and Run (Debugger)",
-            "program": "game/out/debug/rom.out",
-            /*"logging": {
-                "engineLogging": true,
-                "trace": true,
-                "traceResponse": true
-            },*/
+            "preLaunchTask": "Setup Debugging",
+            "program": "${command:cmake.launchTargetPath}.elf",
             "miDebuggerPath": "${workspaceFolder}\\..\\..\\SDKs\\SGDK2-CPP\\m68k-elf-toolchain\\bin\\m68k-elf-gdb.exe",
             "miDebuggerServerAddress": ":1234",
             "MIMode": "gdb",
-            //"stopAtEntry": true, // doesn't seem to be needed now
             "setupCommands": [
                 {
                     "text": "-enable-pretty-printing",
@@ -30,35 +24,7 @@
                    "text": "set target-async off"
                 }
             ],
-            "targetArchitecture": "x64"
-        },
-        {
-            "name": "Run (Release)",
-            "type": "cppdbg",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build (Release) and Run (Debugger)",
-            "program": "game/out/release/rom.out",
-            /*"logging": {
-                "engineLogging": true,
-                "trace": true,
-                "traceResponse": true
-            },*/
-            "miDebuggerPath": "${workspaceFolder}\\..\\..\\SDKs\\SGDK2-CPP\\m68k-elf-toolchain\\bin\\m68k-elf-gdb.exe",
-            "miDebuggerServerAddress": ":1234",
-            "MIMode": "gdb",
-            //"stopAtEntry": true, // doesn't seem to be needed now
-            "setupCommands": [
-                {
-                    "text": "-enable-pretty-printing",
-                    "description": "enable pretty printing",
-                    "ignoreFailures": true
-                },
-                {
-                   "text": "set target-async off"
-                }
-            ],
-            "targetArchitecture": "x64"
+            "targetArchitecture": "x64", // Unused, but required
         }
     ]
 }

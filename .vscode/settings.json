@@ -1,5 +1,4 @@
 {
-    "cmake.configureOnOpen": false,
     "files.associations": {
         "*.s": "m68k",
         "*.rcpp": "cpp",
@@ -198,5 +197,54 @@
                 }
             }
         ]
+    },
+    "debug.showInStatusBar": "never",
+    "cmake.configureOnOpen": true,
+    "cmake.generator": "Ninja",
+    "cmake.buildBeforeRun": false,
+    "cmake.options.statusBarVisibility": "visible",
+    "cmake.options.advanced": {
+        "configure": {
+            "statusBarVisibility": "visible"
+        },
+        "configurePreset": {
+            "statusBarVisibility": "visible"
+        },
+        "buildTarget": {
+            "statusBarVisibility": "visible"
+        },
+        "build": {
+            "statusBarVisibility": "hidden"
+        },
+        "launch": {
+            "statusBarVisibility": "hidden"
+        },
+        "launchTarget": {
+            "statusBarVisibility": "hidden"
+        },
+        "debug": {
+            "statusBarVisibility": "hidden"
+        },
+        "ctest": {
+            "statusBarVisibility": "hidden"
+        },
+        "cpack": {
+            "statusBarVisibility": "hidden"
+        },
+        "workflow": {
+            "statusBarVisibility": "hidden"
+        },
+        "workflowPreset": {
+            "statusBarVisibility": "hidden"
+        },
+        "packagePreset": {
+            "statusBarVisibility": "hidden"
+        },
+        "testPreset": {
+            "statusBarVisibility": "hidden"
+        },
+        "buildPreset": {
+            "statusBarVisibility": "hidden"
+        }
     }
 }
