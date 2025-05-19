@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Declare.hpp"
-#include "Script.hpp"
-#include "Scene.hpp"
+#include "adventure-md/Declare.hpp"
+#include "adventure-md/Script.hpp"
+#include "adventure-md/Scene.hpp"
 #include "BuryYourGays_Scenes.hpp"
 
 #include <memory>

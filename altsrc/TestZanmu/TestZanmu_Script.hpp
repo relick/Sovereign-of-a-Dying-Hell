@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Declare.hpp"
-#include "Script.hpp"
-#include "Scene.hpp"
+#include "adventure-md/Declare.hpp"
+#include "adventure-md/Script.hpp"
+#include "adventure-md/Scene.hpp"
 #include "TestZanmu_Scenes.hpp"
 
 #include <memory>

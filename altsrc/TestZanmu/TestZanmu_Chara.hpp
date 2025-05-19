@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Declare.hpp"
-#include "CharacterData.hpp"
+#include "adventure-md/Declare.hpp"
+#include "adventure-md/CharacterData.hpp"
 
 #include "res/chara.h"
 

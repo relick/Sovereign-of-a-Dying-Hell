@@ -2,7 +2,7 @@
 #include "TestZanmu_Script.hpp"
 #include "TestZanmu_Chara.hpp"
 
-#include "SceneDefines.hpp"
+#include "adventure-md/SceneDefines.hpp"
 
 #include "res/music.h"
 #include "res/bg.h"
