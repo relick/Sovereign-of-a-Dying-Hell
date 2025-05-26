@@ -1,4 +1,5 @@
 Tasks:
+~~ABC graphics in font~~
 Music (todo: break down what's needed)
 Snap transitions
 Text title intro for each scene (slide and fade)
@@ -10,19 +11,14 @@ Explicit save/load?
 
 Bugs:
 Save data isn't resilient
+~~Low FPS on vote sections (sprite management is bad)~~
+~~Is charade typo~~
+~~Council image appeared after vote passed for an ending~~
+~~Kishin alliance Suika choice incorrectly flipped~~
+~~Title palette not correctly starting from black on game end~~
+~~ROM header says 'SAMPLE PROGRAM'~~
+~~Title screen arrow appearing before the fade completes~~
+~~Bouncing of oni is too fast now, and the balancing may be bad on the mashing~~
 
 Things to remember:
 Web build toggle when distributing
-
-Done:
-ABC graphics in font
-
-Bugs fixed:
-Low FPS on vote sections (sprite management is bad)
-Is charade typo
-Council image appeared after vote passed for an ending
-Kishin alliance Suika choice incorrectly flipped
-Title palette not correctly starting from black on game end
-ROM header says 'SAMPLE PROGRAM'
-Title screen arrow appearing before the fade completes
-Bouncing of oni is too fast now, and the balancing may be bad on the mashing
