@@ -1,6 +1,6 @@
 #pragma once
 
-#include <genesis.h>
+#include <SGDK/genesis.h>
 #include "adventure-md/Constants.hpp"
 #include "adventure-md/TypeSafeID.hpp"
 

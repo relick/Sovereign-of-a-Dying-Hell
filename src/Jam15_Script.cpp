@@ -7,10 +7,11 @@
 #include "adventure-md/Version.hpp"
 #include "adventure-md/VNWorld.hpp"
 
+#include "adventure-md/res/vn.h"
+#include "adventure-md/res/fonts.h"
+
 #include "res/bg.h"
-#include "res/vn.h"
 #include "res/sfx.h"
-#include "res/fonts.h"
 
 namespace Jam15
 {

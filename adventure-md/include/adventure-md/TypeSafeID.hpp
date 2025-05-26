@@ -1,6 +1,6 @@
 #pragma once
 
-#include <genesis.h>
+#include <SGDK/genesis.h>
 #include <limits>
 
 template<typename, typename T_Core>
