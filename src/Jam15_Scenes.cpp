@@ -12,12 +12,12 @@
 #define SCENE_RUN(scene_name) Game::SceneRoutine scene_name::Run(Game::Game& io_game, Game::VNWorld& io_vn, Game::Script& io_script)
 #define SCENE_SETUP() [[maybe_unused]] Jam15::Script& script = static_cast<Jam15::Script&>(io_script)
 
-#define get_influence() io_game.ReadVar<Variables::Influence>()
-#define set_influence(AMOUNT) io_game.SetVar<Variables::Influence>(AMOUNT)
+#define get_influence() script.Vars().Influence
+#define set_influence(AMOUNT) script.Vars().Influence = AMOUNT
 #define add_influence(AMOUNT) set_influence(get_influence() + AMOUNT);
 #define zsay(FACE, TEXT) say_face(zanmu, FACE, TEXT)
 #define zthink(FACE, TEXT) think_face(zanmu, FACE, TEXT)
-#define suika_cost() (io_game.ReadVar<Variables::SuikaDissuaded>() ? 0 : 12)
+#define suika_cost() (script.Vars().SuikaDissuaded ? 0 : 12)
 
 namespace Jam15
 {
@@ -297,7 +297,7 @@ SCENE_RUN(LobbyingYuugi)
     show(yuugi, neutral);
 
     bool const hasYuugiInfluence = opinion >= 0;
-    io_game.SetVar<Variables::HasYuugiInfluence>(hasYuugiInfluence);
+    script.Vars().HasYuugiInfluence = hasYuugiInfluence;
     if (hasYuugiInfluence)
     {
         say(yuugi, "I think this has a chance to work.");
@@ -346,13 +346,13 @@ SCENE_RUN(VotingForAnimalRights)
 
     say(speaker, "An interesting proposal. Any opinions?");
 #else
-    io_game.SetVar<Variables::HasYuugiInfluence>(true);
+    script.Vars().HasYuugiInfluence = true;
 #endif
 
     // Start on 100 or 150 now
     set_influence(128);
 
-    if (io_game.ReadVar<Variables::HasYuugiInfluence>())
+    if (script.Vars().HasYuugiInfluence)
     {
         show(yuugi, angry);
         say(yuugi, "We gotta do this! The animal spirits need some relief!");
@@ -377,14 +377,14 @@ SCENE_RUN(VotingForAnimalRights)
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
 
-    if (io_game.ReadVar<Variables::HasYuugiInfluence>())
+    if (script.Vars().HasYuugiInfluence)
     {
         add_influence(-32);
     }
     //set_influence(result.m_remainingInfluence);
-    io_game.SetVar<Variables::PunishmentVotePasses>(result.m_playerWon);
+    script.Vars().PunishmentVotePasses = result.m_playerWon;
 
-    if (io_game.ReadVar<Variables::PunishmentVotePasses>())
+    if (script.Vars().PunishmentVotePasses)
     {
         say(speaker, "It seems that passed.");
 
@@ -397,7 +397,7 @@ SCENE_RUN(VotingForAnimalRights)
         say(zanmu, "I'll take it into my hands and notify the guards of the Animal Realm right away. This decision is absolutely the right one.");
         zthink(gloat, "My plan is well under way now.");
         
-        if (io_game.ReadVar<Variables::HasYuugiInfluence>())
+        if (script.Vars().HasYuugiInfluence)
         {
             show(yuugi, neutral);
             say(yuugi, "Thank you, Nippaku. I couldn't have done that by myself. I'm certain, this is the right thing to have done.");
@@ -412,7 +412,7 @@ SCENE_RUN(VotingForAnimalRights)
 
         show(zanmu, neutral);
         say(zanmu, "*sigh*, what a pity.");
-        if (io_game.ReadVar<Variables::HasYuugiInfluence>())
+        if (script.Vars().HasYuugiInfluence)
         {
             show(yuugi, dejected);
             say(yuugi, "Damn it... I really thought we had a chance. Have you lost your touch, Nippaku?");
@@ -465,7 +465,7 @@ SCENE_RUN(SuikaApproaches)
     zsay(smirk, "Straight to the point, huh?");
 
     // Default to false, is set to true if persuasion is successful
-    io_game.SetVar<Variables::SuikaDissuaded>(false);
+    script.Vars().SuikaDissuaded = false;
 
     {
         choice(
@@ -563,7 +563,7 @@ SCENE_RUN(SuikaApproaches)
             zsay(neutral, "Can't say I'm interested in such a place, but I understand wanting to leave. Take care, Suika.");
             zthink(pleasant, "I think that means she won't get in my way. That's good!");
 
-            io_game.SetVar<Variables::SuikaDissuaded>(true);
+            script.Vars().SuikaDissuaded = true;
             break;
         }
         }
@@ -621,13 +621,13 @@ SCENE_RUN(DelegatingToHisami)
     zsay(neutral, "There's a number of things you could do to help.");
     zsay(neutral, "Perhaps you could lobby the Yama? If they voice support, it will be even harder to lose this proposal. But the psychological impact of such a surefire policy being rejected would be even greater on the Council.");
     zsay(neutral, "Or maybe, it's better to play it safe and spread doubt of the idea among the rest of the oni so it's more likely to fail from the get go.");
-    if (io_game.ReadVar<Variables::SuikaDissuaded>())
+    if (script.Vars().SuikaDissuaded)
     {
         zsay(neutral, "In fact, now that Suika's backed off, maybe one of her kishin friends would be open to an alliance. That could pay greater dividends in the long run.");
     }
 
     {
-        if (io_game.ReadVar<Variables::SuikaDissuaded>())
+        if (script.Vars().SuikaDissuaded)
         {
             choice(
                 "\"Lobby the Yama. Get them to voice support.\"",
@@ -648,9 +648,9 @@ SCENE_RUN(DelegatingToHisami)
         say(hisami, "As you command, Lady Zanmu~!");
         hide();
 
-        io_game.SetVar<Variables::LobbiedTheYama>(res == 0);
-        io_game.SetVar<Variables::SpreadSeedsOfDoubt>(res == 1);
-        io_game.SetVar<Variables::KishinAlliance>(res == 2);
+        script.Vars().LobbiedTheYama = res == 0;
+        script.Vars().SpreadSeedsOfDoubt = res == 1;
+        script.Vars().KishinAlliance = res == 2;
 
         zthink(neutral, "Good. We'll see how that plays out, then.");
     }
@@ -678,24 +678,24 @@ SCENE_RUN(VotingForPriceIncreases)
     say(bcouncil, "Yeah. I see nothing wrong with this.");
     say(speaker, "Seems opinion isn't divided, but let's vote anyway to be sure.");
 #else
-    io_game.SetVar<Variables::SuikaDissuaded>(true);
-    io_game.SetVar<Variables::LobbiedTheYama>(false);
-    io_game.SetVar<Variables::SpreadSeedsOfDoubt>(true);
-    io_game.SetVar<Variables::KishinAlliance>(false);
+    script.Vars().SuikaDissuaded = true;
+    script.Vars().LobbiedTheYama = false;
+    script.Vars().SpreadSeedsOfDoubt = true;
+    script.Vars().KishinAlliance = false;
 #endif
 
-    if (io_game.ReadVar<Variables::SpreadSeedsOfDoubt>())
+    if (script.Vars().SpreadSeedsOfDoubt)
     {
         desc("Hisami's work with the lesser oni has granted you extra influence for this vote only.");
         add_influence(32);
     }
-    else if (io_game.ReadVar<Variables::KishinAlliance>())
+    else if (script.Vars().KishinAlliance)
     {
         desc("Hisami's work with a senior kishin has granted you lasting influence with the Council.");
         add_influence(32);
     }
     u16 attackSize = 128;
-    if (io_game.ReadVar<Variables::LobbiedTheYama>())
+    if (script.Vars().LobbiedTheYama)
     {
         desc("Word of the Yama's support has reached the oni, they will be harder to dissuade.");
         attackSize += 52;
@@ -714,20 +714,20 @@ SCENE_RUN(VotingForPriceIncreases)
     start_vote(vote);
     Game::VoteResult const result = get_vote_result();
 
-    if (io_game.ReadVar<Variables::SpreadSeedsOfDoubt>())
+    if (script.Vars().SpreadSeedsOfDoubt)
     {
         add_influence(-32);
     }
     // Min to account for the single vote bonus
     //set_influence(std::min<u16>(get_influence(), result.m_remainingInfluence));
-    io_game.SetVar<Variables::PriceIncreaseVoteFails>(result.m_playerWon);
+    script.Vars().PriceIncreaseVoteFails = result.m_playerWon;
 
-    if (io_game.ReadVar<Variables::PriceIncreaseVoteFails>())
+    if (script.Vars().PriceIncreaseVoteFails)
     {
         say(speaker, "How surprising? I thought the sentiment was in your favour, Nippaku.");
 
         zthink(pleasant, "Oh, I think it went swimmingly!");
-        if (io_game.ReadVar<Variables::LobbiedTheYama>())
+        if (script.Vars().LobbiedTheYama)
         {
             desc("Losing the vote despite the Yama's support has secured you great and lasting influence with the Council.");
             add_influence(128);
@@ -755,7 +755,7 @@ SCENE_RUN(VotingForPriceIncreases)
         say(zanmu, "Thank you Council, I'll hand over to others now.");
         hide();
         
-        if (!io_game.ReadVar<Variables::SuikaDissuaded>())
+        if (!script.Vars().SuikaDissuaded)
         {
             zthink(neutral, "Hmm. Suika was here today. She probably saw through my intentions...");
         }
@@ -809,7 +809,7 @@ SCENE_RUN(EngagingYuuma)
     say_hidden(yuuma, "Nippaku...");
 
     u8 flattery = 0;
-    if (io_game.ReadVar<Variables::PunishmentVotePasses>())
+    if (script.Vars().PunishmentVotePasses)
     {
         ++flattery;
         show(yuuma, pleased);
@@ -929,7 +929,7 @@ SCENE_RUN(EngagingYuuma)
         say(yuuma, "Hahahah!");
         say(yuuma, "I don't trust you one bit!");
 
-        if (io_game.ReadVar<Variables::PriceIncreaseVoteFails>())
+        if (script.Vars().PriceIncreaseVoteFails)
         {
             ++flattery;
         }
@@ -1036,7 +1036,7 @@ SCENE_RUN(EngagingYuuma)
             desc("You've secured Yuuma's backing.");
 
             zthink(gloat, "Fantastic. This will be key to my victory.");
-            io_game.SetVar<Variables::YuumaPromised>(true);
+            script.Vars().YuumaPromised = true;
 
             script.SetNextScene(Scenes::VotingForExecutive);
             end;
@@ -1086,7 +1086,7 @@ SCENE_RUN(VotingForExecutive)
     say(speaker, "Nippaku, your proposal is acknowledged. We'll hold a vote now, to put the matter to rest. Hopefully a *productive* meeting can follow.");
 #endif
 
-    if (io_game.ReadVar<Variables::KishinAlliance>())
+    if (script.Vars().KishinAlliance)
     {
         desc("Your alliance with the senior kishin has paid off again in bonus influence for this vote.");
         add_influence(32);
@@ -1301,7 +1301,7 @@ SCENE_RUN(VotingToRelocateHell)
 
     say(speaker, "Our rule is to debate and vote on all proposals. Let this one be healthy.");
 #else
-    io_game.SetVar<Variables::YuumaPromised>(true);
+    script.Vars().YuumaPromised = true;
 #endif
 
     desc("The vote is about to start.");
@@ -1325,7 +1325,7 @@ SCENE_RUN(VotingToRelocateHell)
         }
     }
 
-    if (io_game.ReadVar<Variables::YuumaPromised>())
+    if (script.Vars().YuumaPromised)
     {
         zthink(gloat, "I still have cards to play. I'm not giving up now!");
 
@@ -1351,7 +1351,7 @@ SCENE_RUN(VotingToRelocateHell)
         show(yuugi, angry);
         say(yuugi, "Nippaku! I can't stand for this, no matter what threats you have!");
 
-        if (io_game.ReadVar<Variables::SuikaDissuaded>())
+        if (script.Vars().SuikaDissuaded)
         {
             show(suika, pout);
             say(suika, "I can't say it's a bad idea, all things told...");

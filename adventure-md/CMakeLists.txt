@@ -6,57 +6,64 @@ find_package(SGDK REQUIRED)
 
 add_library(adventure-md)
 target_link_libraries(adventure-md PRIVATE SGDK::mdcpp)
-target_sources(adventure-md
-  PUBLIC FILE_SET HEADERS BASE_DIRS include FILES
-    include/adventure-md/CharacterAnimator.hpp
-    include/adventure-md/CharacterData.hpp
-    include/adventure-md/ChoiceSystem.hpp
-    include/adventure-md/Constants.hpp
-    include/adventure-md/Coroutine.hpp
-    include/adventure-md/Debug.hpp
-    include/adventure-md/Declare.hpp
-    include/adventure-md/DialoguePrinter2.hpp
-    include/adventure-md/FadeOps.hpp
-    include/adventure-md/FadeOps.inl
-    include/adventure-md/FontData.hpp
-    include/adventure-md/Game.hpp
-    include/adventure-md/GameRoutines.hpp
-    include/adventure-md/IntroWorld.hpp
-    include/adventure-md/PaletteOps.hpp
-    include/adventure-md/PaletteOps.inl
-    include/adventure-md/Scene.hpp
-    include/adventure-md/SceneDefines.hpp
-    include/adventure-md/Script.hpp
-    include/adventure-md/SFXManager.hpp
-    include/adventure-md/SpriteManager.hpp
-    include/adventure-md/TileData.hpp
-    include/adventure-md/TileOps.hpp
-    include/adventure-md/TitleWorld.hpp
-    include/adventure-md/TypeSafeID.hpp
-    include/adventure-md/Version.hpp
-    include/adventure-md/VNWorld.hpp
-    include/adventure-md/VoteMode.hpp
-    include/adventure-md/Worlds.hpp
+
+set(header_files
+  CharacterAnimator.hpp
+  CharacterData.hpp
+  ChoiceSystem.hpp
+  Constants.hpp
+  Coroutine.hpp
+  Debug.hpp
+  Declare.hpp
+  DialoguePrinter2.hpp
+  FadeOps.hpp
+  FadeOps.inl
+  FontData.hpp
+  Game.hpp
+  GameRoutines.hpp
+  IntroWorld.hpp
+  PaletteOps.hpp
+  PaletteOps.inl
+  Saves.hpp
+  Scene.hpp
+  SceneDefines.hpp
+  Script.hpp
+  SFXManager.hpp
+  SpriteManager.hpp
+  TileData.hpp
+  TileOps.hpp
+  TitleWorld.hpp
+  TypeSafeID.hpp
+  Version.hpp
+  VNWorld.hpp
+  VoteMode.hpp
+  Worlds.hpp
 )
-target_sources(adventure-md
-  PRIVATE
-    src/CharacterAnimator.cpp
-    src/ChoiceSystem.cpp
-    src/DialoguePrinter2.cpp
-    src/FontData.cpp
-    src/Game.cpp
-    src/IntroWorld.cpp
-    src/SFXManager.cpp
-    src/SpriteManager.cpp
-    src/TitleWorld.cpp
-    src/Version.cpp
-    src/VNWorld.cpp
-    src/VoteMode.cpp
+list(TRANSFORM header_files PREPEND include/adventure-md/)
+target_sources(adventure-md PUBLIC FILE_SET HEADERS BASE_DIRS include FILES ${header_files})
+
+set(source_files
+  CharacterAnimator.cpp
+  ChoiceSystem.cpp
+  DialoguePrinter2.cpp
+  FontData.cpp
+  Game.cpp
+  IntroWorld.cpp
+  SFXManager.cpp
+  SpriteManager.cpp
+  TitleWorld.cpp
+  Version.cpp
+  VNWorld.cpp
+  VoteMode.cpp
 )
-md_target_resources(adventure-md
-  PUBLIC
-    res/fonts.res
-    res/intro.res
-    res/vn.res
-    res/voting.res
+list(TRANSFORM source_files PREPEND src/)
+target_sources(adventure-md PRIVATE ${source_files})
+
+set(resource_files
+  fonts.res
+  intro.res
+  vn.res
+  voting.res
 )
+list(TRANSFORM resource_files PREPEND res/)
+md_target_resources(adventure-md PUBLIC ${resource_files})

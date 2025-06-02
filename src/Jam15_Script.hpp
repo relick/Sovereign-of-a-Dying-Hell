@@ -2,6 +2,7 @@
 
 #include "adventure-md/Declare.hpp"
 #include "adventure-md/Game.hpp"
+#include "adventure-md/Saves.hpp"
 #include "adventure-md/Script.hpp"
 #include "adventure-md/Scene.hpp"
 #include "adventure-md/SpriteManager.hpp"
@@ -13,45 +14,32 @@
 namespace Jam15
 {
 
-enum class Variables : u8
+struct Variables
 {
-	SceneNum,
-	Influence,
-	HasYuugiInfluence,
-	PunishmentVotePasses,
-	SuikaDissuaded,
-	LobbiedTheYama,
-	SpreadSeedsOfDoubt,
-	KishinAlliance,
-	PriceIncreaseVoteFails,
-	YuumaPromised,
-	EasyMode,
-
-	Count,
+	Scenes SceneNum{};
+	u16 Influence{};
+	bool HasYuugiInfluence{};
+	bool PunishmentVotePasses{};
+	bool SuikaDissuaded{};
+	bool LobbiedTheYama{};
+	bool SpreadSeedsOfDoubt{};
+	bool KishinAlliance{};
+	bool PriceIncreaseVoteFails{};
+	bool YuumaPromised{};
+	bool MashlessMode{};
 };
-inline constexpr u16 c_saveVersion = static_cast<u16>(Variables::Count); // Just hacking it as count for now while in dev
+enum class SaveVersion : u8
+{
+	NewSaveSystem = 1,
 
-}
-
-template<>
-struct Game::VariablesTypeTuple<Jam15::Variables> {
-	using Tuple = std::tuple<
-		Jam15::Scenes, // SceneNum
-		u16, // Influence
-		bool, // HasYuugiInfluence
-		bool, // PunishmentVotePasses
-		bool, // SuikaDissuaded
-		bool, // LobbiedTheYama
-		bool, // SpreadSeedsOfDoubt
-		bool, // KishinAlliance
-		bool, // PriceIncreaseVoteFails
-		bool, // YuumaPromised
-		bool // EasyMode
-	>;
+	End,
+	Current = End - 1,
+	OldestSupported = NewSaveSystem,
 };
 
-namespace Jam15
-{
+// 16 available slots (1KiB each, overkill I guess)
+using SRAM = Saves::SaveMemory<16>;
+inline constexpr u16 c_saveSlot = 0; // TODO(?): more than one save slot
 
 class Script
 	: public Game::Script
@@ -64,6 +52,8 @@ class Script
 	
 	std::unique_ptr<Game::Scene> CreateScene(Scenes i_scene);
 
+	Variables m_variables;
+
 	Game::SpriteHandle m_arrowSpr;
 	s16 m_selection{ 0 };
 	bool m_hasLoadedData{ false };
@@ -73,12 +63,15 @@ class Script
 	std::optional<Scenes> m_nextScene;
 	bool m_nextSceneIsEnding{ false };
 	
-	bool m_isMashlessMode{ false };
+	void SaveVariables();
+	void TryLoadVariables();
 
 public:
-	bool IsMashlessMode() const { return m_isMashlessMode; }
+	bool IsMashlessMode() const { return m_variables.MashlessMode; }
 	void SetNextScene(Scenes i_scene) { m_nextScene = i_scene; }
 	void GoToEnding(Scenes i_scene) { m_nextScene = i_scene; m_nextSceneIsEnding = true; }
+
+	Variables& Vars() { return m_variables; }
 
 	Game::SFXID desc_beeps;
 

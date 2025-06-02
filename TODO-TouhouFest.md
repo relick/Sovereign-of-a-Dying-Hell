@@ -1,16 +1,22 @@
 Tasks:
 ~~ABC graphics in font~~
-Music (todo: break down what's needed)
+Music
+- Title screen
+- Council
+- Yuugi
+- Yuuma
+- Hisami
+- Suika
+- Final Council
 Snap transitions
 Text title intro for each scene (slide and fade)
 Palette cycles for each background
-Zanmu should react more overtly over the first vote being unwinnable
+~~Zanmu should react more overtly over the first vote being unwinnable~~
 Credits
 Music room
-Explicit save/load?
 
 Bugs:
-Save data isn't resilient
+~~Save data isn't resilient~~
 ~~Low FPS on vote sections (sprite management is bad)~~
 ~~Is charade typo~~
 ~~Council image appeared after vote passed for an ending~~

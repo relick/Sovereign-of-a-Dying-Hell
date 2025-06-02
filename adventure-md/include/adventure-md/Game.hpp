@@ -32,28 +32,6 @@ struct LambdaHolder
 	T_Lambda m_lambda;
 };
 
-template<typename T>
-concept IsEnum = std::is_enum_v<T>;
-
-// Specialise with using Tuple = std::tuple<types, for, variables>;
-template<IsEnum T>
-struct VariablesTypeTuple {};
-
-template<typename T>
-concept VariablesEnum = IsEnum<T> && requires
-{
-	typename VariablesTypeTuple<T>::Tuple;
-	{ T::Count } -> std::same_as<T>;
-	// Implicitly requires std::tuple
-	requires std::tuple_size_v<typename VariablesTypeTuple<T>::Tuple> == static_cast<size_t>(T::Count);
-};
-
-template<typename T, T t_Index>
-concept ValidVarIndex = VariablesEnum<T> && (t_Index >= static_cast<T>(0)) && (t_Index < T::Count);
-
-template<auto t_Index> requires ValidVarIndex<decltype(t_Index), t_Index>
-using TypeOfVar = std::tuple_element_t<static_cast<size_t>(t_Index), typename VariablesTypeTuple<decltype(t_Index)>::Tuple>;
-
 class Game
 {
 	std::unique_ptr<World> m_curWorld;
@@ -82,10 +60,6 @@ class Game
 	static inline VBlankCallbackID::Core s_callbackID = 0;
 	static inline std::vector<std::pair<VBlankCallbackID, std::function<void()>>> s_vBlankCallbacks;
 
-	// TODO: improve beyond just being a set of numbers.
-	bool m_loadedData{ false };
-	std::vector<u16> m_gameVariables;
-
 public:
 	Game();
 
@@ -110,37 +84,6 @@ public:
 	template<NotTaskCoroutine T_Lambda, typename... T_Args>
 	void QueueLambdaTask(T_Lambda&& i_lambda, TaskPriority i_priority, T_Args&&... i_args);
 	bool TasksInProgress() const;
-
-	template<VariablesEnum T>
-	void ResetVariables() { m_loadedData = false; m_gameVariables.clear(); m_gameVariables.resize(static_cast<u16>(T::Count)); }
-	template<auto t_Index>
-	void SetVar(TypeOfVar<t_Index> i_value)
-		requires(sizeof(TypeOfVar<t_Index>) == sizeof(u16))
-	{ m_gameVariables[static_cast<u16>(t_Index)] = std::bit_cast<u16>(i_value); }
-	template<auto t_Index>
-	void SetVar(TypeOfVar<t_Index> i_value)
-		requires(sizeof(TypeOfVar<t_Index>) == sizeof(u8)) && (!std::same_as<TypeOfVar<t_Index>, bool>)
-	{ m_gameVariables[static_cast<u16>(t_Index)] = std::bit_cast<u8>(i_value); }
-	template<auto t_Index>
-	void SetVar(bool i_value)
-		requires std::same_as<TypeOfVar<t_Index>, bool>
-	{ m_gameVariables[static_cast<u16>(t_Index)] = i_value ? 1 : 0; }
-	template<auto t_Index>
-	TypeOfVar<t_Index> ReadVar() const
-		requires(sizeof(TypeOfVar<t_Index>) == sizeof(u16))
-	{ return std::bit_cast<TypeOfVar<t_Index>>(m_gameVariables[static_cast<u16>(t_Index)]); }
-	template<auto t_Index>
-	TypeOfVar<t_Index> ReadVar() const
-		requires(sizeof(TypeOfVar<t_Index>) == sizeof(u8)) && (!std::same_as<TypeOfVar<t_Index>, bool>)
-	{ return std::bit_cast<TypeOfVar<t_Index>>(static_cast<u8>(m_gameVariables[static_cast<u16>(t_Index)])); }
-	template<auto t_Index>
-	bool ReadVar() const
-		requires std::same_as<TypeOfVar<t_Index>, bool>
-	{ return m_gameVariables[static_cast<u16>(t_Index)] == 1; }
-
-	void SaveVariables(u16 i_currentSaveVersion);
-	bool LoadVariables(u16 i_expectedSaveVersion);
-	bool HasLoadedData() const { return m_loadedData; }
 
 private:
 	static void VIntCallback();

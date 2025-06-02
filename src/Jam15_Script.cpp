@@ -22,15 +22,11 @@ void Script::InitTitle
 	Game::TitleWorld& io_title
 )
 {
-	io_game.LoadVariables(c_saveVersion);
-	m_hasLoadedData = io_game.HasLoadedData();
-	if (!m_hasLoadedData)
+	TryLoadVariables();
+
+	if ( !m_hasLoadedData )
 	{
 		m_selection = 1;
-	}
-	else
-	{
-		m_isMashlessMode = io_game.ReadVar<Variables::EasyMode>();
 	}
 
 	Image const& titleImg = m_hasLoadedData ? title : title_nocont;
@@ -83,8 +79,7 @@ void Script::UpdateTitle
 		{
 			m_hasLoadedData = false;
 
-			m_isMashlessMode = m_selection == 2;
-			io_game.SetVar<Variables::EasyMode>(m_isMashlessMode);
+			m_variables.MashlessMode = ( m_selection == 2 );
 		}
 
 		m_arrowSpr = io_game.Sprites().RemoveSprite(m_arrowSpr);
@@ -150,11 +145,11 @@ void Script::InitVN
 	if (m_hasLoadedData)
 	{
 		// Get scene num
-		sceneToStart = io_game.ReadVar<Variables::SceneNum>();
+		sceneToStart = m_variables.SceneNum;
 	}
 	else
 	{
-		io_game.ResetVariables<Variables>();
+		m_variables = {};
 	}
 
 	SetNextScene(sceneToStart);
@@ -173,8 +168,8 @@ void Script::UpdateVN
 		if (!m_nextSceneIsEnding)
 		{
 			// Save data first
-			io_game.SetVar<Variables::SceneNum>(*m_nextScene);
-			io_game.SaveVariables(c_saveVersion);
+			m_variables.SceneNum = *m_nextScene;
+			SaveVariables();
 		}
 
 		// Tidy up visuals
@@ -223,6 +218,48 @@ std::unique_ptr<Game::Scene> Script::CreateScene
 	}
 	
 	return {};
+}
+
+void Script::SaveVariables()
+{
+	SRAM& sram = SRAM::Get();
+
+	auto serialiser = sram.MakeSerialiser();
+
+	serialiser << m_variables;
+
+	bool const writeSuccess = sram.WriteSlotData(
+		c_saveSlot,
+		serialiser,
+		SaveVersion::Current
+	);
+
+	Assert( writeSuccess, "Failed to save" );
+}
+
+void Script::TryLoadVariables()
+{
+	
+	SRAM& sram = SRAM::Get();
+
+	auto deserialiser = sram.MakeDeserialiser();
+
+	bool const readSuccess = sram.ReadSlotData(
+		c_saveSlot,
+		deserialiser,
+		SaveVersion::OldestSupported
+	);
+
+	if ( !readSuccess )
+	{
+		m_hasLoadedData = false;
+		return;
+	}
+
+	// Can deserialise
+	deserialiser >> m_variables;
+
+	m_hasLoadedData = true;
 }
 
 }
