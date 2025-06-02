@@ -4,8 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/../../SDKs/SGDK2-CPP/inc/",
-                "${workspaceFolder}/../../SDKs/SGDK2-CPP/res/"
+                "${workspaceFolder}/../../SDKs/SGDK2-CPP/install/include/",
             ],
             "defines": [
                 "_DEBUG",
