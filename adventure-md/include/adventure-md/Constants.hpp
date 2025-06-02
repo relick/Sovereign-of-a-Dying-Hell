@@ -3,7 +3,7 @@
 #include "adventure-md/Declare.hpp"
 
 #ifndef WEB_BUILD
-#define WEB_BUILD 1
+#define WEB_BUILD 0
 #endif
 
 // Sys constants
