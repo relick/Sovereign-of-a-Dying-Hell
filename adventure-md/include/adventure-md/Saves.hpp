@@ -275,7 +275,7 @@ class SaveMemory
 	{
 		if ( !IsMemoryInitialised() )
 		{
-			bool const success = ClearAllSlots();
+			[[maybe_unused]] bool const success = ClearAllSlots();
 			Assert( success, "Failed to clear all slots when initialising SRAM" );
 		}
 	}

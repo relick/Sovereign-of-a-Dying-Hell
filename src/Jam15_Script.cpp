@@ -228,7 +228,7 @@ void Script::SaveVariables()
 
 	serialiser << m_variables;
 
-	bool const writeSuccess = sram.WriteSlotData(
+	[[maybe_unused]] bool const writeSuccess = sram.WriteSlotData(
 		c_saveSlot,
 		serialiser,
 		SaveVersion::Current
