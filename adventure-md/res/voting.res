@@ -48,3 +48,5 @@ TILEMAP voting_failed_failed_map "voting/Failed_Failed.png" voting_failed_failed
 TILESET voting_influence_bar "voting/influencebar.png" NONE NONE ROW
 TILESET voting_influence_bar_text_set "voting/influencetext.png"
 TILEMAP voting_influence_bar_text_map "voting/influencetext.png" voting_influence_bar_text_set
+
+WAV mash_sfx "sfx/mash.wav" XGM

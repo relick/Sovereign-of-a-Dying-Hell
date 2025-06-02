@@ -5,7 +5,7 @@
 #include "adventure-md/Version.hpp"
 #include "adventure-md/VNWorld.hpp"
 
-#include "res/voting.h"
+#include "adventure-md/res/voting.h"
 
 #include <cstdlib>
 
@@ -90,8 +90,7 @@ void VoteMode::Start
 	m_remainingInfluence = m_params.m_startingPlayerInfluence;
 	m_voteWon = false;
 
-	// TODO: uncomment when VoteMode moved out of adventure-md
-	// m_mash = m_game->SFX().AddSFX(zanmu_beep, std::size(zanmu_beep), Channel::TextBeeps);
+	m_mash = m_game->SFX().AddSFX(mash_sfx, std::size(mash_sfx), Channel::TextBeeps);
 
 	GenerateAttackEvents();
 	SetupGraphics();
