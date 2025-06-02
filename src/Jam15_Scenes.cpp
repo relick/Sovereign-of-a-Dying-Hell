@@ -83,6 +83,9 @@ SCENE_RUN(FirstVoteProposal)
     };
     start_vote(vote);
 
+    desc( "At the start, your influence is not high enough to win votes (even with the best mashing skills!)" );
+    desc( "Your goal now is to persuade others to stand in your corner!" );
+
     say(speaker, "A decisive defeat. No more proposals from you today, Nippaku, please.");
 
     show(zanmu, neutral);
