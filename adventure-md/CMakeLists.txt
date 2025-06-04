@@ -4,9 +4,6 @@ project(Adventure-MD C CXX ASM)
 
 find_package(SGDK REQUIRED)
 
-add_library(adventure-md)
-target_link_libraries(adventure-md PRIVATE SGDK::mdcpp)
-
 set(header_files
   CharacterAnimator.hpp
   CharacterData.hpp
@@ -40,7 +37,6 @@ set(header_files
   Worlds.hpp
 )
 list(TRANSFORM header_files PREPEND include/adventure-md/)
-target_sources(adventure-md PUBLIC FILE_SET HEADERS BASE_DIRS include FILES ${header_files})
 
 set(source_files
   CharacterAnimator.cpp
@@ -57,7 +53,6 @@ set(source_files
   VoteMode.cpp
 )
 list(TRANSFORM source_files PREPEND src/)
-target_sources(adventure-md PRIVATE ${source_files})
 
 set(resource_files
   fonts.res
@@ -66,4 +61,18 @@ set(resource_files
   voting.res
 )
 list(TRANSFORM resource_files PREPEND res/)
-md_target_resources(adventure-md PUBLIC ${resource_files})
+
+macro(make_adventuremd_lib suffix)
+  add_library(adventure-md${suffix})
+  target_link_libraries(adventure-md${suffix} PRIVATE SGDK::mdcpp)
+  set_target_properties(adventure-md${suffix} PROPERTIES SGDK_GENERATED_PREFIX adventure-md)
+  target_sources(adventure-md${suffix} PUBLIC FILE_SET HEADERS BASE_DIRS include FILES ${header_files})
+  target_sources(adventure-md${suffix} PRIVATE ${source_files})
+  md_target_resources(adventure-md${suffix} PUBLIC ${resource_files})
+endmacro()
+
+make_adventuremd_lib("")
+target_compile_definitions(adventure-md PUBLIC WEB_BUILD=0)
+
+make_adventuremd_lib("_web")
+target_compile_definitions(adventure-md_web PUBLIC WEB_BUILD=1)

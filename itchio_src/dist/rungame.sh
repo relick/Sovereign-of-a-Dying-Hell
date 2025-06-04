@@ -1,1 +1,0 @@
-./blastem/blastem sovereign.bin

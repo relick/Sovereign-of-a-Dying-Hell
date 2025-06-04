@@ -2,5 +2,23 @@
   "version": 9,
   "include": [
     "${fileDir}/../../SDKs/SGDK2-CPP/install/lib/cmake/SGDK/CMakeGamePresets.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "Install",
+      "inherits": [ "Release" ],
+      "toolchainFile": "${fileDir}/../../SDKs/SGDK2-CPP/install/lib/cmake/SGDK/Toolchain/SGDKToolchain.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "JAM_INSTALL": true
+      },
+      "installDir": "${sourceDir}/distribute"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Install",
+      "configurePreset": "Install"
+    }
   ]
 }

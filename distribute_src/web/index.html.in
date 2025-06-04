@@ -21,7 +21,7 @@
     })
     // Ref
     /* await Nostalgist.launch({
-        rom: './rom.bin',
+        rom: './@ROM_TARGET_NAME@.bin',
         core: 'genesis_plus_gx',
         retroarchConfig: {
             //aspect_ratio_index: 21, // Force 1:1 PAR
@@ -49,7 +49,7 @@
         // FYI, using the genesis_plus_gx filter looks nice but the scaling is garbo
         // Whereas using the shaders, you can only use the ones that have one shader per preset, with the same name ~_~
         await Nostalgist.launch({
-            rom: './rom.bin',
+            rom: './@ROM_TARGET_NAME@.bin',
             core: 'genesis_plus_gx',
             shader: "crt/fakelottes-geom-mini", // Nicest, probably
             //shader: "crt/crt-mattias",
@@ -73,7 +73,7 @@
     else
     {
         await Nostalgist.launch({
-            rom: './rom.bin',
+            rom: './@ROM_TARGET_NAME@.bin',
             core: 'genesis_plus_gx',
             retroarchConfig: {
                 aspect_ratio_index: 21, // Force 1:1 PAR

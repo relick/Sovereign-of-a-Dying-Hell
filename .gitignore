@@ -44,3 +44,6 @@
 # Distribution
 *.zip
 /distribute
+/distribute_src/emu/blastem_linux
+/distribute_src/emu/blastem_macos
+/distribute_src/emu/blastem_win
