@@ -17,6 +17,9 @@ Music room
 
 Bugs:
 ~~Save data isn't resilient~~
+Player reported issue where it's low fps on repeat playthrough?
+Input issues on choices when tapping
+Yuuma needs shifting to right a little
 ~~Low FPS on vote sections (sprite management is bad)~~
 ~~Is charade typo~~
 ~~Council image appeared after vote passed for an ending~~
